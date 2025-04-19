@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Import the font */
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/src/assets/fonts/HankenGrotesk-Thin.ttf') format('truetype');
+	font-weight: 100;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/src/assets/fonts/HankenGrotesk-Light.ttf') format('truetype');
+	font-weight: 300;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/src/assets/fonts/HankenGrotesk-Regular.ttf') format('truetype');
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/src/assets/fonts/HankenGrotesk-Medium.ttf') format('truetype');
+	font-weight: 500;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/src/assets/fonts/HankenGrotesk-Bold.ttf') format('truetype');
+	font-weight: 700;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/src/assets/fonts/HankenGrotesk-Black.ttf') format('truetype');
+	font-weight: 900;
+	font-style: normal;
+}
+
+@layer base {
+	html {
+		font-family: 'Hanken Grotesk', sans-serif;
+	}
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+
+input.defaultCheckbox::before {
+	content: url(../src/assets/svg/checked.svg);
+	color: white;
+	opacity: 0;
+	height: 16px;
+	width: 16px;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%, 0px);
+}
+
+input:checked.defaultCheckbox::before {
+	opacity: 1;
+}
+
+
+
+/* @layer base {
+	html {
+		font-family: 'DM Sans', sans-serif !important;
+		font-feature-settings: 'kern' !important;
+		-webkit-font-smoothing: antialiased;
+		letter-spacing: -0.5px;
+	}
+} */
+
+
+.dialogScroll::-webkit-scrollbar {
+	width: 8px;
+	/* Set the width of the scrollbar */
+	border-radius: 4px;
+}
+
+.dialogScroll::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	/* Set the background color of the track */
+	border-radius: 4px;
+}
+
+.dialogScroll::-webkit-scrollbar-thumb {
+	background: #888;
+	/* Set the color of the scrollbar thumb */
+	border-radius: 4px;
+	/* Optional: Add rounded corners */
+}
+
+.dialogScroll::-webkit-scrollbar-thumb:hover {
+	background: #555;
+	/* Change color on hover */
+	border-radius: 4px;
+}
+
+/* spinner */
+
+
+.fallback-spinner {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&.app-loader {
+		height: 100vh;
+		flex-direction: column;
+
+		.loading {
+			margin-top: 1rem;
+		}
+	}
+
+	.loading {
+		width: 55px;
+		height: 55px;
+		border-radius: 50%;
+		border: 3px solid transparent;
+		-webkit-box-sizing: border-box;
+		box-sizing: border-box;
+
+		.effect-1,
+		.effect-2,
+		.effect-3 {
+			width: 55px;
+			height: 55px;
+			border-radius: 50%;
+			border: 3px solid transparent;
+			border-left: 3px solid rgba(121, 97, 249, 1);
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+
+		.effect-1 {
+			position: absolute;
+			animation: rotate 1s ease infinite;
+		}
+
+		.effect-2 {
+			position: absolute;
+			animation: rotateOpacity 1s ease infinite 0.1s;
+		}
+
+		.effect-3 {
+			-webkit-animation: rotateOpacity 1s ease infinite 0.2s;
+			animation: rotateOpacity 1s ease infinite 0.2s;
+		}
+
+		.loading .effects {
+			transition: all 0.3s ease;
+		}
+	}
+}
+
+/* // .fallback-logo {
+  //   position: absolute;
+  //   left: calc(50% - 45px);
+  //   top: 40%;
+  // } */
+
+@keyframes rotate {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+
+	100% {
+		-webkit-transform: rotate(1turn);
+		transform: rotate(1turn);
+	}
+}
+
+@keyframes rotateOpacity {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+		opacity: 0.1;
+	}
+
+	100% {
+		-webkit-transform: rotate(1turn);
+		transform: rotate(1turn);
+		opacity: 1;
+	}
+}
