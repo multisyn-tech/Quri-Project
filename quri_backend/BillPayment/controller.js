@@ -42,7 +42,8 @@ const billPaymentController = async (req, res) => {
     payment_method_types: ["card"],
     line_items: lineItems,
     mode: "payment",
-    success_url: `${BASE_URL}/quri/bill/success`,
+    // success_url: `${BASE_URL}/quri/bill/success`,
+    success_url: `${BASE_URL}/quri/menu/orderPlaced`,
   });
 
   res.status(200).send({

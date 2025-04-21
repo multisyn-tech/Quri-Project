@@ -14,7 +14,6 @@ router.post("/split-bill-checkout", splitBillCheckoutController);
 
 router.post("/custom-bill-amount-checkout", customBillCheckoutController);
 
-
 router.get("/stripe-payments", getStripePaymentsController);
 
 module.exports = router;

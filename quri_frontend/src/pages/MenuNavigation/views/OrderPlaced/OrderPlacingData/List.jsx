@@ -113,7 +113,7 @@ const List = () => {
                     </div>
                 </Button2>
 
-                <Button
+                {/* <Button
                     gradientFrom="#FF5AA7"
                     gradientMid="#FFD855"
                     gradientTo="#FF7B02"
@@ -122,7 +122,7 @@ const List = () => {
                     <div className='flex items-center'>
                         <span>Pay your bill</span>
                     </div>
-                </Button>
+                </Button> */}
 
                 <div className='flex items-center text-xs mt-4 text-center px-6'>
                     <p className='font-normal text-[10px] text-[#3A3A3A]'>By using Quri you agree to your terms and privacy policy</p>

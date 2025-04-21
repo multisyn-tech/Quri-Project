@@ -110,7 +110,7 @@ const Home = () => {
                             <h1 className='text-3xl text-center font-normal leading-tight'>Your gateway to seamless dining and rewards</h1>
                         </div>
 
-                        <Button2
+                        {/* <Button2
                             onClick={menu}
                             gradientFrom="#FFF"
                             gradientMid="#FFF"
@@ -130,7 +130,71 @@ const Home = () => {
                             <div className='flex items-center'>
                                 <span>Pay your bill</span>
                             </div>
+                        </Button> */}
+
+
+                        <Button
+                            onClick={menu}
+                            gradientFrom="#FF5AA7"
+                            gradientMid="#FFD855"
+                            gradientTo="#FF7B02"
+                        >
+                            <div className='flex items-center'>
+                                <span>Order Now</span>
+                            </div>
                         </Button>
+
+
+
+                        <div
+                            style={{
+                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                borderRadius: "60px",
+                                padding: "clamp(0.75rem, 2vw, 1.25rem)",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                backgroundColor: "#fff",
+                                maxWidth: "100%",
+                                width: "clamp(250px, 40vw, 500px)",
+                            }}
+                        >
+                            <div style={{ display: "flex", alignItems: "center", gap: "clamp(0.5rem, 1vw, 1rem)" }}>
+                                <span
+                                    style={{
+                                        fontSize: "clamp(1rem, 2vw, 1.5rem)",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="22"
+                                        height="22"
+                                        viewBox="0 0 24 24"
+                                        style={{ fill: "url(#gradient1)" }}
+                                    >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="12" y1="12" x2="12" y2="7" stroke="#fff" strokeWidth="2" />
+                                        <line x1="12" y1="12" x2="15" y2="12" stroke="#fff" strokeWidth="2" />
+                                    </svg>
+                                </span>
+                                <span style={{ fontSize: "clamp(0.9rem, 1.5vw, 1.2rem)" }}>Estimated wait time:</span>
+                            </div>
+                            <b style={{ fontSize: "clamp(1rem, 2vw, 1.5rem)" }}>5 Min</b>
+
+                            {/* SVG Gradient Definition */}
+                            <svg width="0" height="0">
+                                <defs>
+                                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style={{ stopColor: "#fe6a9c", stopOpacity: 1 }} />
+                                        <stop offset="100%" style={{ stopColor: "#fff", stopOpacity: 1 }} />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+
+
                         <div className='flex items-center text-xs mt-4'>
                             <p>by using Quri you agree to your terms and privacy policy</p>
                         </div>

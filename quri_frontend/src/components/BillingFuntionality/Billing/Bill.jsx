@@ -165,11 +165,11 @@ const Bill = () => {
                             </Card2>
 
                             <section className="flex flex-col items-center my-10 space-y-4 w-full">
-                                <Button2 onClick={splitBill} gradientFrom="#FFF" gradientMid="#FFF" gradientTo="#FFF">
+                                {/* <Button2 onClick={splitBill} gradientFrom="#FFF" gradientMid="#FFF" gradientTo="#FFF">
                                     <div className='flex'>
                                         <span>Split bill</span>
                                     </div>
-                                </Button2>
+                                </Button2> */}
                                 <Button onClick={payFullBill} gradientFrom="#FF5AA7" gradientMid="#FFD855" gradientTo="#FF7B02">
                                     <span>Pay full bill</span>
                                 </Button>

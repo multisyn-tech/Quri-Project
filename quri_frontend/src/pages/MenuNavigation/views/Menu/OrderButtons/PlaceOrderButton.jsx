@@ -16,6 +16,9 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
     const dispatch = useDispatch();
 
     const finalOrderPlace = () => {
+
+
+
         // Map cartItems to OrderDetails
         const orderDetails = cartItems.map(item => ({
             MenuID: item.MenuID,
@@ -47,7 +50,8 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
 
     // Navigate after 5 seconds
     setTimeout(() => {
-        navigate('/quri/menu/orderPlaced');  
+        // navigate('/quri/menu/orderPlaced');  
+        navigate('/quri/home/bill');  // temperory navigation
     }, 3000);  
 
     }
