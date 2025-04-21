@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Badge, Button, Image, InfiniteScroll } from 'antd-mobile';
 import { FaPlus } from "react-icons/fa6";
+import { useSelector, useDispatch } from 'react-redux';
+import { addItemToCart, removeItemFromCart, updateItemQuantity } from '../../../../../features/orders/orderSlice';
+import Swal from 'sweetalert2';
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -8,20 +12,61 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const PopularDishes = () => {
   const [quantity, setQuantity] = useState(1);
   const [popularDishes, setPopularDishes] = useState([]);
-  const incrementQuantity = () => setQuantity(quantity + 1);
+
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.orders.cartItems); // Get cart items from Redux
+
+
+  const addToOrder = (item, quantity) => {
+
+    const existingItem = cartItems.find(cartItem => cartItem.MenuID === item.MenuID);
+
+    if (existingItem) {
+
+      Swal.fire({
+        icon: 'info',
+        title: 'Notice',
+        text: 'Item is already in the cart !',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+    } else {
+      // If item is not in cart, add it
+      dispatch(addItemToCart({ item, quantity }));
+    }
+
+
+
+
+  };
 
 
   const getPopularDishes = async (req, res) => {
+
+    const restId = localStorage.getItem('RestaurantID');
     try {
-      const response = await fetch(`${BASE_URL}/restaurant/popular-dishes`);
+      const response = await fetch(`${BASE_URL}/restaurant/popular-dishes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ restId })
+      });
+
       if (!response.ok) {
         throw new Error('Failed to fetch popular dishes');
       }
 
       const dishes = await response.json();
-      console.log('Popular Dishes:', popularDishes);
 
-      setPopularDishes(dishes)
+      // console.log("Popular disahes : ", dishes.data)
+
+      setPopularDishes(dishes.data)
+      // setPopularDishes([])
 
     } catch (error) {
       console.error('Error fetching popular dishes:', error);
@@ -54,7 +99,7 @@ const PopularDishes = () => {
                   {/* Item Image */}
                   <Image
                     lazy
-                    src={item.image}
+                    src={`${BASE_URL}/` + item.Image}
                     width={200}
                     height={200}
                     fit="cover"
@@ -62,15 +107,15 @@ const PopularDishes = () => {
                   />
                   {/* Button in the bottom-right corner */}
                   <Button
-                    onClick={incrementQuantity}
+                    onClick={() => addToOrder(item, quantity)}
                     className="absolute bottom-14 left-44 p-2.5 rounded-full bg-black text-white"
                   >
                     <FaPlus size={14} />
                   </Button>
                   {/* Item details */}
                   <div className="mt-2 ml-1">
-                    <h3 className="text-xl text-black font-normal">{item.name}</h3>
-                    <span className="text-sm font-light text-[#444444]">{item.price} AED</span>
+                    <h3 className="text-xl text-black font-normal">{item.itemName}</h3>
+                    <span className="text-sm font-light text-[#444444]">{item.Price} AED</span>
                   </div>
                 </div>
               </div>

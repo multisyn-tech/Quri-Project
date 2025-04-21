@@ -1122,30 +1122,38 @@ const FetchQRCodeService = async (QRCode) => {
   }
 };
 
-const fetchPopularDishesService = async () => {
+const fetchPopularDishesService = async (restaurantID) => {
   try {
+  
+    
     const [rows] = await db.promise().query(
       `SELECT 
-            m.menuId,
-            m.item_name,
-            m.item_description,
-            m.item_image,
-            COUNT(od.menuId) AS total_orders
-          FROM 
-            orderdetails od
-          JOIN 
-            orders o ON od.orderId = o.orderId
-          JOIN 
-            menus m ON od.menuId = m.menuId
-          WHERE 
-            o.restaurantId = ? AND m.restaurantId = ?
-          GROUP BY 
-            m.menuId, m.item_name, m.item_description, m.item_image
-          ORDER BY 
-            total_orders DESC
-          LIMIT 10`,
-      [3158, 3158] // Replace with dynamic RestaurantID if needed
+          m.MenuID,
+          m.ItemName,
+          m.Price,
+          m.ItemDescription,
+          m.Image,
+          c.CategoryID,
+          c.CategoryName,
+          COUNT(od.MenuID) AS total_orders
+        FROM 
+          orderdetails od
+        JOIN 
+          orders o ON od.OrderID = o.OrderID
+        JOIN 
+          menus m ON od.MenuID = m.MenuID
+        JOIN 
+          categories c ON m.CategoryID = c.CategoryID
+        WHERE 
+          o.RestaurantID = ? AND m.RestaurantID = ?
+        GROUP BY 
+          m.MenuID, m.itemName, m.itemDescription, m.Image, m.Price, c.CategoryName
+        ORDER BY 
+          total_orders DESC
+        LIMIT 10`,
+      [restaurantID, restaurantID]
     );
+    
 
     return {
       success: true,

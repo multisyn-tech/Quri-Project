@@ -616,49 +616,40 @@ const fetchQRCodeDetailsController = async (req, res) => {
 
 // getting Popular Dishes function
 const fetchPopularDishesController = async (req, res) => {
-  console.log("getting popular dishes...");
+  const { restId } = req.body;
 
-  const favoriteItems = [
-    {
-      category: "Lunch",
-      name: "Grilled Octopus",
-      price: 65,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPIgsDtfPqvJczVfxHhfDNAjH6-RW2986aOg&s",
-    },
-    {
-      category: "Salads",
-      name: "Burrata Cheese",
-      price: 40,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrmMdf0KioilGV5Clo4dKjAzt8fPZSk9WHFQ&s",
-    },
-    {
-      category: "Drinks",
-      name: "Iced Coffee",
-      price: 15,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqLs454hVyYfUYn9l3LVmP8T_0-0Kjf3AODw&s",
-    },
-    {
-      category: "Desserts",
-      name: "Chocolate Lava Cake",
-      price: 45,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJYg-bd41gp07DGUmjqX24KYf9f6GMce3OEw&s",
-    },
-    {
-      category: "Promotions",
-      name: "Margherita Pizza",
-      price: 60,
-      image:
-        "https://cdn.shopify.com/s/files/1/0274/9503/9079/files/20220211142754-margherita-9920_5a73220e-4a1a-4d33-b38f-26e98e3cd986.jpg?v=1723650067",
-    },
-  ];
+  try {
+    if (!restId) {
+      return res.status(400).json({
+        success: false,
+        message: "Restaurant ID is required.",
+        data: [],
+      });
+    }
 
-  res.json(favoriteItems);
+    const favoriteItems = await fetchPopularDishesService(restId);
 
+    if (
+      !favoriteItems.success ||
+      !favoriteItems.data ||
+      favoriteItems.data.length === 0
+    ) {
+      return res.status(200).json({
+        success: true,
+        message: "No popular dishes found.",
+        data: [],
+      });
+    }
 
+    return res.status(200).json(favoriteItems);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      data: [],
+      error: error.message,
+    });
+  }
 };
 
 module.exports = {

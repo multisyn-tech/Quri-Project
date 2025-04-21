@@ -26,9 +26,9 @@ const secretKey = process.env.JWT_SECRET;
 
  const AddOrder = async (req, res) => {
   try {
-    console.log("Received order request:", req.body); // Log the request body
+    // console.log("Received order request:", req.body); // Log the request body
     const result = await addOrderService(req.body);
-  console.log(result);
+  // console.log(result);
     res.status(201).json({ message: "Order processed successfully", result });
     console.log("Sent Order request:",req.body);
   } catch (error) {
@@ -39,12 +39,12 @@ const secretKey = process.env.JWT_SECRET;
 
 // Fetch Order By TableID
  const getOrderById = async (req, res) => {
-  console.log("Received order request:", req.params); // Log the request parameters
+  // console.log("Received order request:", req.params); // Log the request parameters
   const { tableId } = req.params;
 
   try {
     const order = await getOrderByTableIdService(tableId);
-    console.log("Order fetched successfully:", order); // Log the fetched order
+    // console.log("Order fetched successfully:", order); // Log the fetched order
     res.status(200).json({ order });
   } catch (error) {
     console.error("Error fetching order:", error.message); // Log the error

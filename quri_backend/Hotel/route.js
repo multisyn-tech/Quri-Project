@@ -82,7 +82,7 @@ router.delete('/categories/:CategoryID', deleteCategory);
 
 
 // get popular dishes (most ordered dishes)
-router.get("/popular-dishes", fetchPopularDishesController);
+router.post("/popular-dishes", fetchPopularDishesController);
 
 
 // QR CODE SCAN DYNAMIC 

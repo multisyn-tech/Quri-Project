@@ -44,6 +44,7 @@ const MenuItems = () => {
   const [visible, setVisible] = useState(false); // Modal visibility
   const [selectedItem, setSelectedItem] = useState(null); // Currently selected menu item
 
+
   const { isDrawerOpen, toggleDrawer } = useDrawer(true);
 
   useEffect(() => {
