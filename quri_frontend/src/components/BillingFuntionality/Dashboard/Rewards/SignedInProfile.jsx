@@ -9,7 +9,7 @@ const SignedInProfile = () => {
   const [selectedRating, setSelectedRating] = useState(0);
 
   const handleStarClick = (index) => {
-    setSelectedRating(index + 1);
+    // setSelectedRating(index + 1);
   };
 
 

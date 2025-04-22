@@ -9,7 +9,7 @@ import ItemModal from './ItemModal';
 import { fetchMenuByTableID } from '../../../../features/menu/menuSlice';
 import ViewOrderButton from './OrderButtons/ViewOrderButton';
 import PlaceOrderButton from './OrderButtons/PlaceOrderButton';
-import { MdArrowBack  } from "react-icons/md";
+import { MdArrowBack } from "react-icons/md";
 import { PiDotsThreeOutline } from "react-icons/pi";
 import FAQ from '../../../../components/BillingFuntionality/Dashboard/SideBarContent/FAQ';
 import SideBarMenu from '../../../../components/BillingFuntionality/Dashboard/SideBarMenu';
@@ -106,15 +106,20 @@ const MenuItems = () => {
         {/* Header with Hamburger Icon */}
 
         <button onClick={goBackToHome}>
-          <LeftOutline  fontSize={20} className="mr-2" />
+          <LeftOutline fontSize={20} className="mr-2" />
         </button>
 
 
         <div className="flex items-center">
 
-          <button onClick={toggleDrawer}>
+          {/* <button onClick={toggleDrawer}>
             <PiDotsThreeOutline size={20} />
+          </button> */}
+
+          <button onClick={goBackToHome}>
+            <LeftOutline fontSize={20} className="mr-2" />
           </button>
+
 
           {/* Tabs for categories */}
           <Tabs
@@ -137,7 +142,7 @@ const MenuItems = () => {
 
 
         {/* Filter buttons */}
-        <div className="flex space-x-2 mb-4 mt-3">
+        {/* <div className="flex space-x-2 mb-4 mt-3">
           <div
             className={`p-[1px] bg-gradient-to-r from-[#FF7B02] to-[#FFD855] rounded-xl ${selectedFilter === 'Summer Deals' ? 'bg-black' : ''
               }`}
@@ -174,7 +179,7 @@ const MenuItems = () => {
               Fan Favorite 🏆
             </button>
           </div>
-        </div>
+        </div> */}
 
 
 

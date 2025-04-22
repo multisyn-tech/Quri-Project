@@ -26,7 +26,7 @@ const Home = () => {
     // Find the setting with KeyID 'image' for the header image
     const headerImageUrl = settings?.find(setting => setting.KeyID === 'image')?.Value || HeaderImage;
 
-    const { isDrawerOpen, toggleDrawer } = useDrawer();
+    const { isDrawerOpen, toggleDrawer, toggleRewardsModal } = useDrawer();
 
     const menu = () => {
         navigate('/quri/menu/home');
@@ -36,8 +36,8 @@ const Home = () => {
         navigate('/quri/home/bill');
     };
 
-    const contactUs = () => {
-        console.log("Contact Pressed");
+    const customerRegisteration = () => {
+        toggleRewardsModal();
     };
 
 
@@ -71,7 +71,7 @@ const Home = () => {
                             </button>
                             <button
                                 className="bg-white text-black px-2 py-2 rounded-full shadow-md hover:bg-gray-200 active:bg-gray-400 active:shadow-inner active:scale-95 transition-transform duration-150 ease-in-out"
-                                onClick={contactUs}
+                                onClick={customerRegisteration}
                             >
                                 <IoPersonOutline size={20} />
                             </button>
@@ -194,12 +194,15 @@ const Home = () => {
                             </svg>
                         </div>
 
+                        &nbsp;
+                        &nbsp;
+                        &nbsp;
 
                         <div className='flex items-center text-xs mt-4'>
                             <p>by using Quri you agree to your terms and privacy policy</p>
                         </div>
                         <div>
-                            <p className='flex flex-row items-center justify-center mt-20'>served by <span className='ml-2'><img src={FooterImage} alt="Quri Image" width="35" /></span></p>
+                            <p className='flex flex-row items-center justify-center mb-5'>served by <span className='ml-2'><img src={FooterImage} alt="Quri Image" width="35" /></span></p>
                         </div>
                     </section>
                 </header>
