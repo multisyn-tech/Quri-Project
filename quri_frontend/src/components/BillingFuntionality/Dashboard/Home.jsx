@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDrawer } from '../../../state/drawerContext.jsx';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,15 @@ const Home = () => {
     const navigate = useNavigate();
     const settings = useSelector((state) => state.qrcode.qrCodeDetails.data?.settings);
 
+    const restaurantID = useSelector((state) => state.qrcode.qrCodeDetails.data?.RestaurantID);
+
+
+    useEffect(() => {
+        if (restaurantID && !localStorage.getItem('RestaurantID')) {
+            localStorage.setItem('RestaurantID', restaurantID);
+        }
+    }, [restaurantID]);
+
     // Find the setting with KeyID 'RestaurantName'
     const restaurantName = settings?.find(setting => setting.KeyID === 'RestaurantName')?.Value || 'Unknown Restaurant';
 
@@ -39,6 +48,9 @@ const Home = () => {
     const customerRegisteration = () => {
         toggleRewardsModal();
     };
+
+
+
 
 
     return (

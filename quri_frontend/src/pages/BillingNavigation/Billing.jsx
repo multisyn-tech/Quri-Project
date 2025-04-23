@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import BackgroundImg from "../../assets/Billing/Background.png"
@@ -12,6 +12,13 @@ const Billing = () => {
     const showModal = location.state?.showModal || false;
 
     const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+    
+    useEffect(() => {
+        if (orderDetails && orderDetails.length > 0) {
+          localStorage.setItem('orderDetail', JSON.stringify(orderDetails));
+        }
+      }, [orderDetails]);
+      
 
 
     const handleCloseModal = () => {

@@ -8,14 +8,25 @@ import { PiDotsThreeOutline } from "react-icons/pi";
 import { LeftOutline } from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
 import StepProgressBar from './StepProgressBar';
+import { useSelector } from 'react-redux';
+
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
 const Loader = () => {
+
+    const settings = useSelector((state) => state.qrcode.qrCodeDetails.data?.settings);
+
+    const headerImageUrl = settings?.find(setting => setting.KeyID === 'image')?.Value || HeaderImage;
 
     const animationDurationInMinutes = 5; // 5 minutes
     const animationDuration = animationDurationInMinutes * 60 * 1000; // Convert to milliseconds (5 minutes = 300000 ms)
-    
+
     const [currentStep, setCurrentStep] = useState(0); // Change this to move between steps
 
-    const steps = ['Order Received', 'In the Kitchen', 'Out for Delivery', 'Delivered']; // Example steps
+    // const steps = ['Order Received', 'In the Kitchen', 'Out for Delivery', 'Delivered']; // Example steps
+    const steps = ['In the Kitchen']; // Example steps
 
     const navigate = useNavigate();
 
@@ -31,7 +42,7 @@ const Loader = () => {
                 return prevStep + 1;
             });
         }, animationDuration); // Adjust time as needed 
-    
+
         return () => clearInterval(interval); // Cleanup the interval on unmount
     }, [steps.length, animationDuration]); // Adding steps.length as a dependency
 
@@ -45,8 +56,6 @@ const Loader = () => {
     }
 
     return (
-
-
         <>
             {/* Header Content */}
             <div className='flex flex-col w-full' >
@@ -86,7 +95,10 @@ const Loader = () => {
                             backgroundClip: 'padding-box, border-box', // Clip the background to create the gradient effect on the border
                         }} >
                         {/* Centering the image inside the card */}
-                        <img src={HeaderImage} alt="Header Image" width={120} />
+                        <img
+                            className="w-[136px] h-[136px] rounded-[19px] border-2 border-orange-400"
+                            src={headerImageUrl.startsWith('uploads/') ? `${BASE_URL}/${headerImageUrl}` : headerImageUrl}
+                            alt="Header Image" width={120} />
                     </div>
                 </section>
 

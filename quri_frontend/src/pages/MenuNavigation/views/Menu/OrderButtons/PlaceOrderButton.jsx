@@ -17,8 +17,6 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
 
     const finalOrderPlace = () => {
 
-
-
         // Map cartItems to OrderDetails
         const orderDetails = cartItems.map(item => ({
             MenuID: item.MenuID,

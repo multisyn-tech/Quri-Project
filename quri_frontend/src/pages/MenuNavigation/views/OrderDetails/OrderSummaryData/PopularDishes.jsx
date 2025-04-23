@@ -11,10 +11,15 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const PopularDishes = () => {
   const [quantity, setQuantity] = useState(1);
-  const [popularDishes, setPopularDishes] = useState([]);
+  const [popularDishes, setPopularDishes] = useState([]);  
 
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.orders.cartItems); // Get cart items from Redux
+
+  const settings = useSelector((state) => state.qrcode.qrCodeDetails.data?.settings);
+
+  // Find the setting with KeyID 'RestaurantName'
+  const restaurantName = settings?.find(setting => setting.KeyID === 'RestaurantName')?.Value || 'Unknown Restaurant';
 
 
   const addToOrder = (item, quantity) => {
@@ -38,10 +43,6 @@ const PopularDishes = () => {
       // If item is not in cart, add it
       dispatch(addItemToCart({ item, quantity }));
     }
-
-
-
-
   };
 
 
@@ -65,6 +66,7 @@ const PopularDishes = () => {
 
       // console.log("Popular disahes : ", dishes.data)
 
+
       setPopularDishes(dishes.data)
       // setPopularDishes([])
 
@@ -84,7 +86,7 @@ const PopularDishes = () => {
       <div className='p-2'>
         {/* Header Section */}
         <div className='flex flex-col'>
-          <h1 className='text-xl'>Popular dishes at Accents</h1>
+          <h1 className='text-xl'>Popular dishes at {restaurantName}</h1>
           <p className='text-gray-500'>Other customers also tried these dishes</p>
         </div>
 

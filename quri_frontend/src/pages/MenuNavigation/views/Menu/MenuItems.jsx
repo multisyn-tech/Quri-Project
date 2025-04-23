@@ -23,11 +23,12 @@ const MenuItems = () => {
   const navigate = useNavigate();
   const qrcode = useSelector((state) => state.qrcode.qrCodeDetails.data?.QRCode);
   //console.log("QrCode: ",qrcode)
+  
   const tableID = useSelector((state) => state.qrcode.qrCodeDetails.data?.TableID);
   // console.log("Table ID: ", tableID);
 
   const menu = useSelector((state) => state.menus.menu); // Get the entire menu object
-  //console.log("Menu",menu);
+  // console.log("Menu",menu);
   const menuItems = menu ? menu.menuItems : [];
 
   // console.log('menu Items',menuItems)

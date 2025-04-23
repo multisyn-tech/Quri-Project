@@ -132,7 +132,7 @@ const QuriTable = ({ propsData, columns, tableData = [], name, setTableData }) =
             center: undefined,
             outline: undefined,
           }))}
-          data={searchValue.length ? filteredData : tableData}
+          data={searchValue.length ? filteredData : [...tableData].reverse()}
           pagination
           paginationRowsPerPageOptions={[10, 15, 25, 50, 100]}
           sortIcon={<ChevronDown size={10} />}

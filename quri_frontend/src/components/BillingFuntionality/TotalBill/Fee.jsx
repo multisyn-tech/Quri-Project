@@ -24,7 +24,7 @@ const Fee = ({ onClose }) => {
           <img src={payment} alt="payment" className="w-12 h-12 mr-4" />
           <p>We charge AED 0.99 per transaction</p>
         </div>
-        <div className='w-full'>
+        {/* <div className='w-full'>
           <Button
             onClick={quriFee}
             gradientFrom="#0F84F6"
@@ -33,7 +33,7 @@ const Fee = ({ onClose }) => {
           >
             <span>Why?</span>
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

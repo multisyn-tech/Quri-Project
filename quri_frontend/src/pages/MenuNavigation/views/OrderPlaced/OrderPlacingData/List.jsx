@@ -13,8 +13,8 @@ const List = () => {
     const qrCode = useSelector((state) => state.qrcode.qrCodeDetails?.data?.QRCode || null);
     const tableID = useSelector((state) => state.qrcode.qrCodeDetails?.data?.TableID || null);
     const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+    
     // console.log("Cart Items", cartItems);
-
 
     useEffect(() => {
         if (tableID) {

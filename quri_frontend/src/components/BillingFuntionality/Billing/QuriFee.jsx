@@ -27,7 +27,7 @@ const QuriFee = ({ onClose }) => {
           <img src={payment} alt="payment" className="w-12 h-12 mr-4" />
           <p>We charge AED {QURI_SERVICE_FEE}  per transaction</p>
         </div>
-        <div className='w-full'>
+        {/* <div className='w-full'>
           <Button
             onClick={quriFee}
             gradientFrom="#0F84F6"
@@ -36,7 +36,7 @@ const QuriFee = ({ onClose }) => {
           >
             <span>Why?</span>
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
