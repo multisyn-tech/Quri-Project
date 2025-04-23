@@ -60,7 +60,7 @@ const ReusableModal = ({ isOpen, toggle, title, children }) => {
                   color: 'transparent'
                 }}
               >
-                Ibrahim
+              {/* name */}
               </span>
             </h1>
             <img src={stars} alt="Star Image" />

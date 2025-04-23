@@ -115,8 +115,7 @@ const NewCardPay = () => {
           <p className="text-xs text-gray-400">Inclusive of all taxes & charges</p>
         </div>
         <div className="flex space-x-1 font-bold space-y-3">
-          <p className="text-xl font-medium">${total != null ? formattedTotal : '00.0'}</p>
-          <p className="text-xs">AED</p>
+          <p className="text-xl font-medium">AED {total != null ? formattedTotal : '00.0'}</p>
         </div>
       </div>
 
