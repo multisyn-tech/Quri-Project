@@ -105,11 +105,6 @@ const MenuItems = () => {
       <section className="p-4 flex-grow overflow-y-auto">
         {/* Header with Hamburger Icon */}
 
-        <button onClick={goBackToHome}>
-          <LeftOutline fontSize={20} className="mr-2" />
-        </button>
-
-
         <div className="flex items-center">
 
           {/* <button onClick={toggleDrawer}>
@@ -192,7 +187,7 @@ const MenuItems = () => {
                 className="flex items-center justify-between mb-4 cursor-pointer"
                 onClick={() => handleMenuItemClick(item)} // Click handler to open modal
               >
-                <div>
+                <div className='w-full'>
                   <div className="flex flex-row items-center">
                     <h3 className="font-normal text-2xl">{item.ItemName}</h3>
                     {item.discount && (
@@ -214,6 +209,7 @@ const MenuItems = () => {
                   width={100}
                   height={100}
                   fit="cover"
+                  className='ml-4'
                   style={{ borderRadius: 12 }}
                 />
 

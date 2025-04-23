@@ -5,34 +5,32 @@ import AddingTip from './AddingTip';
 import Fee from './Fee';
 import BillProceeding from './BillProceeding';
 import { viewOrder } from '../../../features/orders/orderSlice';
+import { QURI_SERVICE_FEE } from "../../../config/constants";
 
 const TotalAmount = () => {
 
   const dispatch = useDispatch();
-  const order = useSelector((state) => state.orders.order);
+  const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+
+
   const tableId = useSelector((state) => state.qrcode.qrCodeDetails.data.TableID);
   useEffect(() => {
     dispatch(viewOrder(tableId)); // Dispatching the viewOrder action on component mount
   }, [dispatch]);
 
-
-
-
-  const QURI_SERVICE_FEE = 0.99;
   const VAT = 14.3;
 
   const [isQuriFeeVisible, setIsQuriFeeVisible] = useState(false);
   const [isBillVisible, setIsBillVisible] = useState(false);
 
+
   const calculateSubtotal = () => {
-    if (!order.orderDetails) {
-      return 0;
-    }
-    return order.orderDetails.reduce((total, item) => total + (parseFloat(item.Price) * item.Quantity), 0);
+    return orderDetails.reduce((total, item) => total + (parseFloat(item.Price) * item.Quantity), 0);
   };
 
   const subtotal = calculateSubtotal();
-  const total = subtotal + QURI_SERVICE_FEE + VAT;
+  const total = subtotal + QURI_SERVICE_FEE;
+
 
   const quriServiceFee = () => {
     setIsQuriFeeVisible(true);

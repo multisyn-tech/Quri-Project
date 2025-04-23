@@ -57,9 +57,9 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
     }
 
     return (
-        // <div className="fixed bottom-4 left-0 right-0 mx-auto ">
+        <div className="fixed bottom-4 left-0 right-0 mx-4 mt-2 ">
             <Button
-                className="flex flex-row items-center justify-center w-full bg-black text-white py-3 px-6 rounded-full my-2"
+                className="flex flex-row items-center justify-center w-full bg-black text-white py-3 px-6 rounded-full my-1"
                 onClick={finalOrderPlace}
             >
                 <div className="flex flex-row items-center w-full justify-between space-x-10">
@@ -77,11 +77,10 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
                         }}>
                         {totalPrice}
                     </p>
-
                 </div>
 
             </Button>
-        // </div>
+        </div>
     )
 }
 

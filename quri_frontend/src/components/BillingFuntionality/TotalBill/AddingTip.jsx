@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BiSolidEdit } from "react-icons/bi";
 import HeartImage from '../../../assets/Billing/heart-tick.svg';
 import { Image } from 'antd-mobile'
@@ -6,9 +6,15 @@ import { RiHeartsFill } from "react-icons/ri";
 import { FaStar } from "react-icons/fa";
 import Switch from "react-switch";
 import { calculateTip } from './utility/tipCalculator';
+import { LocalLaundryService } from '@mui/icons-material';
 
 const AddingTip = ({ total, onShowBill }) => {
   const [selectedTip, setSelectedTip] = useState(null);
+
+  const [selectCustomTip, setSelectCustomTip] = useState(false);
+  const [customTipAmount, setCustomTipAmount] = useState(0);
+
+
   const [isClicked, setIsClicked] = useState(false);
   const [isToggled, setIsToggled] = useState(false); // Toggle state
   const [selectedRating, setSelectedRating] = useState(0);
@@ -45,7 +51,20 @@ const AddingTip = ({ total, onShowBill }) => {
   };
 
   // Calculate the tip based on the selectedTip
-  const tipAmount = selectedTip !== null ? calculateTip(total, selectedTip) : 0;
+  let tipAmount = selectedTip !== null ? calculateTip(total, selectedTip) : 0;
+  tipAmount = Number(tipAmount.toFixed(2))
+
+  
+  useEffect(() => {
+    const finalTip = customTipAmount || tipAmount || 0;
+    localStorage.removeItem('tipAmount')
+    localStorage.setItem('tipAmount', JSON.stringify(finalTip));
+    window.dispatchEvent(new Event('tipUpdated'));
+  }, [tipAmount, customTipAmount]);
+
+
+
+
 
   return (
     <>
@@ -99,12 +118,31 @@ const AddingTip = ({ total, onShowBill }) => {
             {selectedTip !== null ? (
               <span className='text-gray-400 underline'>{selectedTip} AED</span>
             ) : (
-              <span className='text-gray-400'>Pay custom tip</span>
+              <>
+                <span onClick={()=>setSelectCustomTip(prev => !prev)} className='text-gray-400'>Pay custom tip</span>
+
+                {selectCustomTip ? (
+                  <input
+                    className="ml-4 px-3 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    style={{ border: '1px solid #FFC48E' }}
+                    value={customTipAmount}
+                    onChange={(e) => {
+                      setCustomTipAmount(e.target.value)
+                      console.log('Current input value:', e.target.value);
+                    }}
+                    type="number" placeholder='Enter tip amount' />
+                ) : null}
+
+              </>
+
+
+
+
             )}
           </div>
 
           {/* Loyalty points card */}
-          <div className="flex  items-center justify-center mt-4">
+          {/* <div className="flex  items-center justify-center mt-4">
             <div className="flex-col bg-gradient-to-r from-[#40008C] via-[#6D00CB] to-[#6D00CB] text-white rounded-xl p-2 flex items-center space-x-4 w-full max-w-3xl">
               <div className="flex justify-between items-center w-full space-x-2 ">
                 <span ><RiHeartsFill size={25} /></span>
@@ -116,8 +154,8 @@ const AddingTip = ({ total, onShowBill }) => {
                     checked={isToggled}
                     offColor="#fff"
                     onColor="#fff"
-                    offHandleColor="#000000"  // Thumb color when OFF
-                    onHandleColor="#000000"  // Thumb color when ON
+                    offHandleColor="#000000"  
+                    onHandleColor="#000000" 
                     handleDiameter={28}
                     height={28}
                     width={50}
@@ -130,11 +168,12 @@ const AddingTip = ({ total, onShowBill }) => {
                   />
                 </button>
               </div>
-              {/* Conditionally display Loyalty Points Section based on toggle */}
+           
+           
               {isToggled && (
                 <div className="text-center w-full max-w-sm mx-auto">
                   <div className="flex flex-col items-center justify-center max-w-sm ">
-                    {/* Rating Stars */}
+               
                     <div className="flex justify-center mt-4 space-x-1">
                       {[...Array(5)].map((_, index) => (
                         <FaStar
@@ -147,7 +186,7 @@ const AddingTip = ({ total, onShowBill }) => {
                       ))}
                     </div>
 
-                    {/* Points Text */}
+
                     <div className="mt-4 text-center text-white text-sm">
                       Horray! Enjoy the discount
                     </div>
@@ -155,7 +194,8 @@ const AddingTip = ({ total, onShowBill }) => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
+
         </div>
       </div>
     </>

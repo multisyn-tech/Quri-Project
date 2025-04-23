@@ -6,8 +6,6 @@ import ItemsSection from './OrderSummaryData/ItemsSection';
 import PopularDishes from './OrderSummaryData/PopularDishes';
 import PlaceOrderButton from '../Menu/OrderButtons/PlaceOrderButton';
 
-
-
 const OrderSummary = () => {
   const navigate = useNavigate();
   const tableID = useSelector((state) => state.qrcode.qrCodeDetails.data?.TableID);

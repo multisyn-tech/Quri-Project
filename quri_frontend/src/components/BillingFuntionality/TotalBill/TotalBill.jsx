@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -10,12 +10,14 @@ import questionMark from '../../../assets/Billing/Vector.png';
 import NewCardPay from './NewCardPay';
 import { QURI_SERVICE_FEE } from '../../../config/constants';
 
-
+import QuriFee from '../Billing/QuriFee';
 
 
 const TotalBill = () => {
 
     const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+
+    const [isQuriFeeVisible, setIsQuriFeeVisible] = useState(false);
 
     const navigate = useNavigate();
 
@@ -56,7 +58,7 @@ const TotalBill = () => {
                 <Card2>
                     <ul className="space-y-2">
                         <li className="flex justify-between font-bold">
-                            <span className='text-gray-400'>Subtotal</span><span>${subtotal.toFixed(2)}</span>
+                            <span className='text-gray-400'>Subtotal</span><span>AED {subtotal.toFixed(2)}</span>
                         </li>
                         <li className="flex justify-between font-bold">
                             <span className='text-gray-400 flex items-center'>
@@ -65,11 +67,11 @@ const TotalBill = () => {
                                     <img src={questionMark} alt="question Mark" className='w-3 h-3' />
                                 </button>
                             </span>
-                            <span>${QURI_SERVICE_FEE}</span>
+                            <span>AED {QURI_SERVICE_FEE}</span>
                         </li>
                         <li className="flex justify-between font-medium">
                             <span className='text-[#000000] text-lg'>Total</span>
-                            <span className='text-[#40008C] text-lg'>${total.toFixed(2)}</span>
+                            <span className='text-[#40008C] text-lg'>AED {total.toFixed(2)}</span>
                         </li>
                     </ul>
                 </Card2>
@@ -83,8 +85,19 @@ const TotalBill = () => {
             <div className='bg-[#F5F5F5] py-1'></div>
             {/* This shows the card payment */}
             <header className='mt-4 flex items-center justify-center'>
-                <NewCardPay  />
+                <NewCardPay />
             </header>
+
+
+            {isQuriFeeVisible && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div>
+                        <QuriFee onClose={closeQuriFee} />
+                    </div>
+                </div>
+            )}
+
+
         </>
     )
 }

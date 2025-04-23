@@ -9,6 +9,10 @@ import { LeftOutline } from 'antd-mobile-icons';
 import { useNavigate } from 'react-router-dom';
 import StepProgressBar from './StepProgressBar';
 const Loader = () => {
+
+    const animationDurationInMinutes = 5; // 5 minutes
+    const animationDuration = animationDurationInMinutes * 60 * 1000; // Convert to milliseconds (5 minutes = 300000 ms)
+    
     const [currentStep, setCurrentStep] = useState(0); // Change this to move between steps
 
     const steps = ['Order Received', 'In the Kitchen', 'Out for Delivery', 'Delivered']; // Example steps
@@ -26,10 +30,10 @@ const Loader = () => {
                 // Otherwise, increment the step
                 return prevStep + 1;
             });
-        }, 5000); // Adjust time as needed
+        }, animationDuration); // Adjust time as needed 
     
         return () => clearInterval(interval); // Cleanup the interval on unmount
-    }, [steps.length]); // Adding steps.length as a dependency
+    }, [steps.length, animationDuration]); // Adding steps.length as a dependency
 
 
     const contactUs = () => {
@@ -93,8 +97,8 @@ const Loader = () => {
 
                 {/* Loader Progress Bar */}
 
-                <div className='mb-4'>
-                    <StepProgressBar currentStep={currentStep} steps={steps} />
+                <div className='mb-4 mx-2'>
+                    <StepProgressBar currentStep={currentStep} steps={steps} delay={animationDuration} />
                 </div>
 
 

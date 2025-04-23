@@ -5,6 +5,8 @@ import BackgroundImage from '../../../../assets/Billing/Sign_In_Card.png'; // Im
 import HeaderImage from '../../../../assets/Billing/Exclusive_Rewards.png';
 import stars from '../../../../assets/Billing/Starrrrrrrrrrrrrrrrrrrrzzzzzzz.png';
 import FooterImage from '../../../../assets/Billing/Quri-Heading.png';
+
+
 const ReusableModal = ({ isOpen, toggle, title, children }) => {
   return (
     <Dialog

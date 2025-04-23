@@ -4,6 +4,9 @@ import { IoMdClose } from "react-icons/io";
 import payment from '../../../assets/Billing/payment.png';
 import { useNavigate } from 'react-router-dom';
 
+import { QURI_SERVICE_FEE } from "../../../config/constants.js";
+
+
 const QuriFee = ({ onClose }) => {
   const navigate = useNavigate();
 
@@ -22,7 +25,7 @@ const QuriFee = ({ onClose }) => {
         </div>
         <div className="flex items-center mb-4">
           <img src={payment} alt="payment" className="w-12 h-12 mr-4" />
-          <p>We charge AED 0.99 per transaction</p>
+          <p>We charge AED {QURI_SERVICE_FEE}  per transaction</p>
         </div>
         <div className='w-full'>
           <Button

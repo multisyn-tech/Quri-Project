@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useDrawer } from '../../../state/drawerContext.jsx';
 import FooterImage from '../../../assets/Billing/Quri-Heading.png';
 import LockScreen from '../../../assets/Billing/Locks.png';
 import Button from '../Buttons/Button.jsx';
@@ -14,9 +15,8 @@ import { Button2 } from '../Buttons/Button.jsx';
 import { BiUser } from "react-icons/bi";
 import { MdArrowBackIosNew } from "react-icons/md";
 import { viewOrder } from '../../../features/orders/orderSlice.jsx';
-
 import { QURI_SERVICE_FEE } from "../../../config/constants.js";
-
+import SideBarMenu from '../../BillingFuntionality/Dashboard/SideBarMenu.jsx';
 
 const Bill = () => {
     const navigate = useNavigate();
@@ -24,6 +24,8 @@ const Bill = () => {
     const [isQuriFeeVisible, setIsQuriFeeVisible] = useState(false);
     const [isLoaderVisible, setIsLoaderVisible] = useState(false);
     const [isBillDividerVisible, setIsBillDividerVisible] = useState(false);
+
+    const { isDrawerOpen, toggleDrawer, toggleRewardsModal } = useDrawer();
 
 
     const qrCode = useSelector((state) => state.qrcode.qrCodeDetails?.data?.QRCode || null);
@@ -55,6 +57,13 @@ const Bill = () => {
 
     const payFullBill = () => {
         navigate('/quri/bill/checkout');
+    };
+
+
+
+
+    const customerRegisteration = () => {
+        toggleRewardsModal();
     };
 
 
@@ -102,6 +111,8 @@ const Bill = () => {
                 <Loader />
             ) : (
                 <>
+                  <SideBarMenu isOpen={isDrawerOpen} toggleDrawer={toggleDrawer} />
+
                     <div className={`relative p-4  ${isBillDividerVisible ? 'shadow-lg' : ''}`}>
                         <header className={`flex flex-col items-center   ${isQuriFeeVisible ? 'filter blur-sm' : ''}`}>
                             <section className="relative flex flex-row items-center justify-between mb-6 w-full">
@@ -111,7 +122,7 @@ const Bill = () => {
 
                                 <p className="absolute left-1/2 transform -translate-x-1/2 text-xl">Pay now</p>
 
-                                <button className="flex-shrink-0 p-2 rounded-full transition-transform transform hover:scale-110 active:scale-90 focus:outline-none">
+                                <button onClick={customerRegisteration} className="flex-shrink-0 p-2 rounded-full transition-transform transform hover:scale-110 active:scale-90 focus:outline-none">
                                     <BiUser size={24} />
                                 </button>
                             </section>
