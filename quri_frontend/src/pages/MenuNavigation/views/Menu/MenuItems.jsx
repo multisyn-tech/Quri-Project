@@ -36,10 +36,9 @@ const MenuItems = () => {
   const categories = [...new Set(menuItems.map(item => item.CategoryName))];
 
   const cartItems = useSelector((state) => state.orders.cartItems);
-  //console.log("Cart Items",cartItems);
-
   // console.log("Cart Items",cartItems);
 
+  
   const [selectedCategory, setSelectedCategory] = useState(categories[0] || '');
   const [selectedFilter, setSelectedFilter] = useState(''); // Track selected filter
   const [visible, setVisible] = useState(false); // Modal visibility

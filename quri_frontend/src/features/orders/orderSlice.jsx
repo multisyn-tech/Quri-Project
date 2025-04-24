@@ -191,6 +191,9 @@ const orderSlice = createSlice({
         existingItem.quantity = quantity; // Update the item's quantity
       }
     },
+    resetCartItems: (state) => {
+      state.cartItems = []; // Reset the cartItems to an empty array
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -274,7 +277,7 @@ const orderSlice = createSlice({
   },
 });
 
-export const { addItemToCart, removeItemFromCart, updateItemQuantity } = orderSlice.actions;
+export const { addItemToCart, removeItemFromCart, updateItemQuantity, resetCartItems } = orderSlice.actions;
 
 //Memoized purposes
 export const selectQrCodeDetails = (state) => state.qrcode.qrCodeDetails?.data;
