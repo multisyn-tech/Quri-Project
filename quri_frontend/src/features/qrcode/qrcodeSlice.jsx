@@ -22,7 +22,8 @@ export const getQRDetails = createAsyncThunk(
 const qrcodeSlice = createSlice({
   name: 'qrcode',
   initialState: {
-    qrCodeDetails: {}, // Changed to an object assuming a single QR code details
+    // qrCodeDetails: {}, // Changed to an object assuming a single QR code details
+    qrCodeDetails: JSON.parse(localStorage.getItem('backupQrCodeDetails')) || {}, // Load from localStorage if needed
     ordersByTableID: null,
     cartItems:[],
     loading: false,

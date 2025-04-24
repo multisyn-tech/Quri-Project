@@ -38,8 +38,9 @@ const ItemModal = ({ visible, item, onClose }) => {
 
     // Add item to the cart or update the quantity if it's already in the cart
     const handleAddOrUpdateItem = () => {
-        const existingItem = cartItems.find(cartItem => cartItem.MenuID === item.MenuID);
 
+        const existingItem = cartItems.find(cartItem => cartItem.MenuID === item.MenuID);
+            
         if (existingItem) {
             // If item exists in cart, update the quantity
             dispatch(updateItemQuantity({ MenuID: item.MenuID, quantity }));

@@ -20,11 +20,16 @@ import { persistReducer, persistStore } from 'redux-persist';
 // import storageSession from 'redux-persist/lib/storage/session'
 import storage from 'redux-persist/lib/storage';
 
+import rootReducer from './rootReducer';
+
+
 const persistConfig = {
   key: 'root',
   // storage:storageSession,
   storage: storage,
-  whitelist: ['qrCodeDetails', 'cartItems', 'menus', 'BillSplit', 'auth', 'ordersByTableID'],
+  // whitelist: ['qrCodeDetails', 'cartItems', 'menus', 'BillSplit', 'auth', 'ordersByTableID'],
+  whitelist: ['qrcode', 'menus', 'BillSplit', 'auth', 'orders'],
+
 }
 
 const persistedOrderReducer = persistReducer(persistConfig, orderReducer);
@@ -34,30 +39,42 @@ const persistedBillSplitReducer = persistReducer(persistConfig, billReducer);
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 
 
+// export const store = configureStore({
+//   reducer: {
+//     menus: persistedMenuReducer,
+//     tables: tableReducer,
+//     customers: customerReducer,
+//     settings: settingReducer,
+//     orders: persistedOrderReducer,
+//     categories: categoriesReducer,
+//     reviews: reviewReducer,
+//     BillSplit: persistedBillSplitReducer,
+//     // auth:persistedAuthReducer,
+//     qrcode: persistedQRCodeReducer,
+//     dashboard: dashboardReducer,
+//     restaurants: restaurantReducer,
+//     superMenus: superMenuReducer,
+//     superOrder:superOrderReducer, 
+//     payments:paymentReducer,
+
+
+//   },
+//   middleware: getDefaultMiddleware =>
+//     getDefaultMiddleware({
+//       serializableCheck: false,
+//     })
+// });
+
+const persistedReducer = persistReducer(persistConfig, rootReducer); 
+
+
 export const store = configureStore({
-  reducer: {
-    menus: persistedMenuReducer,
-    tables: tableReducer,
-    customers: customerReducer,
-    settings: settingReducer,
-    orders: persistedOrderReducer,
-    categories: categoriesReducer,
-    reviews: reviewReducer,
-    BillSplit: persistedBillSplitReducer,
-    // auth:persistedAuthReducer,
-    qrcode: persistedQRCodeReducer,
-    dashboard: dashboardReducer,
-    restaurants: restaurantReducer,
-    superMenus: superMenuReducer,
-    superOrder:superOrderReducer, 
-    payments:paymentReducer,
-
-
-  },
+  reducer: persistedReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: false,
-    })
+    }),
 });
+
 
 export const persistor = persistStore(store);
