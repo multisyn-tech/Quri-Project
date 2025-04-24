@@ -12,7 +12,8 @@ const {
   changeOrderStatus,
   editOrder,
   deleteOrder,
-  getMenuByTableIDController
+  getMenuByTableIDController,
+  findOrderID
 } = require("./controller.js");
 
 const router = express.Router();
@@ -26,7 +27,11 @@ router.get('/order/:tableId', getOrderById);
 
 // Get QrCode
 router.post("/order", AddOrder);
+
+router.post('/order/getID', findOrderID);
+
 router.put("/order/changeStatus/:OrderID", changeOrderStatus);
+
 router.put("/order/edit/:OrderID", editOrder);
 router.delete("/order/delete/:OrderID", deleteOrder);
 

@@ -4,12 +4,11 @@ const addOrderService = async function ({
   OrderID,
   RestaurantID,
   CustomerID,
-  Status = 'Received', // Default status to 'Received' if not provided
+  Status = "Received", // Default status to 'Received' if not provided
   TotalAmount,
   OrderDetails, // New parameter for order details
   TableID,
   OrderDate,
-  
 }) {
   const validStatuses = [
     "Received",
@@ -23,7 +22,9 @@ const addOrderService = async function ({
   ];
 
   if (!RestaurantID || !TotalAmount || !OrderDetails || !TableID) {
-    throw new Error("RestaurantID, TotalAmount, OrderDetails, and TableID are required");
+    throw new Error(
+      "RestaurantID, TotalAmount, OrderDetails, and TableID are required"
+    );
   }
 
   if (!validStatuses.includes(Status)) {
@@ -32,23 +33,36 @@ const addOrderService = async function ({
 
   try {
     // Check if there's an existing order for the TableID
-    const [existingOrders] = await db.promise().query(
-      "SELECT * FROM orders WHERE TableID = ? ORDER BY OrderID DESC LIMIT 1",
-      [TableID]
-    );
+    const [existingOrders] = await db
+      .promise()
+      .query(
+        "SELECT * FROM orders WHERE TableID = ? ORDER BY OrderID DESC LIMIT 1",
+        [TableID]
+      );
 
-    if (existingOrders.length === 0 || existingOrders[0].Status === "Completed") {
+    if (
+      existingOrders.length === 0 ||
+      existingOrders[0].Status === "Completed"
+    ) {
       // No existing orders or the latest order is completed, insert a new order with status 'Received'
-      const insertQuery = "INSERT INTO orders (RestaurantID, CustomerID, Status, TotalAmount,OrderDate, TableID) VALUES (?, ?, 'Received', ?,?, ?)";
-      const insertValues = [RestaurantID, CustomerID, TotalAmount,OrderDate, TableID];
+      const insertQuery =
+        "INSERT INTO orders (RestaurantID, CustomerID, Status, TotalAmount,OrderDate, TableID) VALUES (?, ?, 'Received', ?,?, ?)";
+      const insertValues = [
+        RestaurantID,
+        CustomerID,
+        TotalAmount,
+        OrderDate,
+        TableID,
+      ];
       const [result] = await db.promise().query(insertQuery, insertValues);
       OrderID = result.insertId;
 
       // Insert data into orderdetails table
       for (const detail of OrderDetails) {
         const { MenuID, quantity, Price } = detail;
-        const insertDetailsQuery = "INSERT INTO orderdetails (OrderID, MenuID, Quantity, Price, isServed) VALUES (?, ?, ?, ?, ?)";
-        const insertDetailsValues = [OrderID, MenuID, quantity, Price, 'No'];
+        const insertDetailsQuery =
+          "INSERT INTO orderdetails (OrderID, MenuID, Quantity, Price, isServed) VALUES (?, ?, ?, ?, ?)";
+        const insertDetailsValues = [OrderID, MenuID, quantity, Price, "No"];
         await db.promise().query(insertDetailsQuery, insertDetailsValues);
       }
     } else {
@@ -57,27 +71,40 @@ const addOrderService = async function ({
       OrderID = currentOrder.OrderID;
 
       // Update the order details
-      const updateQuery = "UPDATE orders SET RestaurantID = ?, CustomerID = ?, Status = ?, TotalAmount = ?,OrderDate = ?, TableID = ? WHERE OrderID = ?";
-      const updateValues = [RestaurantID, CustomerID, Status, TotalAmount,OrderDate, TableID, OrderID];
+      const updateQuery =
+        "UPDATE orders SET RestaurantID = ?, CustomerID = ?, Status = ?, TotalAmount = ?,OrderDate = ?, TableID = ? WHERE OrderID = ?";
+      const updateValues = [
+        RestaurantID,
+        CustomerID,
+        Status,
+        TotalAmount,
+        OrderDate,
+        TableID,
+        OrderID,
+      ];
       await db.promise().query(updateQuery, updateValues);
 
       // Insert or update data into orderdetails table
       for (const detail of OrderDetails) {
         const { MenuID, quantity, Price } = detail;
         // Check if the detail already exists
-        const [existingDetails] = await db.promise().query(
-          "SELECT * FROM orderdetails WHERE OrderID = ? AND MenuID = ?",
-          [OrderID, MenuID]
-        );
+        const [existingDetails] = await db
+          .promise()
+          .query(
+            "SELECT * FROM orderdetails WHERE OrderID = ? AND MenuID = ?",
+            [OrderID, MenuID]
+          );
 
         if (existingDetails.length === 0) {
           // If detail does not exist, insert it
-          const insertDetailsQuery = "INSERT INTO orderdetails (OrderID, MenuID, Quantity, Price, isServed) VALUES (?, ?, ?, ?, ?)";
-          const insertDetailsValues = [OrderID, MenuID, quantity, Price, 'No'];
+          const insertDetailsQuery =
+            "INSERT INTO orderdetails (OrderID, MenuID, Quantity, Price, isServed) VALUES (?, ?, ?, ?, ?)";
+          const insertDetailsValues = [OrderID, MenuID, quantity, Price, "No"];
           await db.promise().query(insertDetailsQuery, insertDetailsValues);
         } else {
           // If detail exists, update the quantity and price
-          const updateDetailsQuery = "UPDATE orderdetails SET Quantity = ?, Price = ? WHERE OrderID = ? AND MenuID = ?";
+          const updateDetailsQuery =
+            "UPDATE orderdetails SET Quantity = ?, Price = ? WHERE OrderID = ? AND MenuID = ?";
           const updateDetailsValues = [quantity, Price, OrderID, MenuID];
           await db.promise().query(updateDetailsQuery, updateDetailsValues);
         }
@@ -91,10 +118,7 @@ const addOrderService = async function ({
   }
 };
 
-
-
-
- const getOrderByTableIdService = async (TableID) => {
+const getOrderByTableIdService = async (TableID) => {
   if (!TableID) {
     throw new Error("TableID is required");
   }
@@ -103,10 +127,12 @@ const addOrderService = async function ({
     console.log("Fetching order for TableID:", TableID); // Log the TableID
 
     // Fetch the latest order for the given TableID that is not completed
-    const [orders] = await db.promise().query(
-      "SELECT * FROM orders WHERE TableID = ? AND Status <> 'Completed' ORDER BY OrderID DESC LIMIT 1",
-      [TableID]
-    );
+    const [orders] = await db
+      .promise()
+      .query(
+        "SELECT * FROM orders WHERE TableID = ? AND Status <> 'Completed' ORDER BY OrderID DESC LIMIT 1",
+        [TableID]
+      );
 
     if (orders.length === 0) {
       console.log("No order found for TableID:", TableID); // Log if no order is found
@@ -143,11 +169,8 @@ const addOrderService = async function ({
   }
 };
 
-
-
-
 // Adding a customer
- const addCustomer = async (data) => {
+const addCustomer = async (data) => {
   const { Name, PhoneNumber, Email, RestaurantID } = data;
   if (!Name) {
     throw new Error("Name cannot be null or undefined");
@@ -204,7 +227,7 @@ const getCustomerById = async (customerId) => {
 };
 
 // Edit customer
- const editCustomer = async (customerId, customerData) => {
+const editCustomer = async (customerId, customerData) => {
   try {
     const { name, email, phoneNumber, restaurantId } = customerData;
     const result = await db
@@ -225,7 +248,7 @@ const getCustomerById = async (customerId) => {
 };
 
 // Delete customer
- const deleteCustomer = async (customerId) => {
+const deleteCustomer = async (customerId) => {
   try {
     const result = await db
       .promise()
@@ -240,7 +263,7 @@ const getCustomerById = async (customerId) => {
   }
 };
 
- const getAllOrder = async function (RestaurantID, page, limit) {
+const getAllOrder = async function (RestaurantID, page, limit) {
   try {
     const offset = (page - 1) * limit;
 
@@ -271,10 +294,15 @@ const getCustomerById = async (customerId) => {
  *
  */
 
- const getOrderByCustomerID = async function (RestaurantID, CustomerID, page, limit) {
+const getOrderByCustomerID = async function (
+  RestaurantID,
+  CustomerID,
+  page,
+  limit
+) {
   try {
     const offset = (page - 1) * limit;
-    
+
     // Fetch orders
     const [rows] = await db
       .promise()
@@ -282,7 +310,7 @@ const getCustomerById = async (customerId) => {
         "SELECT * FROM orders WHERE RestaurantID = ? AND CustomerID = ? LIMIT ? OFFSET ?",
         [RestaurantID, CustomerID, limit, offset]
       );
-    
+
     // Fetch total count of orders
     const [countResult] = await db
       .promise()
@@ -290,7 +318,7 @@ const getCustomerById = async (customerId) => {
         "SELECT COUNT(*) as total FROM orders WHERE RestaurantID = ? AND CustomerID = ?",
         [RestaurantID, CustomerID]
       );
-    
+
     const total = countResult[0].total;
 
     return { orders: rows, total };
@@ -303,7 +331,8 @@ const getCustomerById = async (customerId) => {
 /**
  * Cancelling the order only if the customer's order is received and not started to process.
  */
- const changeOrderStatusService = async function (OrderID, newStatus) {
+const changeOrderStatusService = async function (OrderID, newStatus) {
+
   // Enum for valid statuses
   const validStatuses = [
     "Received",
@@ -320,6 +349,8 @@ const getCustomerById = async (customerId) => {
   if (!validStatuses.includes(newStatus)) {
     throw new Error("Invalid status");
   }
+
+  
 
   try {
     // Check the current status of the order
@@ -352,7 +383,7 @@ const getCustomerById = async (customerId) => {
 
 //editing the order based on status
 
- const editOrderService = async function ({
+const editOrderService = async function ({
   OrderID,
   RestaurantID,
   CustomerID,
@@ -421,7 +452,7 @@ const getCustomerById = async (customerId) => {
 
 //Deleting the order only if order status is receive
 
- const deleteOrderService = async function (OrderID) {
+const deleteOrderService = async function (OrderID) {
   try {
     // Fetch the current status of the order
     const [order] = await db
@@ -451,14 +482,13 @@ const getCustomerById = async (customerId) => {
   }
 };
 
-
 /**
  * Get Menu Based on Table ID
  * The Table ID will determine the Menu
  * Restaurant ID will link both menu
  */
 
- const getMenuByTableID = async function (TableID) {
+const getMenuByTableID = async function (TableID) {
   try {
     const query = `
       SELECT t.RestaurantID, t.TableID, m.MenuID, m.Price, m.ItemName, m.ItemDescription, m.Image, m.CategoryID, c.CategoryName, m.MenuStatus, r.RestaurantName, r.Address
@@ -496,7 +526,7 @@ const getCustomerById = async (customerId) => {
     };
 
     // Extract Menu items
-    const menuItems = rows.map(row => ({
+    const menuItems = rows.map((row) => ({
       MenuID: row.MenuID,
       Price: row.Price,
       ItemName: row.ItemName,
@@ -516,7 +546,25 @@ const getCustomerById = async (customerId) => {
   }
 };
 
+// get order id by orderDetailID
+const findOrderIDService = async function (orderDetailIds) {
+  try {
+    const placeholders = orderDetailIds.map(() => "?").join(", ");
+    const query = `
+      SELECT DISTINCT OrderID 
+      FROM orderdetails 
+      WHERE OrderDetailID IN (${placeholders})
+    `;
 
+    const [rows] = await db.query(query, orderDetailIds);
+
+    const orderID = rows?.OrderID ?? null;
+    return orderID;
+  } catch (err) {
+    console.error("Error in getting Order Id from order detail id:", err);
+    throw err;
+  }
+};
 
 module.exports = {
   addOrderService,
@@ -531,5 +579,6 @@ module.exports = {
   changeOrderStatusService,
   editOrderService,
   deleteOrderService,
-  getMenuByTableID
+  getMenuByTableID,
+  findOrderIDService,
 };

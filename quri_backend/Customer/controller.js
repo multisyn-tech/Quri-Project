@@ -13,7 +13,8 @@ const {
   changeOrderStatusService,
   editOrderService,
   deleteOrderService,
-  getMenuByTableID
+  getMenuByTableID,
+  findOrderIDService,
 } = require("./service.js");
 
 dotenv.config();
@@ -24,13 +25,13 @@ const secretKey = process.env.JWT_SECRET;
  * Adding orders placed by customers.
  */
 
- const AddOrder = async (req, res) => {
+const AddOrder = async (req, res) => {
   try {
     // console.log("Received order request:", req.body); // Log the request body
     const result = await addOrderService(req.body);
-  // console.log(result);
+    // console.log(result);
     res.status(201).json({ message: "Order processed successfully", result });
-    console.log("Sent Order request:",req.body);
+    console.log("Sent Order request:", req.body);
   } catch (error) {
     console.error("Error processing order:", error); // Log the error
     res.status(400).json({ message: error.message });
@@ -38,7 +39,7 @@ const secretKey = process.env.JWT_SECRET;
 };
 
 // Fetch Order By TableID
- const getOrderById = async (req, res) => {
+const getOrderById = async (req, res) => {
   // console.log("Received order request:", req.params); // Log the request parameters
   const { tableId } = req.params;
 
@@ -53,16 +54,20 @@ const secretKey = process.env.JWT_SECRET;
 };
 
 // Fetching All orders
- const GetAllOrder = async function (req, res) {
+const GetAllOrder = async function (req, res) {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header is missing" });
+      return res
+        .status(401)
+        .json({ message: "Authorization header is missing" });
     }
 
     const token = authHeader.split(" ")[1];
     if (!token) {
-      return res.status(401).json({ message: "Access token is missing or invalid" });
+      return res
+        .status(401)
+        .json({ message: "Access token is missing or invalid" });
     }
 
     const decodedToken = jwt.verify(token, secretKey);
@@ -71,13 +76,15 @@ const secretKey = process.env.JWT_SECRET;
       return res.status(400).json({ message: "RestaurantID is required" });
     }
 
-    const page = parseInt(req.query.page, 10)||1;
-    const limit = parseInt(req.query.limit, 10)||10;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
 
     //console.log(`Page: ${page}, Limit: ${limit}`); // Logging the values
 
     if (isNaN(page) || isNaN(limit) || page <= 0 || limit <= 0) {
-      return res.status(400).json({ message: "Invalid page or limit parameter" });
+      return res
+        .status(400)
+        .json({ message: "Invalid page or limit parameter" });
     }
 
     const data = await getAllOrder(RestaurantID, page, limit);
@@ -97,16 +104,20 @@ const secretKey = process.env.JWT_SECRET;
 
 //Fetching orders based on customer ID
 
- const GetAllOrderByCustomer = async function (req, res) {
+const GetAllOrderByCustomer = async function (req, res) {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ message: "Authorization header is missing" });
+      return res
+        .status(401)
+        .json({ message: "Authorization header is missing" });
     }
 
     const token = authHeader.split(" ")[1];
     if (!token) {
-      return res.status(401).json({ message: "Access token is missing or invalid" });
+      return res
+        .status(401)
+        .json({ message: "Access token is missing or invalid" });
     }
 
     const decodedToken = jwt.verify(token, secretKey);
@@ -115,22 +126,28 @@ const secretKey = process.env.JWT_SECRET;
       return res.status(400).json({ message: "RestaurantID is required" });
     }
 
-    const CustomerID = req.params.customerId; 
+    const CustomerID = req.params.customerId;
     if (!CustomerID) {
       return res.status(400).json({ message: "CustomerID is required" });
     }
 
-
-    const page = parseInt(req.query.page, 10)||1;
-    const limit = parseInt(req.query.limit, 10)||10;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
 
     //console.log(`Page: ${page}, Limit: ${limit}`); // Logging the values
 
     if (isNaN(page) || isNaN(limit) || page <= 0 || limit <= 0) {
-      return res.status(400).json({ message: "Invalid page or limit parameter" });
+      return res
+        .status(400)
+        .json({ message: "Invalid page or limit parameter" });
     }
 
-   const data = await getOrderByCustomerID(RestaurantID, CustomerID, page, limit);
+    const data = await getOrderByCustomerID(
+      RestaurantID,
+      CustomerID,
+      page,
+      limit
+    );
 
     res.status(200).json({
       success: true,
@@ -145,11 +162,10 @@ const secretKey = process.env.JWT_SECRET;
   }
 };
 
-
 /**
  * Adding customers
  */
- const AddCustomers = async (req, res) => {
+const AddCustomers = async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1]; // Assuming the token is in the format "Bearer TOKEN"
     if (!token) {
@@ -177,7 +193,7 @@ const secretKey = process.env.JWT_SECRET;
  * Fetch all the customers
  */
 
- const FindAllCustomers = async function (req, res) {
+const FindAllCustomers = async function (req, res) {
   try {
     const token = req.headers.authorization.split(" ")[1]; // Assuming the token is in the format "Bearer TOKEN"
     if (!token) {
@@ -199,7 +215,7 @@ const secretKey = process.env.JWT_SECRET;
 };
 
 // Fetch customer by ID
- const getCustomerByIdController = async (req, res) => {
+const getCustomerByIdController = async (req, res) => {
   const { customerId } = req.params;
 
   try {
@@ -212,7 +228,7 @@ const secretKey = process.env.JWT_SECRET;
 };
 
 // Edit customer
- const editCustomerController = async (req, res) => {
+const editCustomerController = async (req, res) => {
   const { customerId } = req.params;
   try {
     const token = req.headers.authorization.split(" ")[1]; // Assuming the token is in the format "Bearer TOKEN"
@@ -248,7 +264,7 @@ const secretKey = process.env.JWT_SECRET;
 };
 
 // Delete a customer
- const deleteCustomerController = async (req, res) => {
+const deleteCustomerController = async (req, res) => {
   const customerId = parseInt(req.params.customerId, 10);
 
   if (isNaN(customerId)) {
@@ -263,14 +279,29 @@ const secretKey = process.env.JWT_SECRET;
   }
 };
 
- const changeOrderStatus = async (req, res) => {
+// find order id using orderDetailID
+const findOrderID = async (req, res) => {
+
+  const { orderDetailIds } = req.body; 
+
+  try {
+    const orderID = await findOrderIDService(orderDetailIds);
+    res.status(200).json({ message: "Order Id", orderID });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+
+};
+
+
+
+const changeOrderStatus = async (req, res) => {
   const { OrderID } = req.params;
   const { newStatus } = req.body;
-  console.log(req.body);
-  console.log(req.params);
+
   try {
     const result = await changeOrderStatusService(OrderID, newStatus);
-    console.log(result);
+
     res
       .status(200)
       .json({ message: "Order status updated successfully", result });
@@ -308,11 +339,10 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-
 /**
  * Logic for fetching Menu Based on Table ID
  */
- const getMenuByTableIDController = async (req, res) => {
+const getMenuByTableIDController = async (req, res) => {
   const { tableId } = req.params;
 
   if (!tableId) {
@@ -324,7 +354,9 @@ const deleteOrder = async (req, res) => {
     return res.status(200).json(menu);
   } catch (err) {
     console.error("Error in getMenuByTableIDController:", err);
-    return res.status(500).json({ error: "An error occurred while fetching the menu" });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while fetching the menu" });
   }
 };
 
@@ -341,5 +373,6 @@ module.exports = {
   changeOrderStatus,
   editOrder,
   deleteOrder,
-  getMenuByTableIDController
+  getMenuByTableIDController,
+  findOrderID,
 };
