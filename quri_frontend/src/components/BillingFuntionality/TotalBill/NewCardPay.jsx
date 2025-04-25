@@ -49,9 +49,6 @@ const NewCardPay = () => {
   localStorage.removeItem("billAmount");
   localStorage.setItem("billAmount", JSON.stringify(Number(total).toFixed(2)));
 
-
-
-
   const handleStripePayment = async () => {
 
     try {
@@ -106,6 +103,8 @@ const NewCardPay = () => {
 
   };
 
+
+
   return (
     <div className="p-4 flex flex-col justify-center w-full pb-5">
       {/* Payment Information */}
@@ -124,15 +123,9 @@ const NewCardPay = () => {
         {/* Card Button */}
 
         {/* Stripe payment */}
-        <button onClick={handleStripePayment} className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-1/2 hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
+        <button onClick={handleStripePayment} className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
           <TbCreditCard className="text-2xl" />
-          <span className="text-lg ">Card</span>
-        </button>
-
-        {/* Apple Pay Button */}
-        <button className="flex items-center justify-center space-y-1 gap-2 bg-black text-white py-2 px-4 rounded-full w-1/2 hover:bg-gray-800 active:bg-gray-900 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
-          <IoLogoApple className="text-2xl" />
-          <span className="text-lg font-bold"> Pay</span>
+          <span className="text-lg "> Pay Bill </span>
         </button>
 
 
