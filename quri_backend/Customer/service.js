@@ -42,7 +42,8 @@ const addOrderService = async function ({
 
     if (
       existingOrders.length === 0 ||
-      existingOrders[0].Status === "Completed"
+      existingOrders[0].Status === "Completed" ||
+      existingOrders[0].Status === "Received"
     ) {
       // No existing orders or the latest order is completed, insert a new order with status 'Received'
       const insertQuery =

@@ -11,14 +11,7 @@ const Billing = () => {
     const navigate = useNavigate();
     const showModal = location.state?.showModal || false;
 
-    const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
-    
-    useEffect(() => {
-        if (orderDetails && orderDetails.length > 0) {
-          localStorage.setItem('orderDetail', JSON.stringify(orderDetails));
-        }
-      }, [orderDetails]);
-      
+
 
 
     const handleCloseModal = () => {

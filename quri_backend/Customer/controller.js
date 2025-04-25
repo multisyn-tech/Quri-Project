@@ -45,7 +45,9 @@ const getOrderById = async (req, res) => {
 
   try {
     const order = await getOrderByTableIdService(tableId);
-    // console.log("Order fetched successfully:", order); // Log the fetched order
+
+    console.log("Order fetched successfully:", order); // Log the fetched order
+    
     res.status(200).json({ order });
   } catch (error) {
     console.error("Error fetching order:", error.message); // Log the error

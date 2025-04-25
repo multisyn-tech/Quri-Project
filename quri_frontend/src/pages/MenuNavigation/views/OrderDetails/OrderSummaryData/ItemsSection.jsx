@@ -14,6 +14,9 @@ const ItemsSection = () => {
     // Access cart items from Redux store
     const cartItems = useSelector((state) => state.orders.cartItems);
 
+    const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+    // console.log("orderDetails: ",orderDetails)
+
  
     // Function to increment quantity and update in Redux
     const incrementQuantity = (item) => {

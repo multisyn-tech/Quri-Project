@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Button } from 'antd-mobile';
@@ -13,7 +13,7 @@ const orderDate = dayjs().format('MM-DD-YYYY');
 
 const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch();   
 
     const finalOrderPlace = () => {
 
@@ -23,7 +23,6 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
             quantity: item.quantity,
             Price: item.Price,
         }));
-
 
         // Dispatch addOrder action with the correctly structured payload
         dispatch(addOrder({
@@ -46,11 +45,11 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
             timerProgressBar: true,
         });
 
-    // Navigate after 5 seconds
-    setTimeout(() => {
-        // navigate('/quri/menu/orderPlaced');  
-        navigate('/quri/home/bill');  // temperory navigation
-    }, 3000);  
+        // Navigate after 5 seconds
+        setTimeout(() => {
+            // navigate('/quri/menu/orderPlaced');  
+            navigate('/quri/home/bill');  // temperory navigation
+        }, 3000);
 
     }
 

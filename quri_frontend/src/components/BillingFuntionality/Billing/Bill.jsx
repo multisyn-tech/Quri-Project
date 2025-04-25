@@ -32,7 +32,6 @@ const Bill = () => {
     const tableID = useSelector((state) => state.qrcode.qrCodeDetails?.data?.TableID || null);
     const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
 
-    // console.log("Order Details : ", orderDetails);
     // console.log("Table ID from Bill: ", tableID)
 
     useEffect(() => {

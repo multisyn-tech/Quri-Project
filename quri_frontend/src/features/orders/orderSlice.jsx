@@ -13,7 +13,7 @@ export const getOrders = createAsyncThunk(
     try {
       const token = localStorage.getItem('authToken');
       const resID = localStorage.getItem('RestaurantID');
-      
+
       if (!token) {
         throw new Error('No token found');
       }
@@ -51,7 +51,7 @@ export const getDetailsOfOrders = createAsyncThunk(
       });
       console.log(response.data);
       return response.data;
-     
+
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -75,7 +75,7 @@ export const getOrdersByCustomer = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-console.log(response)
+      console.log(response)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -98,7 +98,7 @@ export const getOrdersByTableID = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-console.log(response)
+      console.log(response)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -125,11 +125,11 @@ export const addOrder = createAsyncThunk(
 export const viewOrder = createAsyncThunk(
   'orders/viewOrder',
   async (tableId, { rejectWithValue }) => {
-   
+
     try {
       const response = await axios.get(`${BASE_URL}/customers/order/${tableId}`);
       // dispatch(cartItems(response.data))
-      //console.log("View Order Response",response.data)
+      // console.log("View Order Response",response.data)
       return response.data;
     } catch (error) {
       console.error("Error while fetching order:", error.response?.data || error.message); // Log error details
@@ -139,10 +139,10 @@ export const viewOrder = createAsyncThunk(
 );
 export const updateOrderStatus = createAsyncThunk(
   'orders/orderStatus',
-  async ( payload , { rejectWithValue }) => {
-   console.log('payload==', payload)
+  async (payload, { rejectWithValue }) => {
+    console.log('payload==', payload)
     try {
-      const response = await axios.put(`${BASE_URL}/customers/order/changeStatus/${payload.OrderID}`,payload);
+      const response = await axios.put(`${BASE_URL}/customers/order/changeStatus/${payload.OrderID}`, payload);
       // dispatch(cartItems(response.data))
       return response.data;
     } catch (error) {
@@ -157,10 +157,10 @@ const orderSlice = createSlice({
   name: 'orders',
   initialState: {
     orders: [],
-    detailsOfOrders:[],
-    orderStatus:[],
-    ordersByCustomer:[],
-    ordersByTableID:[],
+    detailsOfOrders: [],
+    orderStatus: [],
+    ordersByCustomer: [],
+    ordersByTableID: [],
     order: { orderDetails: [] },
     loading: false,
     status: 'idle',
