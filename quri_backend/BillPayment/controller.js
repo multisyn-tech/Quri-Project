@@ -31,7 +31,7 @@ const billPaymentController = async (req, res) => {
               (total, item) => total + parseFloat(item.Price) * item.Quantity,
               0
             )) *
-            100
+          100
         ),
       },
       quantity: 1,
@@ -161,7 +161,7 @@ const splitBillCheckoutController = async (req, res) => {
         person: `Person ${i}`,
         sessionId: session.id,
         paymentLink: session.url,
-        amountToPay: (roundedAmount / 100).toFixed(2), 
+        amountToPay: (roundedAmount / 100).toFixed(2),
       });
     }
 
@@ -183,7 +183,7 @@ const customBillCheckoutController = async (req, res) => {
           name: "Custom Bill Payment",
           description: "Quri custom payment",
         },
-        unit_amount: Math.round(parseFloat(amount) * 100), 
+        unit_amount: Math.round(parseFloat(amount) * 100),
       },
       quantity: 1,
     },
@@ -216,20 +216,20 @@ const getStripePaymentsController = async (req, res) => {
         limit: 100,
         expand: ["data.customer", "data.payment_intent", "data.customer_details"],
       };
-    
+
       if (startingAfter) {
         params.starting_after = startingAfter;
       }
-    
+
       const sessions = await stripe.checkout.sessions.list(params);
-    
+
       const paid = sessions.data.filter((s) => s.payment_status === "paid");
       allPaidSessions.push(...paid);
-    
+
       hasMore = sessions.has_more;
       startingAfter = sessions.data[sessions.data.length - 1]?.id;
     }
-    
+
 
     const paginated = allPaidSessions.slice(0, limit).map((session) => ({
       paymentId: `${session.id.slice(0, 6)}...${session.id.slice(-4)}`,
@@ -249,6 +249,98 @@ const getStripePaymentsController = async (req, res) => {
   }
 };
 
+// payment integration of n-genius gateway
+const getNGeniusPaymentController = async (req, res) => {
+  const apiKey = process.env.N_GENIUS_API_KEY;
+  const outletRef = process.env.OUTLET_REFERENCE;
+  const { formattedTotal, orderID, orderDetails } = req.body;
+
+  const accessTokenAPIURL_Live = "https://api-gateway.ngenius-payments.com/identity/auth/access-token"; // production acount URL
+  const accessTokenAPIURL_Test = "https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token "; // sandbox account URL
+
+  const createOrderAPIURL_Live = `https://api-gateway.ngenius-payments.com/transactions/outlets/${outletRef}/orders`;  // production acount URL
+  const createOrderAPIURL_Test = `https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/${outletRef}/orders`; // sandbox account URL
+
+
+  if (!formattedTotal) {
+    return res.status(400).json({ error: 'Missing amount' });
+  }
+
+  // console.log("order details: ", orderDetails)
+
+  try {
+
+    const tokenResponse = await fetch(accessTokenAPIURL_Test, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${apiKey}`,
+        'Content-Type': 'application/vnd.ni-identity.v1+json'
+      }
+    });
+
+    const tokenData = await tokenResponse.json();
+
+    // console.log("Token: ",tokenData)
+
+    if (!tokenData.access_token) {
+      return res.status(500).json({ error: 'Failed to get access token' });
+    }
+
+    const accessToken = tokenData.access_token;
+
+    const formattedTotalMinorUnits = Math.round(parseFloat(formattedTotal) * 100);
+
+
+    const orderPayload = {
+      action: "PURCHASE",
+      amount: {
+        currencyCode: "AED",
+        value: formattedTotalMinorUnits
+      },
+      payment: {
+        paymentMethods: ["VISA", "WALLET", "APPLE_PAY"]
+      },
+      merchantAttributes: {
+        redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`, 
+        // redirectUrl: `${BASE_URL}/quri/menu/orderPlaced`, 
+        cancelText:"Order More",
+        cancelUrl:`https://fe.quri.co/quri/menu/home`,
+        // cancelUrl: `${BASE_URL}/quri/menu/home`, 
+      },
+      merchantOrderReference:`${orderID}`
+    };
+
+
+
+    const orderResponse = await fetch(createOrderAPIURL_Test, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/vnd.ni-payment.v2+json',
+        'Accept': 'application/vnd.ni-payment.v2+json',
+      },
+      body: JSON.stringify(orderPayload)
+    });
+
+    const orderData = await orderResponse.json();
+
+    // console.log("create order Response: ", orderData)
+
+    const paymentUrl = orderData._links?.payment?.href;
+
+    if (!paymentUrl) {
+      return res.status(500).json({ error: 'Payment URL not found' });
+    }
+
+    res.json({ payment_url: paymentUrl });
+
+  } catch (err) {
+    console.error('N-Genius Error:', err);
+    res.status(500).json({ error: 'Something went wrong with N-Genius payment' });
+  }
+};
+
+
 
 
 
@@ -257,4 +349,5 @@ module.exports = {
   getStripePaymentsController,
   splitBillCheckoutController,
   customBillCheckoutController,
+  getNGeniusPaymentController,
 };

@@ -8,22 +8,27 @@ import { loadStripe } from '@stripe/stripe-js';
 import Swal from 'sweetalert2';
 
 import { QURI_SERVICE_FEE } from '../../../config/constants';
-
+import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const NewCardPay = () => {
 
   const [tip, setTip] = useState(0);
+  const [loading, setLoading] = useState(false)
 
   const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+
+  const orderID =  useSelector((state) => state.orders?.order?.order?.OrderID || null);
+
+
 
   const calculateSubtotal = () => {
     return orderDetails.reduce((total, item) => total + (parseFloat(item.Price) * item.Quantity), 0);
   };
 
 
-  
+
   useEffect(() => {
     const updateTip = () => {
       const updatedTip = JSON.parse(localStorage.getItem('tipAmount')) || 0;
@@ -42,8 +47,8 @@ const NewCardPay = () => {
 
   const subtotal = calculateSubtotal();
   let total = (parseFloat(subtotal) || 0) + (parseFloat(QURI_SERVICE_FEE) || 0) + (parseFloat(tip) || 0);
-  let formattedTotal = total.toFixed(2); 
-  
+  let formattedTotal = total.toFixed(2);
+
 
   // store orderdetails to local storage for use in success page
   localStorage.removeItem("billAmount");
@@ -103,6 +108,52 @@ const NewCardPay = () => {
 
   };
 
+  // ----------------------------------------------------
+  // handle Network Genius Payment
+  const handleN_GeniusPayment = async () => {
+    
+    setLoading(true)
+    try {
+      const response = await axios.post(`${BASE_URL}/bill/n-genius-payment`, {
+        formattedTotal,
+        orderID,
+        orderDetails
+      });
+      const paymentUrl = response.data?.payment_url;
+
+      if (paymentUrl) {
+        window.location.href = paymentUrl; // redirect user to payment page
+      } else {
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed!',
+          text: 'Payment process failed',
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+
+        setLoading(false)
+        throw new Error('Payment URL not received');
+      }
+    } catch (error) {
+      setLoading(false)
+      console.error("Payment Error:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Payment process failed',
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+    }
+  }
 
 
   return (
@@ -120,13 +171,22 @@ const NewCardPay = () => {
 
       {/* Payment Buttons */}
       <div className="flex gap-4">
-        {/* Card Button */}
 
         {/* Stripe payment */}
         <button onClick={handleStripePayment} className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
           <TbCreditCard className="text-2xl" />
           <span className="text-lg "> Pay Bill </span>
         </button>
+
+        {/* N-Genius Payment */}
+        {loading ? (
+          <p className="my-4">Redirecting...</p>
+        ) : (
+          <button onClick={handleN_GeniusPayment} className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
+            <TbCreditCard className="text-2xl" />
+            <span className="text-lg "> Checkout </span>
+          </button>
+        )}
 
 
       </div>
