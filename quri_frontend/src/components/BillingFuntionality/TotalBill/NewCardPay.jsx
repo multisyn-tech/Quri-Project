@@ -19,7 +19,7 @@ const NewCardPay = () => {
 
   const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
 
-  const orderID =  useSelector((state) => state.orders?.order?.order?.OrderID || null);
+  const orderID = useSelector((state) => state.orders?.order?.order?.OrderID || null);
 
 
 
@@ -111,7 +111,7 @@ const NewCardPay = () => {
   // ----------------------------------------------------
   // handle Network Genius Payment
   const handleN_GeniusPayment = async () => {
-    
+
     setLoading(true)
     try {
       const response = await axios.post(`${BASE_URL}/bill/n-genius-payment`, {
@@ -122,7 +122,7 @@ const NewCardPay = () => {
       const paymentUrl = response.data?.payment_url;
 
       if (paymentUrl) {
-        window.location.href = paymentUrl; // redirect user to payment page
+        window.location.href = `${paymentUrl}&slim=0`; // redirect user to payment page
       } else {
 
         Swal.fire({
@@ -180,7 +180,11 @@ const NewCardPay = () => {
 
         {/* N-Genius Payment */}
         {loading ? (
-          <p className="my-4">Redirecting...</p>
+          <>             
+          <p className="my-4">
+            Redirecting...
+          </p>
+          </>
         ) : (
           <button onClick={handleN_GeniusPayment} className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
             <TbCreditCard className="text-2xl" />

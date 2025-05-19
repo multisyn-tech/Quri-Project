@@ -298,16 +298,20 @@ const getNGeniusPaymentController = async (req, res) => {
         value: formattedTotalMinorUnits
       },
       payment: {
-        paymentMethods: ["VISA", "WALLET", "APPLE_PAY"]
+        // paymentMethods: ["VISA","MASTERCARD","SAMSUNG_PAY","APPLE_PAY","GOOGLE_PAY"]
+        paymentMethods: ["VISA","MASTERCARD"]
       },
       merchantAttributes: {
-        redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`, 
+        redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`,
         // redirectUrl: `${BASE_URL}/quri/menu/orderPlaced`, 
-        cancelText:"Order More",
-        cancelUrl:`https://fe.quri.co/quri/menu/home`,
+        cancelText: "Order More",
+        cancelUrl: `https://fe.quri.co/quri/menu/home`,
         // cancelUrl: `${BASE_URL}/quri/menu/home`, 
+        paymentAttempts: "3",
+        offerOnly: "VISA,MASTERCARD,SAMSUNG_PAY,APPLE_PAY"
       },
-      merchantOrderReference:`${orderID}`
+      merchantOrderReference: `${orderID}`,
+
     };
 
 
