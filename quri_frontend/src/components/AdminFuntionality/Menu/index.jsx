@@ -10,6 +10,7 @@ import { fetchMenus, deleteMenu } from '../../../features/menu/menuSlice';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Index = () => {
+
   const dispatch = useDispatch();
   const menus = useSelector((state) => state.menus.menus);
   const loading = useSelector((state) => state.menus.loading);
@@ -27,7 +28,10 @@ const Index = () => {
 
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = menus.slice(indexOfFirstPost, indexOfLastPost);
+  const currentPosts = menus?.slice(indexOfFirstPost, indexOfLastPost);
+
+  console.log(menus);
+
 
   const openAddMenu = () => {
     setIsAddMenuOpen(true);
@@ -92,59 +96,77 @@ const Index = () => {
             </Grid>
           )}
 
-          {currentPosts.map((menu) => (
-            <Grid item xs={10} sm={6} md={4} lg={3} key={menu.MenuID}>
-              <Paper
-                className="p-4 dark:bg-gray-800 dark:text-gray-100"
-                elevation={3}
-                style={{ transition: 'background-color 0.3s ease' }}
-              >
-                <div className="menu-image-container mb-4">
-                  {menu.Image && (
-                    <>
-                      {/* Check if the image is a file upload or an external URL */}
-                      {menu.Image.startsWith('food-uploads/') ? (
-                        <img
-                          src={`${BASE_URL}/${menu.Image}`} //  BASE_URL points to the backend server
-                          alt={menu.ItemName}
-                          style={menuImageStyle}
-                        />
-                      ) : (
-                        <img
-                          src={menu.Image} // Display external URL image directly
-                          alt={menu.ItemName}
-                          style={menuImageStyle}
-                        />
-                      )}
-                    </>
-                  )}
-                </div>
-                <Typography variant="h6" className="dark:text-gray-100">
-                  Name: {menu.ItemName}
-                </Typography>
-                <Typography variant="body1" className="dark:text-gray-300">
-                  Price: AED {menu.Price}
-                </Typography>
-                <Typography variant="body1" className="dark:text-gray-300">
-                  Ingredients: {menu.ItemDescription}
-                </Typography>
-                <Typography variant="body1" className="dark:text-gray-300">
-                  Category: {menu.CategoryName}
-                </Typography>
-                <Typography variant="body1" className={getStatusColor(menu.MenuStatus)}>
-                  Menu Status: {menu.MenuStatus}
-                </Typography>
-                <div className="flex justify-between mt-4">
-                  <IconButton color="primary" size="large" className="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full" onClick={() => openEditMenu(menu.MenuID)}>
-                    <Edit fontSize="inherit" />
-                  </IconButton>
-                  <IconButton color="error" size="large" className="hover:bg-red-100 dark:hover:bg-red-900 rounded-full" onClick={() => handleDeleteMenu(menu.MenuID)}>
-                    <Delete fontSize="inherit" />
-                  </IconButton>
-                </div>
-              </Paper>
+          {Array.isArray(currentPosts) && currentPosts.length > 0 ? (
+            currentPosts.map((menu) => (
+              <Grid item xs={10} sm={6} md={4} lg={3} key={menu.MenuID}>
+                <Paper
+                  className="p-4 dark:bg-gray-800 dark:text-gray-100"
+                  elevation={3}
+                  style={{ transition: 'background-color 0.3s ease' }}
+                >
+                  <div className="menu-image-container mb-4">
+                    {menu.Image && (
+                      <>
+                        {menu.Image.startsWith('food-uploads/') ? (
+                          <img
+                            src={`${BASE_URL}/${menu.Image}`}
+                            alt={menu.ItemName}
+                            style={menuImageStyle}
+                          />
+                        ) : (
+                          <img
+                            src={menu.Image}
+                            alt={menu.ItemName}
+                            style={menuImageStyle}
+                          />
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <Typography variant="h6" className="dark:text-gray-100">
+                    Name: {menu.ItemName}
+                  </Typography>
+                  <Typography variant="body1" className="dark:text-gray-300">
+                    Price: AED {menu.Price}
+                  </Typography>
+                  <Typography variant="body1" className="dark:text-gray-300">
+                    Ingredients: {menu.ItemDescription}
+                  </Typography>
+                  <Typography variant="body1" className="dark:text-gray-300">
+                    Category: {menu.CategoryName}
+                  </Typography>
+                  <Typography variant="body1" className={getStatusColor(menu.MenuStatus)}>
+                    Menu Status: {menu.MenuStatus}
+                  </Typography>
+                  <div className="flex justify-between mt-4">
+                    <IconButton
+                      color="primary"
+                      size="large"
+                      className="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full"
+                      onClick={() => openEditMenu(menu.MenuID)}
+                    >
+                      <Edit fontSize="inherit" />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      size="large"
+                      className="hover:bg-red-100 dark:hover:bg-red-900 rounded-full"
+                      onClick={() => handleDeleteMenu(menu.MenuID)}
+                    >
+                      <Delete fontSize="inherit" />
+                    </IconButton>
+                  </div>
+                </Paper>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12}>
+              <Typography variant="h6" align="center" className="dark:text-gray-400">
+                No menu available.
+              </Typography>
             </Grid>
-          ))}
+          )}
+
 
           <Grid item xs={12}>
             <Pagination

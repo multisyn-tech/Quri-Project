@@ -23,22 +23,28 @@ const MenuItems = () => {
   const navigate = useNavigate();
   const qrcode = useSelector((state) => state.qrcode.qrCodeDetails.data?.QRCode);
   //console.log("QrCode: ",qrcode)
-  
+
   const tableID = useSelector((state) => state.qrcode.qrCodeDetails.data?.TableID);
   // console.log("Table ID: ", tableID);
 
   const menu = useSelector((state) => state.menus.menu); // Get the entire menu object
   // console.log("Menu",menu);
-  const menuItems = menu ? menu.menuItems : [];
 
-  // console.log('menu Items',menuItems)
+  // const menuItems = menu ? menu.menuItems : [];
+  const menuItems = Array.isArray(menu?.menuItems) ? menu.menuItems : [];
 
-  const categories = [...new Set(menuItems.map(item => item.CategoryName))];
+
+  // console.log('menu Items', menuItems)
+
+  // const categories = [...new Set(menuItems.map(item => item.CategoryName))];
+  const categories = [...new Set(menuItems.map(item => item?.CategoryName || 'Unknown'))];
+
 
   const cartItems = useSelector((state) => state.orders.cartItems);
+
   // console.log("Cart Items",cartItems);
 
-  
+
   const [selectedCategory, setSelectedCategory] = useState(categories[0] || '');
   const [selectedFilter, setSelectedFilter] = useState(''); // Track selected filter
   const [visible, setVisible] = useState(false); // Modal visibility
@@ -82,7 +88,12 @@ const MenuItems = () => {
   };
 
 
-  const filteredItems = menuItems.filter(item => item.CategoryName === selectedCategory);
+  // const filteredItems = menuItems?.filter(item => item.CategoryName === selectedCategory);
+
+  const filteredItems = selectedCategory
+    ? menuItems.filter(item => item?.CategoryName === selectedCategory)
+    : menuItems;
+
 
   // Calculate total price from the cart items
   const totalPrice = cartItems.reduce((total, item) => {
@@ -91,6 +102,10 @@ const MenuItems = () => {
 
   // console.log("Total Price: ",totalPrice);
 
+
+  if (!menu || !Array.isArray(filteredItems)) {
+    return <div>Loading...</div>;
+  }
 
   const goBackToHome = () => {
     navigate(`/quri/home/${qrcode}`);
@@ -182,40 +197,41 @@ const MenuItems = () => {
 
         <div className="mt-4">
           {filteredItems.map((item, index) => (
-            <React.Fragment key={item.MenuID}>
+            <React.Fragment key={item?.MenuID || index}>
               <div
                 className="flex items-center justify-between mb-4 cursor-pointer"
-                onClick={() => handleMenuItemClick(item)} // Click handler to open modal
+                onClick={() => handleMenuItemClick(item)}
               >
-                <div className='w-full'>
+                <div className="w-full">
                   <div className="flex flex-row items-center">
-                    <h3 className="font-normal text-2xl">{item.ItemName}</h3>
-                    {item.discount && (
+                    <h3 className="font-normal text-2xl">{item?.ItemName}</h3>
+                    {item?.discount && (
                       <Badge content={`${item.discount}% Off`} style={{ marginLeft: 4 }} />
                     )}
                   </div>
-                  <p className="text-xs text-gray-500">{item.ItemDescription}</p>
+                  <p className="text-xs text-gray-500">{item?.ItemDescription}</p>
                   <div className="flex items-center mt-1">
-                    <span className="text-sm text-gray-800">{item.Price} AED</span>
+                    <span className="text-sm text-gray-800">{item?.Price} AED</span>
                   </div>
                 </div>
 
-                <Image
-                  lazy
-                  src={item.Image.startsWith('food-uploads/')
-                    ? `${BASE_URL}/${item.Image}`
-                    : item.Image
-                  }
-                  width={100}
-                  height={100}
-                  fit="cover"
-                  className='ml-4'
-                  style={{ borderRadius: 12 }}
-                />
-
+                {item?.Image && (
+                  <Image
+                    lazy
+                    src={
+                      item.Image.startsWith('food-uploads/')
+                        ? `${BASE_URL}/${item.Image}`
+                        : item.Image
+                    }
+                    width={100}
+                    height={100}
+                    fit="cover"
+                    className="ml-4"
+                    style={{ borderRadius: 12 }}
+                  />
+                )}
               </div>
 
-              {/* Insert special offer section after every 3 items */}
               {(index + 1) % 3 === 0 && index + 1 !== filteredItems.length && (
                 <div className="flex items-center justify-center mb-4">
                   <Image lazy src={cardImg} alt="Special Offer Image" fit="cover" />
@@ -224,13 +240,13 @@ const MenuItems = () => {
             </React.Fragment>
           ))}
 
-          {/* Display the special offer section at the end if there are less than 3 items */}
           {filteredItems.length <= 3 && (
             <div className="flex items-center justify-center mt-8">
               <Image lazy src={cardImg} alt="Special Offer Image" fit="cover" />
             </div>
           )}
         </div>
+
 
 
         {/* Modal Component */}

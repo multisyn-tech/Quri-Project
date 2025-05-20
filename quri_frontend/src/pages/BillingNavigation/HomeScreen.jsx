@@ -6,7 +6,7 @@ import { getQRDetails, reset } from '../../features/qrcode/qrcodeSlice';
 import scanQR from '../../../src/assets/img/scanQR/11136.jpg'
 import { Col, Row } from 'reactstrap';
 import SpinnerComponent from '../../Manage/Fallback-spinner';
-import { getOrdersByTableID } from '../../features/orders/orderSlice';
+import { getOrdersByTableID, reset as resetOrders } from '../../features/orders/orderSlice';
 
 
 
@@ -22,6 +22,9 @@ const HomeScreen = () => {
     useEffect(() => {
         if (qrCode) {
             dispatch(reset());
+
+            dispatch(resetOrders());   // Reset Orders state
+
             dispatch(getQRDetails(qrCode));
         }
     }, [qrCode, dispatch]);

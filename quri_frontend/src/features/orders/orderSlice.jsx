@@ -194,6 +194,22 @@ const orderSlice = createSlice({
     resetCartItems: (state) => {
       state.cartItems = []; // Reset the cartItems to an empty array
     },
+
+    reset: (state) => {
+      state.orders = [];
+      state.detailsOfOrders = [];
+      state.orderStatus = [];
+      state.ordersByCustomer = [];
+      state.ordersByTableID = [];
+      state.order = { orderDetails: [] };
+      state.loading = false;
+      state.status = 'idle';
+      state.error = null;
+      state.cartItems = [];
+      state.totalPrice = 0;
+    }
+
+
   },
   extraReducers: (builder) => {
     builder
@@ -277,7 +293,7 @@ const orderSlice = createSlice({
   },
 });
 
-export const { addItemToCart, removeItemFromCart, updateItemQuantity, resetCartItems } = orderSlice.actions;
+export const { addItemToCart, removeItemFromCart, updateItemQuantity, resetCartItems,  reset  } = orderSlice.actions;
 
 //Memoized purposes
 export const selectQrCodeDetails = (state) => state.qrcode.qrCodeDetails?.data;
@@ -301,3 +317,4 @@ export const selectMemoizedOrderDetails = createSelector(
 
 
 export default orderSlice.reducer;
+
