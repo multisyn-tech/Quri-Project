@@ -21,9 +21,10 @@ const OrderStatus = (props) => {
     const tableForm = props.tableForm
     const setTableData = props.setTableData
 
+
     const dataAvaliable = formData1 !== undefined
 
-    console.log('modalName==', formData1)
+    // console.log('modalName==', formData1)
 
     const SignupSchema = yup.object().shape({
 
@@ -50,7 +51,7 @@ const OrderStatus = (props) => {
                 .unwrap()  // Use unwrap to handle errors properly
                 .then((response) => {
                     const result = response;
-                    console.log('RESULT==', result);
+                    // console.log('RESULT==', result);
 
                     if (tableForm) {
                         const data = JSON.parse(JSON.stringify(tableData));
@@ -95,6 +96,8 @@ const OrderStatus = (props) => {
         };
         console.log('OJJ', obj);
 
+        props.RejectedModalStatus(obj);
+
         if (obj.newStatus == '') {
             setErrorMessage('status');
             toast.error('Select Status to Proceed');
@@ -132,23 +135,29 @@ const OrderStatus = (props) => {
                             label='Select Status *'
                             defaultValue={dataAvaliable &&
                                 (formData1.Status === "received" || formData1.Status === "Received" ?
-                                    orderStatusOptions.find(x => x.value === "received")
-                                    : formData1.Status === "processing" || formData1.Status === "Processing" ?
-                                        orderStatusOptions.find(x => x.value === "processing")
-                                        : formData1.Status === "ready for pickup" || formData1.Status === "Ready for pickup" ?
-                                            orderStatusOptions.find(x => x.value === "ready_for_pickup")
-                                            : formData1.Status === "saved" || formData1.Status === "Saved" ?
-                                                orderStatusOptions.find(x => x.value === "saved")
-                                                : formData1.Status === "completed" || formData1.Status === "Completed" ?
-                                                    orderStatusOptions.find(x => x.value === "completed")
-                                                    : formData1.Status === "cancelled" || formData1.Status === "Cancelled" ?
-                                                        orderStatusOptions.find(x => x.value === "cancelled")
-                                                        : formData1.Status === "paid" || formData1.Status === "Paid" ?
-                                                            orderStatusOptions.find(x => x.value === "paid")
-                                                            : formData1.Status === "refunded" || formData1.Status === "Refunded" ?
-                                                                orderStatusOptions.find(x => x.value === "refunded")
-                                                                : orderStatusOptions.find(x => x.value === "select")) // Default case if no match is found
+                                    orderStatusOptions.find(x => x.value === "received") :
+                                    formData1.Status === "processing" || formData1.Status === "Processing" ?
+                                        orderStatusOptions.find(x => x.value === "processing") :
+                                        formData1.Status === "ready for pickup" || formData1.Status === "Ready for pickup" ?
+                                            orderStatusOptions.find(x => x.value === "ready_for_pickup") :
+                                            formData1.Status === "saved" || formData1.Status === "Saved" ?
+                                                orderStatusOptions.find(x => x.value === "saved") :
+                                                formData1.Status === "completed" || formData1.Status === "Completed" ?
+                                                    orderStatusOptions.find(x => x.value === "completed") :
+                                                    formData1.Status === "cancelled" || formData1.Status === "Cancelled" ?
+                                                        orderStatusOptions.find(x => x.value === "cancelled") :
+                                                        formData1.Status === "paid" || formData1.Status === "Paid" ?
+                                                            orderStatusOptions.find(x => x.value === "paid") :
+                                                            formData1.Status === "refunded" || formData1.Status === "Refunded" ?
+                                                                orderStatusOptions.find(x => x.value === "refunded") :
+                                                                formData1.Status === "accepted" || formData1.Status === "Accepted" ?
+                                                                    orderStatusOptions.find(x => x.value === "accepted") :
+                                                                    formData1.Status === "rejected" || formData1.Status === "Rejected" ?
+                                                                        orderStatusOptions.find(x => x.value === "rejected") :
+                                                                        orderStatusOptions.find(x => x.value === "select"))
                             }
+
+
                             options={orderStatusOptions}
                             // value="Select Status *"
                             errorStyle={errorMessage === "status"}

@@ -13,13 +13,16 @@ import toast from "react-hot-toast";
 
 export const orderStatusOptions = [
   { label: "Received", value: "received" },
-  { label: "Processing", value: "processing" },
-  { label: "Ready for pickup", value: "ready_for_pickup" },
-  { label: "Saved", value: "saved" },
+  { label: "Accepted", value: "accepted" },
+  { label: "Rejected", value: "rejected" },
   { label: "Completed", value: "completed" },
-  { label: "Cancelled", value: "cancelled" },
-  { label: "Paid", value: "paid" },
-  { label: "Refunded", value: "refunded" }
+  // { label: "Processing", value: "processing" },
+  // { label: "Ready for pickup", value: "ready_for_pickup" },
+  // { label: "Saved", value: "saved" },
+  // { label: "Cancelled", value: "cancelled" },
+  // { label: "Paid", value: "paid" },
+  // { label: "Refunded", value: "refunded" },
+
 ];
 
 
@@ -42,8 +45,8 @@ export const deliveryMen = [
     return toast.promise(myPromise, {
         loading: 'Loading, Please Wait',
         // success: 'Data Inserted Successfully',
-        success: (data) => `${data.payload.message}`,
-        error: (data) => `${data.payload.message}`
+        success: (data) => `${data?.payload?.message}`,
+        error: (data) => `${data?.payload?.message}`
     },
     {
         success: {

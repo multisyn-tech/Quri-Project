@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import MenuItems from './MenuItems';
 import { fetchMenuByTableID } from '../../../../features/menu/menuSlice';
-import { addItemToCart, removeItemFromCart, updateItemQuantity } from '../../../../features/orders/orderSlice';
+import { addItemToCart, removeItemFromCart, updateItemQuantity, resetCartItems, resetRejectedOrderItems } from '../../../../features/orders/orderSlice';
+
 
 const Menu = () => {
   const dispatch = useDispatch();
@@ -51,12 +52,14 @@ const Menu = () => {
   //   return <div>Error: {orderError}</div>;
   // }
 
+
+
   return (
     <div className="flex">
-    
+
       <MenuItems />
 
-    
+
     </div>
   );
 };

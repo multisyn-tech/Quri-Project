@@ -18,10 +18,18 @@ const OrderPlaced = () => {
   };
 
 
-  const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
-  const orderDetailIds = orderDetails.map(item => item.OrderDetailID);
-  // console.log(orderDetailIds);
+  let orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+  let orderDetailIds = orderDetails.map(item => item?.OrderDetailID);
 
+
+
+  if (orderDetails.length == 0) {
+    orderDetails = useSelector((state) => state.orders?.orders || []);
+    orderDetailIds = orderDetails[orderDetails.length - 1].OrderID;
+  }
+
+
+  // console.log(orderDetailIds);
 
   const getOrderID = async () => {
     try {
@@ -34,7 +42,7 @@ const OrderPlaced = () => {
       });
 
       const data = await response.json();
-      // console.log(data.orderID);
+      // console.log("get order id ", data.orderID);
 
       if (data.orderID != null) {
         setOrderID(data.orderID)
@@ -50,7 +58,7 @@ const OrderPlaced = () => {
 
     if (orderID === null) return;
 
-    console.log("order is  ", orderID)
+    // console.log("order is  ", orderID)
 
     try {
       const response = await fetch(`${BASE_URl}/customers/order/changeStatus/${orderID}`, {
@@ -62,7 +70,7 @@ const OrderPlaced = () => {
       });
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
     } catch (error) {
       console.error("Error changing order status:", error);
     }
@@ -70,8 +78,8 @@ const OrderPlaced = () => {
 
 
   useEffect(() => {
-    handleResetCart()
     getOrderID();
+    handleResetCart()
 
   }, [orderDetailIds]);
 

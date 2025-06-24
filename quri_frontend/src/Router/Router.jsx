@@ -1,6 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
 import HomeScreen from "../pages/BillingNavigation/HomeScreen";
 import Billing from "../pages/BillingNavigation/Billing";
+
+import Waiting from "../pages/BillingNavigation/Waiting";
+
 import QuriFeeDetails from "../pages/BillingNavigation/QuriFeeDetails";
 import TotalBillings from "../pages/BillingNavigation/TotalBillings";
 import QuriFeeDetail from "../components/BillingFuntionality/TotalBill/FeeDetails";
@@ -92,6 +95,7 @@ const ThemeRoutes = [
     children: [
       { path: "home/:qrCode", exact: true, element: <HomeScreen /> },
       { path: "home/bill", exact: true, element: <Billing /> },
+      { path: "home/waiting", exact: true, element: <Waiting /> },
       { path: "quriFeeDetails", exact: true, element: <QuriFeeDetails /> },
       { path: "bill/checkout", exact: true, element: <TotalBillings /> },
       { path: "fee", exact: true, element: <QuriFeeDetail /> },

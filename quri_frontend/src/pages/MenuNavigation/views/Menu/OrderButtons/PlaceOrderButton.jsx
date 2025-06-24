@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'antd-mobile';
 import { BiBookmarkAltPlus } from "react-icons/bi";
-import { addOrder } from '../../../../../features/orders/orderSlice';
+import { addOrder, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, reset } from '../../../../../features/orders/orderSlice';
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 
@@ -13,16 +13,28 @@ const orderDate = dayjs().format('MM-DD-YYYY');
 
 const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();   
+    const dispatch = useDispatch();
+
+
+
+
+    const orderDetails = useSelector(state => state.orders.detailsOfOrders)
+    // console.log("Order Details: ", orderDetails)
+
 
     const finalOrderPlace = () => {
 
         // Map cartItems to OrderDetails
-        const orderDetails = cartItems.map(item => ({
+        let orderDetails = null;
+
+        orderDetails = cartItems.map(item => ({
             MenuID: item.MenuID,
             quantity: item.quantity,
             Price: item.Price,
+            ItemName: item.ItemName,
+            Image: item.Image,
         }));
+
 
         // Dispatch addOrder action with the correctly structured payload
         dispatch(addOrder({
@@ -33,7 +45,7 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
             OrderDate: orderDate
         }));
 
-        // Show SweetAlert2 success message
+        // Show  success message
         Swal.fire({
             icon: 'success',
             title: 'Order placed successfully!',
@@ -45,10 +57,19 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
             timerProgressBar: true,
         });
 
-        // Navigate after 5 seconds
+
+     
+
+        // Navigate after some time
+        // setTimeout(() => {
+        //     // navigate('/quri/menu/orderPlaced');  
+        //     navigate('/quri/home/bill');  // temperory navigation
+        // }, 3000);
+
+
+        //  waiting screen
         setTimeout(() => {
-            // navigate('/quri/menu/orderPlaced');  
-            navigate('/quri/home/bill');  // temperory navigation
+            navigate(`/quri/home/waiting`);  // temperory navigation
         }, 3000);
 
     }

@@ -30,7 +30,6 @@ const ManageSelectComponent = ({ isSearchable=true ,isMulti,id,zIndex, defaultVa
 
     // const color = useSelector(state => state.themeColor.color)
 
-
     return (
         <div tabIndex='-1' id={id} style={{position: `${props?.style?.position? "relative":""}`, borderRadius: "5px",zIndex:`${zIndex || '2'}`}}>
             <Select

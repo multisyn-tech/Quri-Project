@@ -8,7 +8,7 @@ import { Button } from 'reactstrap'
 import { Print } from '@mui/icons-material';
 import ReactToPrint from 'react-to-print';
 import { orderStatusOptions, orderMethodOptions, deliveryMen, myToast } from '../../../../../Manage/snippets';
-import { getDetailsOfOrders, getOrders, updateOrderStatus } from '../../../../../features/orders/orderSlice';
+import { getDetailsOfOrders, getOrders, updateOrderStatus, resetDetailsOfOrder } from '../../../../../features/orders/orderSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import ManageSelect from '../../../../../Manage/ManageSelect';
 import QuriLogo from '../../../../../assets/Admin/Quri.svg'
@@ -26,25 +26,34 @@ const OrderDetails = (props) => {
 
   const dataAvaliable = formData1 !== undefined
 
-
-
-
-  const dispatch  = useDispatch();
+  const dispatch = useDispatch();
 
   const settings = useSelector((state) => state.settings?.settings);
 
-  const restaurantName = settings && settings.length > 0 
-  ? settings.find(item => item.KeyID === "RestaurantName")?.Value 
-  : "Restaurant Not Available";
+  const restaurantName = settings && settings.length > 0
+    ? settings.find(item => item.KeyID === "RestaurantName")?.Value
+    : "Restaurant Not Available";
 
   //console.log("Restaurant Name: ",restaurantName);
 
-  const orderID = useSelector(state => state.orders.orders?.orders?.[0]?.OrderID || 'No order found');
+  const orders = useSelector((state) => state.orders?.orders?.orders);
+  const lastOrderID = orders[orders.length - 1].OrderID
 
-  console.log("Order ID: ", orderID);
+
+  // const orderID = useSelector(state => state.orders.orders?.orders?.[0]?.OrderID || 'No order found');
+  const orderID = lastOrderID
+
+  // console.log("orders:", orders)
+  // console.log("last order:", lastOrderID)
+
+  // console.log("Order ID: ", orderID);
+
+  const orderDetails = useSelector(state => state.orders.detailsOfOrders)
+  // console.log("Order Details: ", orderDetails)
   
-  const orderDetails = useSelector(state =>  state.orders.detailsOfOrders)
-  console.log("Order Details: ",orderDetails)
+  // const cartItems = useSelector(state => state.orders.cartItems || [] )
+  // console.log("cart items: ", cartItems)
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deliveryServiceNameInput, setDeliveryServiceNameInput] = useState('');
@@ -63,7 +72,7 @@ const OrderDetails = (props) => {
   useEffect(() => {
     if (orderDetails?.orderDetails?.Status) {
       const status = orderDetails.orderDetails.Status;
-      
+
       // Check if the status exists in the orderStatusOptions array
       if (orderStatusOptions.includes(status)) {
         setSelectedStatusOption(status);
@@ -71,9 +80,10 @@ const OrderDetails = (props) => {
     }
   }, [orderDetails]);
 
-   // Fetch order details whenever the orderID changes
+  // Fetch order details whenever the orderID changes
   useEffect(() => {
     if (orderID) {
+      dispatch(resetDetailsOfOrder()); // Optional safety
       dispatch(getDetailsOfOrders(orderID)); // Fetch details for the given orderID
     }
   }, [dispatch, orderID]);
@@ -137,7 +147,7 @@ const OrderDetails = (props) => {
     createdDate: orderDetails?.orderDetails?.OrderDate || '',
     dueDate: orderDetails?.orderDetails?.OrderDate || '',  // Add logic if you have a due date
     companyInfo: {
-      name:restaurantName , // Replace with actual company info if available
+      name: restaurantName, // Replace with actual company info if available
       // address: 'Res Address',
       // city: 'City, State, ZIP',
     },
@@ -153,6 +163,11 @@ const OrderDetails = (props) => {
       Quantity: item.Quantity,
       price: `AED ${item.ItemPrice}`,
     })) || [],
+    // items: cartItems.map(item => ({
+    //   description: item.ItemName,
+    //   Quantity: item.quantity,
+    //   price: `AED ${item.Price}`,
+    // })) || [],
     total: `AED ${orderDetails?.orderDetails?.TotalAmount || '0.00'}`,
   };
 
@@ -165,76 +180,78 @@ const OrderDetails = (props) => {
 
   const handleTimeoutAlert = (obj) => {
 
-  
 
-    const myPromise = new Promise(async(resolve, reject) => {
-        dispatch(updateOrderStatus(obj, dataAvaliable && formData1.OrderID)).then((response) => {
-            const result = response
-           
-            if (tableForm) {
-                
-                const data = JSON.parse(JSON.stringify(tableData))
-                
-                const newObj = {
-                    id: result.id,
-                    sn: data.length + 1,
-                    status:obj.status
-                }
-                    
-                    data.unshift(newObj)
-                    setTableData(data)
-                    props.setInputModal(false)
-                    
-            }
-            setIsUpdated(true)
-            props.setInputModal(false);
-            // props.setTableData([])
-            // setTableData([])
+    const myPromise = new Promise(async (resolve, reject) => {
+      dispatch(updateOrderStatus(obj, dataAvaliable && formData1.OrderID)).then((response) => {
+        const result = response
 
-            let obj = {
-              page: '1',
-              limit: '10',
-              search: ''
-            };
-          
-            dispatch(getOrders(obj));
+        if (tableForm) {
 
-            resolve(result)
-        }).catch((err) => {
+          const data = JSON.parse(JSON.stringify(tableData))
+
+          const newObj = {
+            id: result.id,
+            sn: data.length + 1,
+            status: obj.status
+          }
+
+          data.unshift(newObj)
+          setTableData(data)
+          props.setInputModal(false)
+
+        }
+        setIsUpdated(true)
+        props.setInputModal(false);
+        // props.setTableData([])
+        // setTableData([])
+
+        let obj = {
+          page: '1',
+          limit: '100',
+          search: ''
+        };
+
+        dispatch(getOrders(obj));
+
+        resolve(result)
+      }).catch((err) => {
         reject(err)
-    });
+      });
 
-    
+
     })
-  
+
     return myToast(myPromise)
 
-}
+  }
 
-const handleUpdate = () => {
+  const handleUpdate = () => {
     let obj = {
-      newStatus:selectedStatusOption,
+      newStatus: selectedStatusOption,
     }
-   
-    if(obj.newStatus == ''){
-        setErrorMessage('status')
-        toast.error('Select Status to Proceed')
-      } 
-      else {
-          setErrorMessage("")
+
+
+    if (obj.newStatus == '') {
+      setErrorMessage('status')
+      toast.error('Select Status to Proceed')
+    }
+    else {
+      setErrorMessage("")
+    }
+    if (errorMessage == "" && obj.newStatus !== '') {
+      if (dataAvaliable) {
+        // const updatedObj = Object.assign(obj, {id: formData1.id, provinceName: filteredProvince.label})
+        const updatedObj = Object.assign(obj, { OrderID: formData1.OrderID })
+
+        setUpdatedData(updatedObj)
+
+        props.RejectedModalStatus(updatedObj)
+
       }
-      if(errorMessage==""  && obj.newStatus!=='' ){
-        if (dataAvaliable) {
-            // const updatedObj = Object.assign(obj, {id: formData1.id, provinceName: filteredProvince.label})
-            const updatedObj = Object.assign(obj, {OrderID: formData1.OrderID})
-            
-            setUpdatedData(updatedObj)
-            
-        } 
-        handleTimeoutAlert(obj)
-        }
-}
-  
+      handleTimeoutAlert(obj)
+    }
+  }
+
   return (
     <>
       <Box sx={{ flexGrow: 1, padding: 2 }}>
@@ -264,7 +281,7 @@ const handleUpdate = () => {
               <OrderShippingInfo
                 errorMessage={errorMessage}
                 dataAvaliable={dataAvaliable}
-                formData1 ={formData1}
+                formData1={formData1}
                 selectedStatusOption={selectedStatusOption}
                 handleStatusChange={handleStatusChange}
                 switchChecked={switchChecked}
@@ -272,10 +289,10 @@ const handleUpdate = () => {
               />
             </Grid>
           </Grid>
-          <div style={{display:'flex', justifyContent:'flex-end', width:'100%'}}>
-          <Button className=" mb-1" color="primary" type="button"  onClick={handleUpdate} style={{float:'right', marginTop:'1rem'}}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+            <Button className=" mb-1" color="primary" type="button" onClick={handleUpdate} style={{ float: 'right', marginTop: '1rem' }}>
               {'Update'}
-          </Button>
+            </Button>
           </div>
         </Grid>
       </Box>
@@ -318,7 +335,7 @@ const InvoiceHeader = ({ data1, formData1 }) => {
 const InvoiceBody = ({ data1 }) => {
   return (
     <>
-   
+
       <Grid container spacing={2} sx={{ marginTop: 4 }}>
         <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
           <Typography variant="body1" className='text-nowrap'> <span className='font-bold'>Restaurant Name: </span> {data1.companyInfo.name}</Typography>
@@ -382,49 +399,56 @@ const InvoiceBody = ({ data1 }) => {
   );
 };
 
-const OrderShippingInfo = ({dataAvaliable, formData1, selectedStatusOption, handleStatusChange, switchChecked, handleSwitchChange, errorMessage }) => {
+const OrderShippingInfo = ({ dataAvaliable, formData1, selectedStatusOption, handleStatusChange, switchChecked, handleSwitchChange, errorMessage }) => {
+
+
   return (
     <Grid item xs={12}>
       <Paper elevation={2} sx={{ padding: 2 }}>
         <Typography variant="h6" align='center'>Order & Shipping Info</Typography>
         <FormControl fullWidth variant="outlined" style={{ marginTop: '1rem' }} size="small">
           <Typography sx={{ fontWeight: 'bold' }}>Change Order Status</Typography>
-           <ManageSelect
-                            width="100%"
-                            type='group'
-                            id = 'op_status'
-                            label ='Select Status *'
-                            defaultValue={dataAvaliable && 
-                                (formData1.Status === "received" || formData1.Status === "Received" ?  
-                                    orderStatusOptions.find(x => x.value === "received")
-                                : formData1.Status === "processing" || formData1.Status === "Processing" ? 
-                                    orderStatusOptions.find(x => x.value === "processing")
-                                : formData1.Status === "ready for pickup" || formData1.Status === "Ready for pickup" ? 
-                                    orderStatusOptions.find(x => x.value === "ready_for_pickup")
-                                : formData1.Status === "saved" || formData1.Status === "Saved" ? 
-                                    orderStatusOptions.find(x => x.value === "saved")
-                                : formData1.Status === "completed" || formData1.Status === "Completed" ? 
-                                    orderStatusOptions.find(x => x.value === "completed")
-                                : formData1.Status === "cancelled" || formData1.Status === "Cancelled" ? 
-                                    orderStatusOptions.find(x => x.value === "cancelled")
-                                : formData1.Status === "paid" || formData1.Status === "Paid" ? 
-                                    orderStatusOptions.find(x => x.value === "paid")
-                                : formData1.Status === "refunded" || formData1.Status === "Refunded" ? 
-                                    orderStatusOptions.find(x => x.value === "refunded")
-                                : orderStatusOptions.find(x => x.value === "select")) // Default case if no match is found
-                            }                                             
-                            options={orderStatusOptions}
-                            // value="Select Status *"
-                            errorStyle={errorMessage === "status"}
-                            // loadingCondition={provinceLoading}
-                            // onChange ={(e) =>{
-                            //      setStatus(e.label) 
-                            //     // setValue(-1)
-                            //     // setProvinceName(e.label)
-                            // } }
+          <ManageSelect
+            width="100%"
+            type='group'
+            id='op_status'
+            label='Select Status *'
+            defaultValue={dataAvaliable &&
+              (formData1.Status === "received" || formData1.Status === "Received" ?
+                orderStatusOptions.find(x => x.value === "received")
+                : formData1.Status === "processing" || formData1.Status === "Processing" ?
+                  orderStatusOptions.find(x => x.value === "processing")
+                  : formData1.Status === "ready for pickup" || formData1.Status === "Ready for pickup" ?
+                    orderStatusOptions.find(x => x.value === "ready_for_pickup")
+                    : formData1.Status === "saved" || formData1.Status === "Saved" ?
+                      orderStatusOptions.find(x => x.value === "saved")
+                      : formData1.Status === "completed" || formData1.Status === "Completed" ?
+                        orderStatusOptions.find(x => x.value === "completed")
+                        : formData1.Status === "cancelled" || formData1.Status === "Cancelled" ?
+                          orderStatusOptions.find(x => x.value === "cancelled")
+                          : formData1.Status === "paid" || formData1.Status === "Paid" ?
+                            orderStatusOptions.find(x => x.value === "paid")
+                            : formData1.Status === "refunded" || formData1.Status === "Refunded" ?
+                              orderStatusOptions.find(x => x.value === "refunded")
+                              : formData1.Status === "accepted" || formData1.Status === "Accepted" ?
+                                orderStatusOptions.find(x => x.value === "accepted")
+                                : formData1.Status === "rejected" || formData1.Status === "Rejected" ?
+                                  orderStatusOptions.find(x => x.value === "rejected")
+                                  : orderStatusOptions.find(x => x.value === "select")) // Default if no match
+            }
 
-                            onChange={(e) => {handleStatusChange(e.label)}}
-                        />
+            options={orderStatusOptions}
+            // value="Select Status *"
+            errorStyle={errorMessage === "status"}
+            // loadingCondition={provinceLoading}
+            // onChange ={(e) =>{
+            //      setStatus(e.label) 
+            //     // setValue(-1)
+            //     // setProvinceName(e.label)
+            // } }
+
+            onChange={(e) => { handleStatusChange(e.label) }}
+          />
         </FormControl>
         <Grid container alignItems="center" style={{ marginTop: '1rem' }}>
           <Grid item xs>

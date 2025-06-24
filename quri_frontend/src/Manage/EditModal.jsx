@@ -16,6 +16,8 @@ const EditModal = ({
   setIsUpdated,
   tableData,
   setTableData,
+  rejectedModalStatus,
+  setRejectedModalStatus
 }) => {
   const dispatch = useDispatch();
 
@@ -36,8 +38,8 @@ const EditModal = ({
 
   const getManageInputComponent = (modalName) => {
     setInputModal(true);
-    if (modalName === 'Order Details') return <OrderDetails tableData={tableData} setTableData={setTableData} data={data} isUpdated={isUpdated} updatedData={updatedData} setIsUpdated={setIsUpdated} setUpdatedData={setUpdatedData} setNameModalOpen={setNameModalOpen} inputModal={inputModal} setInputModal={setInputModal}/>
-    if (modalName === 'Order Status') return <OrderStatus tableData={tableData} setTableData={setTableData} data={data} isUpdated={isUpdated} updatedData={updatedData} setIsUpdated={setIsUpdated} setUpdatedData={setUpdatedData} setNameModalOpen={setNameModalOpen} inputModal={inputModal} setInputModal={setInputModal}/>
+    if (modalName === 'Order Details') return <OrderDetails tableData={tableData} setTableData={setTableData} data={data} isUpdated={isUpdated} updatedData={updatedData} setIsUpdated={setIsUpdated} setUpdatedData={setUpdatedData} setNameModalOpen={setNameModalOpen} inputModal={inputModal} setInputModal={setInputModal} rejectedModalStatus={rejectedModalStatus} RejectedModalStatus={setRejectedModalStatus}/>
+    if (modalName === 'Order Status') return <OrderStatus tableData={tableData} setTableData={setTableData} data={data} isUpdated={isUpdated} updatedData={updatedData} setIsUpdated={setIsUpdated} setUpdatedData={setUpdatedData} setNameModalOpen={setNameModalOpen} inputModal={inputModal} setInputModal={setInputModal} rejectedModalStatus={rejectedModalStatus} RejectedModalStatus={setRejectedModalStatus}/>
   };
 
   useEffect(() => {

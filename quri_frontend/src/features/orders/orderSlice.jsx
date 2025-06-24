@@ -33,13 +33,19 @@ export const getOrders = createAsyncThunk(
     }
   }
 );
+
+
 export const getDetailsOfOrders = createAsyncThunk(
   'orders/detailsOfOrders',
   async (orderID, { rejectWithValue }) => {
     try {
-      if (!token) {
-        throw new Error('No token found');
-      }
+
+      const token = localStorage.getItem('authToken');
+      const resID = localStorage.getItem('RestaurantID');
+
+      // if (!token) {
+      //   throw new Error('No token found');
+      // }
       if (!resID) {
         throw new Error('No RestaurantID found');
       }
@@ -49,7 +55,13 @@ export const getDetailsOfOrders = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
+
+      if (response.data?.orderDetails?.items) {
+        response.data.orderDetails.items = [...response.data.orderDetails.items];
+      }
+
+      // console.log("Fetched orderDetails from API:", response.data.orderDetails.items);
+
       return response.data;
 
     } catch (error) {
@@ -75,7 +87,7 @@ export const getOrdersByCustomer = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response)
+      // console.log(response)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -98,7 +110,7 @@ export const getOrdersByTableID = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response)
+      // console.log(response)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -112,7 +124,6 @@ export const addOrder = createAsyncThunk(
   async (orderData, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${BASE_URL}/customers/order`, orderData);
-
       return response.data;
     } catch (error) {
       console.error("Error while adding order:", error.response?.data || error.message); // Log error details
@@ -138,18 +149,43 @@ export const viewOrder = createAsyncThunk(
   }
 );
 export const updateOrderStatus = createAsyncThunk(
-  'orders/orderStatus',
+  'orders/rejectedOrder',
   async (payload, { rejectWithValue }) => {
     console.log('payload==', payload)
     try {
       const response = await axios.put(`${BASE_URL}/customers/order/changeStatus/${payload.OrderID}`, payload);
-      // dispatch(cartItems(response.data))
+      // dispatch(cartItems(response.data))      
       return response.data;
     } catch (error) {
       console.error("Error while fetching order:", error.response?.data || error.message); // Log error details
       return rejectWithValue(error.response?.data || error.message);
     }
   }
+);
+
+export const addRejectedOrder = createAsyncThunk(
+  'orders/addRejectedOrder',
+  async (unavailableItems, thunkAPI) => {
+    try {
+      const res = await axios.post(`${BASE_URL}/customers/order/rejectedOrder`, { items: unavailableItems });
+      return res.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getDetailsOfRejectedOrders = createAsyncThunk(
+  'orders/getDetailsOfRejectedOrders',
+  async (orderId, thunkAPI) => {
+    try {
+      const res = await axios.post(`${BASE_URL}/customers/order/rejectedOrder/${orderId}`);
+      return res.data.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+
 );
 
 
@@ -168,8 +204,9 @@ const orderSlice = createSlice({
     img: '',
     cartItems: [], // Add cartItems to the state
     totalPrice: 0, // Add totalPrice to the state
-
+    rejectedOrderItems: [],
   },
+
   reducers: {
     addItemToCart: (state, action) => {
       const { item, quantity } = action.payload;
@@ -191,8 +228,17 @@ const orderSlice = createSlice({
         existingItem.quantity = quantity; // Update the item's quantity
       }
     },
+
     resetCartItems: (state) => {
       state.cartItems = []; // Reset the cartItems to an empty array
+      state.orders = [];
+    },
+    resetRejectedOrderItems: (state) => {
+      state.rejectedOrderItems = []
+    },
+    resetDetailsOfOrder: (state) => {
+      // state.detailsOfOrders = [];
+      // console.log("details of order:", JSON.stringify(state))
     },
 
     reset: (state) => {
@@ -207,6 +253,7 @@ const orderSlice = createSlice({
       state.error = null;
       state.cartItems = [];
       state.totalPrice = 0;
+      state.rejectedOrderItems = []
     }
 
 
@@ -277,6 +324,7 @@ const orderSlice = createSlice({
       })
       .addCase(getDetailsOfOrders.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        // Store full response in state
         state.detailsOfOrders = action.payload; // Store full response in state
       })
       .addCase(getDetailsOfOrders.pending, (state) => {
@@ -290,10 +338,14 @@ const orderSlice = createSlice({
         state.status = 'succeeded';
         state.orderStatus = action.payload; // Ensure correct data structure
       })
+    // .addCase(addRejectedOrder.fulfilled, (state, action) => {
+    //   const { orderId, rejectedItems } = action.payload;
+    //   state.rejectedOrderItems.push({ orderId, rejectedItems });
+    // })
   },
 });
 
-export const { addItemToCart, removeItemFromCart, updateItemQuantity, resetCartItems,  reset  } = orderSlice.actions;
+export const { addItemToCart, removeItemFromCart, updateItemQuantity, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, reset } = orderSlice.actions;
 
 //Memoized purposes
 export const selectQrCodeDetails = (state) => state.qrcode.qrCodeDetails?.data;

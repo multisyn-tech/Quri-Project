@@ -115,8 +115,11 @@ const Bill = () => {
                     <div className={`relative p-4  ${isBillDividerVisible ? 'shadow-lg' : ''}`}>
                         <header className={`flex flex-col items-center   ${isQuriFeeVisible ? 'filter blur-sm' : ''}`}>
                             <section className="relative flex flex-row items-center justify-between mb-6 w-full">
-                                <button className="flex-shrink-0 p-2 rounded-full transition-transform transform hover:scale-110 active:scale-90 focus:outline-none" onClick={goBack}>
+                                {/* <button className="flex-shrink-0 p-2 rounded-full transition-transform transform hover:scale-110 active:scale-90 focus:outline-none" onClick={goBack}>
                                     <MdArrowBackIosNew size={24} />
+                                </button> */}
+                                <button className="flex-shrink-0 p-2 rounded-full transition-transform transform hover:scale-110 active:scale-90 focus:outline-none" >
+                                    {/* <MdArrowBackIosNew size={24} /> */}
                                 </button>
 
                                 <p className="absolute left-1/2 transform -translate-x-1/2 text-xl">Pay now</p>
