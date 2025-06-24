@@ -15,6 +15,8 @@ const {
   deleteOrderService,
   getMenuByTableID,
   findOrderIDService,
+  addRejectedOrderService,
+  findRejectedOrderService
 } = require("./service.js");
 
 dotenv.config();
@@ -27,7 +29,7 @@ const secretKey = process.env.JWT_SECRET;
 
 const AddOrder = async (req, res) => {
   try {
-    // console.log("Received order request:", req.body); // Log the request body
+    console.log("Received order request:", req.body); // Log the request body
     const result = await addOrderService(req.body);
     // console.log(result);
     res.status(201).json({ message: "Order processed successfully", result });
@@ -47,7 +49,7 @@ const getOrderById = async (req, res) => {
     const order = await getOrderByTableIdService(tableId);
 
     console.log("Order fetched successfully:", order); // Log the fetched order
-    
+
     res.status(200).json({ order });
   } catch (error) {
     console.error("Error fetching order:", error.message); // Log the error
@@ -284,7 +286,7 @@ const deleteCustomerController = async (req, res) => {
 // find order id using orderDetailID
 const findOrderID = async (req, res) => {
 
-  const { orderDetailIds } = req.body; 
+  const { orderDetailIds } = req.body;
 
   try {
     const orderID = await findOrderIDService(orderDetailIds);
@@ -362,6 +364,47 @@ const getMenuByTableIDController = async (req, res) => {
   }
 };
 
+// add rejected orders to table
+const addRejectedOrder = async (req, res) => {
+  try {
+    const items = req.body.items;
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'No items provided' });
+    }
+
+    const { orderId, rejectedItems } = await addRejectedOrderService(items);
+
+    return res.status(200).json({
+      orderId,
+      rejectedItems
+    });
+
+  } catch (error) {
+    console.error("Error in controller:", error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+const findRejectedOrder = async (req, res) => {
+  const orderId = req.params.orderId;
+
+  try {
+    const result = await findRejectedOrderService(orderId);
+    if (result) {
+      res.status(200).json({ success: true, data: result });
+    } 
+    // else {
+    //   res.status(404).json({ success: false, message: "No rejected order id found" });
+    // }
+  } catch (error) {
+    console.error("Error fetching rejected orders:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
 module.exports = {
   AddOrder,
   getOrderById,
@@ -377,4 +420,6 @@ module.exports = {
   deleteOrder,
   getMenuByTableIDController,
   findOrderID,
+  addRejectedOrder,
+  findRejectedOrder,
 };

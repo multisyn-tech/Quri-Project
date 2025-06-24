@@ -13,7 +13,9 @@ const {
   editOrder,
   deleteOrder,
   getMenuByTableIDController,
-  findOrderID
+  findOrderID,
+  addRejectedOrder,
+  findRejectedOrder
 } = require("./controller.js");
 
 const router = express.Router();
@@ -44,5 +46,10 @@ router.delete("/:customerId", deleteCustomerController);
 
 // Fetch Menu based on Table ID
 router.get("/menu/:tableId", getMenuByTableIDController);
+
+
+// add "insert rejected order", "find rejected order" from restaurant dashboard to table 
+router.post('/order/rejectedOrder', addRejectedOrder);
+router.post('/order/rejectedOrder/:orderId', findRejectedOrder);
 
 module.exports = router;

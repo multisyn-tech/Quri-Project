@@ -19,6 +19,8 @@ const addOrderService = async function ({
     "Cancelled",
     "Paid",
     "Refunded",
+    "Accepted",
+    "Rejected"
   ];
 
   if (!RestaurantID || !TotalAmount || !OrderDetails || !TableID) {
@@ -85,31 +87,47 @@ const addOrderService = async function ({
       ];
       await db.promise().query(updateQuery, updateValues);
 
-      // Insert or update data into orderdetails table
+
+      // DELETE previous items before inserting new ones after items rejected by restaurant 
+      await db.promise().query("DELETE FROM orderdetails WHERE OrderID = ?", [OrderID]);
+
+      // 🔁 Insert fresh order items
       for (const detail of OrderDetails) {
         const { MenuID, quantity, Price } = detail;
-        // Check if the detail already exists
-        const [existingDetails] = await db
-          .promise()
-          .query(
-            "SELECT * FROM orderdetails WHERE OrderID = ? AND MenuID = ?",
-            [OrderID, MenuID]
-          );
-
-        if (existingDetails.length === 0) {
-          // If detail does not exist, insert it
-          const insertDetailsQuery =
-            "INSERT INTO orderdetails (OrderID, MenuID, Quantity, Price, isServed) VALUES (?, ?, ?, ?, ?)";
-          const insertDetailsValues = [OrderID, MenuID, quantity, Price, "No"];
-          await db.promise().query(insertDetailsQuery, insertDetailsValues);
-        } else {
-          // If detail exists, update the quantity and price
-          const updateDetailsQuery =
-            "UPDATE orderdetails SET Quantity = ?, Price = ? WHERE OrderID = ? AND MenuID = ?";
-          const updateDetailsValues = [quantity, Price, OrderID, MenuID];
-          await db.promise().query(updateDetailsQuery, updateDetailsValues);
-        }
+        const insertDetailsQuery =
+          "INSERT INTO orderdetails (OrderID, MenuID, Quantity, Price, isServed) VALUES (?, ?, ?, ?, ?)";
+        const insertDetailsValues = [OrderID, MenuID, quantity, Price, "No"];
+        await db.promise().query(insertDetailsQuery, insertDetailsValues);
       }
+
+
+      // Insert or update data into orderdetails table
+      // for (const detail of OrderDetails) {
+      //   const { MenuID, quantity, Price } = detail;
+      //   // Check if the detail already exists
+      //   const [existingDetails] = await db
+      //     .promise()
+      //     .query(
+      //       "SELECT * FROM orderdetails WHERE OrderID = ? AND MenuID = ?",
+      //       [OrderID, MenuID]
+      //     );
+
+      //   if (existingDetails.length === 0) {
+      //     // If detail does not exist, insert it
+      //     const insertDetailsQuery =
+      //       "INSERT INTO orderdetails (OrderID, MenuID, Quantity, Price, isServed) VALUES (?, ?, ?, ?, ?)";
+      //     const insertDetailsValues = [OrderID, MenuID, quantity, Price, "No"];
+      //     await db.promise().query(insertDetailsQuery, insertDetailsValues);
+      //   } else {
+      //     // If detail exists, update the quantity and price
+      //     const updateDetailsQuery =
+      //       "UPDATE orderdetails SET Quantity = ?, Price = ? WHERE OrderID = ? AND MenuID = ?";
+      //     const updateDetailsValues = [quantity, Price, OrderID, MenuID];
+      //     await db.promise().query(updateDetailsQuery, updateDetailsValues);
+      //   }
+      // }
+
+
     }
 
     return { OrderID };
@@ -344,14 +362,18 @@ const changeOrderStatusService = async function (OrderID, newStatus) {
     "Cancelled",
     "Paid",
     "Refunded",
+    "Accepted",
+    "Rejected"
   ];
+
+
 
   // Validate the new status
   if (!validStatuses.includes(newStatus)) {
     throw new Error("Invalid status");
   }
 
-  
+
 
   try {
     // Check the current status of the order
@@ -374,6 +396,9 @@ const changeOrderStatusService = async function (OrderID, newStatus) {
     // Update the status
     const text = "UPDATE orders SET Status = ? WHERE OrderID = ?";
     const values = [newStatus, OrderID];
+
+
+
     const result = await db.promise().query(text, values);
     return result;
   } catch (err) {
@@ -401,6 +426,8 @@ const editOrderService = async function ({
     "Cancelled",
     "Paid",
     "Refunded",
+    "Accepted",
+    "Rejected"
   ];
 
   // Validate input
@@ -567,6 +594,44 @@ const findOrderIDService = async function (orderDetailIds) {
   }
 };
 
+
+// add rejected order into table
+const addRejectedOrderService = async (items) => {
+  for (const item of items) {
+    const orderId = item.orderId;
+    const rejectedItems = item.rejectedItems;
+
+    const rejectedItemsJSON = JSON.stringify(rejectedItems);
+
+    const query = `
+      INSERT INTO rejectedorders (OrderID, rejectedOrder)
+      VALUES (?, ?)
+    `;
+    await db.query(query, [orderId, rejectedItemsJSON]);
+  }
+
+  return {
+    orderId: items[items.length - 1].orderId,
+    rejectedItems: items[items.length - 1].rejectedItems,
+  };
+};
+
+
+const findRejectedOrderService = async (orderId) => {
+  const query = `
+    SELECT * FROM rejectedorders
+    WHERE OrderID = ?
+    ORDER BY id DESC
+    LIMIT 1
+  `;
+
+
+  const [rows] = await db.query(query, [orderId]);
+  return rows;
+};
+
+
+
 module.exports = {
   addOrderService,
   getOrderByTableIdService,
@@ -582,4 +647,7 @@ module.exports = {
   deleteOrderService,
   getMenuByTableID,
   findOrderIDService,
+  addRejectedOrderService,
+  findRejectedOrderService
+
 };
