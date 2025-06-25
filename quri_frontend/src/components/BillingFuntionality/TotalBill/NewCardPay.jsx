@@ -16,8 +16,14 @@ const NewCardPay = () => {
 
   const [tip, setTip] = useState(0);
   const [loading, setLoading] = useState(false)
+  const [showModalSpinner, setShowModalSpinner] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const [paymentOption, setPaymentOption] = useState('');
+
 
   const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+  const orderInfo = useSelector((state) => state.orders?.order?.order?.order || []);
 
   const orderID = useSelector((state) => state.orders?.order?.order?.OrderID || null);
 
@@ -56,13 +62,19 @@ const NewCardPay = () => {
 
   const handleStripePayment = async () => {
 
+
+    // console.log("btn clicked...")
+    // console.log("order detais:", orderDetails)
+    // return; 
+
     try {
       const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
       // data to send at backend
       const body = {
         amount: parseFloat(total.toFixed(2)),
-        orderDetails: orderDetails
+        orderDetails: orderDetails,
+        orderInfo: orderInfo
       }
 
       // Call stripe api endpoint
@@ -156,6 +168,28 @@ const NewCardPay = () => {
   }
 
 
+  const openPaymentsModal = () => {
+    setShowModal(true);
+    setShowModalSpinner(true);
+    setTimeout(() => {
+      setShowModalSpinner(false);
+    }, 5000); 
+  }
+
+
+  const handleSubmitPayment = () => {
+    setShowModalSpinner(true)
+    setLoading(true)
+    setShowModal(false);
+    if (paymentOption === 'stripe') {
+      handleStripePayment();
+    } else if (paymentOption === 'ngenius') {
+      handleN_GeniusPayment();
+    }
+  };
+
+
+
   return (
     <div className="p-4 flex flex-col justify-center w-full pb-5">
       {/* Payment Information */}
@@ -170,20 +204,19 @@ const NewCardPay = () => {
       </div>
 
       {/* Payment Buttons */}
+      {/*
       <div className="flex gap-4">
-
-        {/* Stripe payment */}
         <button onClick={handleStripePayment} className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
           <TbCreditCard className="text-2xl" />
           <span className="text-lg "> Pay Bill </span>
         </button>
 
-        {/* N-Genius Payment */}
+        
         {loading ? (
-          <>             
-          <p className="my-4">
-            Redirecting...
-          </p>
+          <>
+            <p className="my-4">
+              Redirecting...
+            </p>
           </>
         ) : (
           <button onClick={handleN_GeniusPayment} className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition transform duration-150 ease-in-out">
@@ -191,9 +224,120 @@ const NewCardPay = () => {
             <span className="text-lg "> Checkout </span>
           </button>
         )}
+      </div>
+      */}
 
+
+      <div>
+        {/* Main Button */}
+
+        {loading ?
+          <>
+            <div className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full bg-gray-100 cursor-not-allowed">
+              <svg className="animate-spin h-5 w-5 text-gray-700" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
+              <span className="text-lg">Processing...</span>
+            </div>
+          </>
+          :
+          <>
+            <button
+              onClick={openPaymentsModal}
+              className="flex items-center justify-center gap-2 border border-gray-300 text-black py-2 px-4 rounded-full w-full hover:bg-gray-100 active:bg-gray-200 active:scale-95 active:shadow-inner transition duration-150"
+            >
+              <TbCreditCard className="text-2xl" />
+              <span className="text-lg">Pay Now</span>
+            </button>
+          </>
+        }
+
+
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg text-center">
+              {showModalSpinner ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-6 w-6 text-blue-600" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  <p className="text-blue-600">Loading payment methods...</p>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl font-semibold mb-4">Choose Payment Method</h2>
+                  <div className="mb-4 text-left">
+                    <label className="flex items-center gap-2 mb-2">
+                      <input
+                        type="radio"
+                        name="payment"
+                        value="stripe"
+                        checked={paymentOption === 'stripe'}
+                        onChange={(e) => setPaymentOption(e.target.value)}
+                      />
+                      Pay with Stripe
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="payment"
+                        value="ngenius"
+                        checked={paymentOption === 'ngenius'}
+                        onChange={(e) => setPaymentOption(e.target.value)}
+                      />
+                      Pay with N-Genius
+                    </label>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="px-4 py-2 rounded bg-gray-300 text-black hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSubmitPayment}
+                      disabled={!paymentOption}
+                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
       </div>
+
 
 
     </div>

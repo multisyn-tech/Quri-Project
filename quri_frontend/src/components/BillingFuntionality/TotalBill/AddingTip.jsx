@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BiSolidEdit } from "react-icons/bi";
 import HeartImage from '../../../assets/Billing/heart-tick.svg';
+import { useSelector, useDispatch } from 'react-redux';
 import { Image } from 'antd-mobile'
 import { RiHeartsFill } from "react-icons/ri";
 import { FaStar } from "react-icons/fa";
@@ -8,16 +9,23 @@ import Switch from "react-switch";
 import { calculateTip } from './utility/tipCalculator';
 import { LocalLaundryService } from '@mui/icons-material';
 
+import {addPlateNumber} from '../../../features/orders/orderSlice';
+
 const AddingTip = ({ total, onShowBill }) => {
   const [selectedTip, setSelectedTip] = useState(null);
-
+  const dispatch = useDispatch();
   const [selectCustomTip, setSelectCustomTip] = useState(false);
   const [customTipAmount, setCustomTipAmount] = useState(0);
+  const [plateNumber, setPlateNumber] = useState('');
+  const [debouncedPlate, setDebouncedPlate] = useState('');
 
 
   const [isClicked, setIsClicked] = useState(false);
   const [isToggled, setIsToggled] = useState(false); // Toggle state
   const [selectedRating, setSelectedRating] = useState(0);
+
+  const orderInfo = useSelector((state) => state.orders?.order?.order?.order || []);
+
 
   const handleStarClick = (index) => {
     if (selectedRating === index + 1) {
@@ -54,7 +62,7 @@ const AddingTip = ({ total, onShowBill }) => {
   let tipAmount = selectedTip !== null ? calculateTip(total, selectedTip) : 0;
   tipAmount = Number(tipAmount.toFixed(2))
 
-  
+
   useEffect(() => {
     const finalTip = customTipAmount || tipAmount || 0;
     localStorage.removeItem('tipAmount')
@@ -63,6 +71,24 @@ const AddingTip = ({ total, onShowBill }) => {
   }, [tipAmount, customTipAmount]);
 
 
+
+  const handleAddPlate = () => {
+    const updatedOrder = {
+      ...orderInfo,
+      PlateNumber: plateNumber || '', 
+    };
+
+     dispatch(addPlateNumber(updatedOrder)); 
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedPlate(plateNumber);
+      // console.log('Debounced:', plateNumber);
+      handleAddPlate()
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [plateNumber]);
 
 
 
@@ -119,7 +145,7 @@ const AddingTip = ({ total, onShowBill }) => {
               <span className='text-gray-400 underline'>{selectedTip} AED</span>
             ) : (
               <>
-                <span onClick={()=>setSelectCustomTip(prev => !prev)} className='text-gray-400'>Pay custom tip</span>
+                <span onClick={() => setSelectCustomTip(prev => !prev)} className='text-gray-400'>Pay custom tip</span>
 
                 {selectCustomTip ? (
                   <input
@@ -195,6 +221,20 @@ const AddingTip = ({ total, onShowBill }) => {
               )}
             </div>
           </div> */}
+
+
+          {/* plate number */}
+          <div className='my-5'>
+            <h1 className='font-medium text-xl '>Enter your plate number</h1>
+            <input
+              className='my-1 py-3 px-2 w-full border-2'
+              type="text"
+              value={plateNumber || ''}
+              onChange={(e) => setPlateNumber(e.target.value)}
+              required
+              placeholder='Enter your car plate number i.e. AXD-144'
+            />
+          </div>
 
         </div>
       </div>

@@ -17,8 +17,6 @@ const Waiting = () => {
 
     const orderDetails = useSelector((state) => state.orders?.orders || []);
 
-
-
     const latestOrder = orderDetails[orderDetails.length - 1];
     let lastOrderId = latestOrder?.result.OrderID
     // console.log("Last order id:", lastOrderId);
@@ -88,10 +86,10 @@ const Waiting = () => {
         if (lastOrderStatus === "Accepted") {
             timer = setTimeout(() => {
                 navigate('/quri/home/bill');
-            }, 20000); // 20 seconds = 20000 ms
+            }, 10000); 
         }
 
-        return () => clearTimeout(timer); // Cleanup on unmount or dependency change
+        return () => clearTimeout(timer); 
     }, [lastOrderStatus, navigate, showRejectedItems]);
 
 
@@ -99,26 +97,31 @@ const Waiting = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             console.log("waiting...");
-
+            // console.log("lastOrderStatus:", lastOrderStatus)
+            
             dispatch(getDetailsOfOrders(lastOrderId)).then((res) => {
                 const orderStatus = res.payload;
                 setLastOrderStatus(orderStatus.orderDetails.Status);
 
+              
                 dispatch(getDetailsOfRejectedOrders(lastOrderId)).then((res2) => {
                     const items = JSON.parse(res2?.payload?.RejectedOrder || '[]');
                     setShowRejectedItems(items);
 
-                    if (orderStatus.orderDetails.Status === "Rejected" && items.length > 0) {
-                        clearInterval(interval); // ⛔ Stop polling if order is rejected
+                    const status = orderStatus?.orderDetails?.Status || lastOrderStatus;
+                    // console.log("status of order:", status)
+
+                    if (status==="Rejected" && items.length > 0) {
+                        clearInterval(interval); //  Stop polling if order is rejected
                         navigate('/quri/menu/orderSummary', {
                             state: { rejectedItems: items },
                         });
                     }
                 });
             });
-        }, 20000); // ✅ runs every 20 seconds
+        }, 20000); 
 
-        return () => clearInterval(interval); // 🧹 Cleanup on unmount
+        return () => clearInterval(interval); 
     }, [dispatch, lastOrderId, navigate]);
 
 

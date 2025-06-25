@@ -189,6 +189,8 @@ export const getDetailsOfRejectedOrders = createAsyncThunk(
 );
 
 
+
+
 const orderSlice = createSlice({
   name: 'orders',
   initialState: {
@@ -228,7 +230,14 @@ const orderSlice = createSlice({
         existingItem.quantity = quantity; // Update the item's quantity
       }
     },
-
+    addPlateNumber: (state, action) => {
+      if (state.order?.order?.order) {
+        state.order.order.order = {
+          ...state.order.order.order,
+          PlateNumber: action.payload.PlateNumber,
+        };
+      }
+    },
     resetCartItems: (state) => {
       state.cartItems = []; // Reset the cartItems to an empty array
       state.orders = [];
@@ -345,7 +354,7 @@ const orderSlice = createSlice({
   },
 });
 
-export const { addItemToCart, removeItemFromCart, updateItemQuantity, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, reset } = orderSlice.actions;
+export const { addItemToCart, removeItemFromCart, updateItemQuantity, addPlateNumber, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, reset } = orderSlice.actions;
 
 //Memoized purposes
 export const selectQrCodeDetails = (state) => state.qrcode.qrCodeDetails?.data;
