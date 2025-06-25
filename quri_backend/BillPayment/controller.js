@@ -1,10 +1,28 @@
+const {
+  addPlateNumberService,
+} = require("./service.js");
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const BASE_URL = process.env.BASE_URL;
 
+// add platenumber to table
+const addPlateNumber = async (orderInfo) => {
+  try {
+    await addPlateNumberService(orderInfo);
+  } catch (err) {
+    console.error("Error adding plate number:", err.message);
+    throw err;
+  }
+}
+
 // full bill pay
 const billPaymentController = async (req, res) => {
-  const { amount, orderDetails } = req.body;
+  const { amount, orderDetails, orderInfo } = req.body;
+
+
+  await addPlateNumber(orderInfo);
+
 
   const lineItems = [
     ...orderDetails.map((item) => ({
@@ -299,7 +317,7 @@ const getNGeniusPaymentController = async (req, res) => {
       },
       payment: {
         // paymentMethods: ["VISA","MASTERCARD","SAMSUNG_PAY","APPLE_PAY","GOOGLE_PAY"]
-        paymentMethods: ["VISA","MASTERCARD"]
+        paymentMethods: ["VISA", "MASTERCARD"]
       },
       merchantAttributes: {
         redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`,
