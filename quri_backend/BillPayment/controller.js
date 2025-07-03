@@ -2,6 +2,8 @@ const {
   addPlateNumberService,
 } = require("./service.js");
 
+const crypto = require("crypto");
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const BASE_URL = process.env.BASE_URL;
@@ -362,7 +364,77 @@ const getNGeniusPaymentController = async (req, res) => {
   }
 };
 
+//-----------------------------------------------
+// airpay payment integration 
 
+const MERCHANT_ID = "your_merchant_id";
+const USER_ID = "your_user_id";
+const PASSWORD = "your_password";
+const SALT_KEY = "your_salt_key";
+const VENDOR_ID = "your_vendor_id";
+const AGGREGATOR_ID = "your_aggregator_id"; 
+
+
+const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
+const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
+
+
+const getAirpayController = async (req, res) => {
+  try {
+    const { orderDetails, orderId, amount } = req.body;
+
+    //  Vendor 1 gets 100% split
+    const SPLIT_DATA = `${VENDOR_ID}^100^^Y`; // replace VENDOR123 with actual vendor ID
+
+
+    const paymentData = {
+      MERCHANT_ID,
+      USER_ID,
+      PASSWORD,
+      TXN_AMOUNT: amount,
+      CURRENCY: "AED",
+      ORDER_ID: orderId,
+      RETURN_URL,
+      CANCEL_URL,
+      AGGREGATOR_ID,
+      SPLIT_DATA,
+    };
+
+    // Generate checksum
+    const keys = Object.keys(paymentData).sort();
+    const checksumStr = keys.map(k => paymentData[k]).join("|") + "|" + SALT_KEY;
+    const CHECKSUM = crypto.createHash("sha256").update(checksumStr).digest("hex");
+
+    // Final payment URL
+    const baseUrl = "https://payments.airpay.co.in/index.php";
+    const params = new URLSearchParams({ ...paymentData, CHECKSUM });
+    const paymentUrl = `${baseUrl}?${params.toString()}`;
+
+    return res.json({ paymentUrl });
+
+  } catch (error) {
+    console.error("Airpay payment error:", error);
+    return res.status(500).json({ error: "Failed to generate payment URL" });
+  }
+};
+
+
+//-----------------------------------------------
+
+
+// handle GPay token with backend
+
+const handleGPayPaymentController = async(req, res)=>{
+
+  const { token } = req.body;
+
+  console.log("token at backend :", token)
+  res.json({ success: true });
+
+}
+
+
+//-----------------------------------------------
 
 
 
@@ -372,4 +444,6 @@ module.exports = {
   splitBillCheckoutController,
   customBillCheckoutController,
   getNGeniusPaymentController,
+  getAirpayController,
+  handleGPayPaymentController
 };

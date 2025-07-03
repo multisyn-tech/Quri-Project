@@ -18,6 +18,8 @@ const billPaymentRoutes=require('./BillPayment/route.js');
 
 const port = process.env.PORT || 5000;
 
+const Sentry = require("./instrument.js");
+
 db.query("SELECT 1")
   .then(() => {
     console.log("db connection succeeded.");
@@ -67,4 +69,13 @@ app.use((req, res, next) => {
 });
 
 
+// handle global exceptions
+process.on("uncaughtException", (err) => {
+  Sentry.captureException(err);
+  console.error("Uncaught Exception:", err);
+});
 
+process.on("unhandledRejection", (reason) => {
+  Sentry.captureException(reason);
+  console.error("Unhandled Rejection:", reason);
+});

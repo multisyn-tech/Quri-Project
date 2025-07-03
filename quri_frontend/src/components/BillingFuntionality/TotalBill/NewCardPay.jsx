@@ -10,7 +10,12 @@ import Swal from 'sweetalert2';
 import { QURI_SERVICE_FEE } from '../../../config/constants';
 import axios from "axios";
 
+import GooglePayButton from '@google-pay/button-react';
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const FRONTEND_BASE_URL = import.meta.env.VITE_FRONTEND_BASE_URL;
+
+
 
 const NewCardPay = () => {
 
@@ -168,26 +173,83 @@ const NewCardPay = () => {
   }
 
 
+  // ----------------------------------------------------
+  // handle airpay payment 
+
+  const handleAirpayPayment = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`${BASE_URL}/bill/airpay-payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderDetails, orderID, formattedTotal }),
+      });
+
+      const data = await res.json();
+
+      console.log("response of airpay payment: ", data)
+
+      window.location.href = data.paymentUrl;
+    } catch (error) {
+      console.log("Error occured during airpay payment:", error)
+      setLoading(false);
+    }
+  }
+
+
+
+
   const openPaymentsModal = () => {
     setShowModal(true);
     setShowModalSpinner(true);
     setTimeout(() => {
       setShowModalSpinner(false);
-    }, 5000); 
+    }, 5000);
   }
 
 
-  const handleSubmitPayment = () => {
+  const handleSubmitPayment = (selectedOption = paymentOption) => {
     setShowModalSpinner(true)
     setLoading(true)
     setShowModal(false);
-    if (paymentOption === 'stripe') {
+
+    if (selectedOption === 'stripe') {
       handleStripePayment();
-    } else if (paymentOption === 'ngenius') {
+    } else if (selectedOption === 'ngenius') {
       handleN_GeniusPayment();
+    } else if (selectedOption === 'airpay') {
+      handleAirpayPayment()
     }
   };
 
+
+  // handle G-Pay payment using token
+  const gpayPayment = async (obj) => {
+
+    const token = obj.paymentMethodData.tokenizationData.token;
+
+
+
+    // Send token to backend
+    try {
+      const res = await fetch(`${BASE_URL}/bill/process-gpay-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        window.location.href = `${FRONTEND_BASE_URL}/quri/menu/orderPlaced`;
+      } else {
+         window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`;
+      }
+    } catch (err) {
+      console.error('Payment error', err);
+      window.location.href =`${FRONTEND_BASE_URL}/quri/bill/checkout`;
+    }
+
+  }
 
 
   return (
@@ -293,28 +355,92 @@ const NewCardPay = () => {
               ) : (
                 <>
                   <h2 className="text-xl font-semibold mb-4">Choose Payment Method</h2>
-                  <div className="mb-4 text-left">
-                    <label className="flex items-center gap-2 mb-2">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="stripe"
-                        checked={paymentOption === 'stripe'}
-                        onChange={(e) => setPaymentOption(e.target.value)}
+
+
+                  <div className="mb-4 text-center">
+                    <div className="flex flex-col items-center gap-4 mb-6">
+                      <button
+                        type="button"
+                        className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'stripe'
+                          ? 'bg-blue-700 text-white'
+                          : 'bg-blue-100 text-blue-700'
+                          } hover:bg-blue-800 hover:text-white active:bg-blue-900 active:text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        onClick={() => {
+                          const selected = 'stripe';
+                          setPaymentOption(selected);
+                          handleSubmitPayment(selected);
+                        }}
+                      >
+                        Pay with Stripe
+                      </button>
+
+                      {/* <button
+                        type="button"
+                        className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'ngenius'
+                          ? 'bg-green-700 text-white'
+                          : 'bg-green-100 text-green-700'
+                          }`}
+                        onClick={() => {
+                          const selected = 'ngenius';
+                          setPaymentOption(selected);
+                          handleSubmitPayment(selected);
+                        }}
+                      >
+                        Pay with N-Genius
+                      </button> */}
+                    </div>
+
+                    <div className="flex justify-center">
+
+
+                      <GooglePayButton
+                        buttonType="pay"
+                        buttonColor="black"
+                        buttonSizeMode="fill"
+                        buttonLocale="en"
+                        environment="TEST"
+                        paymentRequest={{
+                          apiVersion: 2,
+                          apiVersionMinor: 0,
+                          allowedPaymentMethods: [
+                            {
+                              type: 'CARD',
+                              parameters: {
+                                allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+                                allowedCardNetworks: ['MASTERCARD', 'VISA'],
+                              },
+                              tokenizationSpecification: {
+                                type: 'PAYMENT_GATEWAY',
+                                parameters: {
+                                  gateway: 'example',
+                                  gatewayMerchantId: 'exampleGatewayMerchantId',
+                                },
+                              },
+                            },
+                          ],
+                          merchantInfo: {
+                            merchantId: 'BCR2DN4T2735VBRB',
+                            merchantName: 'Quri',
+                          },
+                          transactionInfo: {
+                            totalPriceStatus: 'FINAL',
+                            totalPriceLabel: 'Total',
+                            totalPrice: formattedTotal,
+                            currencyCode: 'AED',
+                            countryCode: 'AE',
+                          },
+                        }}
+                        onLoadPaymentData={paymentRequest => {
+                          // console.log('load payment data', paymentRequest);
+                          gpayPayment(paymentRequest)
+                        }}
                       />
-                      Pay with Stripe
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="ngenius"
-                        checked={paymentOption === 'ngenius'}
-                        onChange={(e) => setPaymentOption(e.target.value)}
-                      />
-                      Pay with N-Genius
-                    </label>
+
+                    </div>
                   </div>
+
+
+
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => setShowModal(false)}
@@ -322,13 +448,13 @@ const NewCardPay = () => {
                     >
                       Cancel
                     </button>
-                    <button
+                    {/* <button
                       onClick={handleSubmitPayment}
                       disabled={!paymentOption}
                       className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
                     >
                       Submit
-                    </button>
+                    </button> */}
                   </div>
                 </>
               )}

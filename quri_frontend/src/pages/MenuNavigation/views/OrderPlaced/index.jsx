@@ -29,7 +29,7 @@ const OrderPlaced = () => {
   }
 
 
-  // console.log(orderDetailIds);
+  // console.log("order detail:-: ",orderDetailIds);
 
   const getOrderID = async () => {
     try {
