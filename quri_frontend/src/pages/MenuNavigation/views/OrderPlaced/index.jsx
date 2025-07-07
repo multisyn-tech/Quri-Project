@@ -29,6 +29,13 @@ const OrderPlaced = () => {
   }
 
 
+  useEffect(() => {
+    getOrderID();
+    handleResetCart()
+
+  }, [orderDetailIds]);
+
+
   // console.log("order detail:-: ",orderDetailIds);
 
   const getOrderID = async () => {
@@ -44,8 +51,8 @@ const OrderPlaced = () => {
       const data = await response.json();
       // console.log("get order id ", data.orderID);
 
-      if (data.orderID != null) {
-        setOrderID(data.orderID)
+      if (data?.orderID != null) {
+        setOrderID(data?.orderID)
       }
     } catch (error) {
       console.error("Error fetching order IDs:", error);
@@ -77,11 +84,6 @@ const OrderPlaced = () => {
   }
 
 
-  useEffect(() => {
-    getOrderID();
-    handleResetCart()
-
-  }, [orderDetailIds]);
 
 
   useEffect(() => {
