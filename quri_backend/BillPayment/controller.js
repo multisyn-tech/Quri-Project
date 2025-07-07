@@ -437,6 +437,20 @@ const handleGPayPaymentController = async(req, res)=>{
 //-----------------------------------------------
 
 
+// handle apply pay integration with backend 
+
+const handleApplePayPaymentController  = async (req, res)=>{
+
+  const { data } = req.body;
+
+  console.log("data at backend :", data)
+  res.json({ success: true });
+
+}
+
+
+
+//-----------------------------------------------
 
 module.exports = {
   billPaymentController,
@@ -445,5 +459,6 @@ module.exports = {
   customBillCheckoutController,
   getNGeniusPaymentController,
   getAirpayController,
-  handleGPayPaymentController
+  handleGPayPaymentController,
+  handleApplePayPaymentController
 };

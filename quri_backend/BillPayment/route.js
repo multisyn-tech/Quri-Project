@@ -6,7 +6,8 @@ const {
   splitBillCheckoutController,
   getNGeniusPaymentController,
   getAirpayController,
-  handleGPayPaymentController
+  handleGPayPaymentController,
+  handleApplePayPaymentController
 } = require("./controller.js");
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.post("/airpay-payment", getAirpayController)
 
 router.post("/process-gpay-payment", handleGPayPaymentController)
 
+router.post("/handle-applypay-payment", handleApplePayPaymentController)
 
 module.exports = router;
