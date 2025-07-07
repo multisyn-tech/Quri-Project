@@ -15,6 +15,7 @@ import GooglePayButton from '@google-pay/button-react';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const FRONTEND_BASE_URL = import.meta.env.VITE_FRONTEND_BASE_URL;
 
+import ApplePayButton from "./utility/ApplePayButton";
 
 
 const NewCardPay = () => {
@@ -242,11 +243,11 @@ const NewCardPay = () => {
       if (result.success) {
         window.location.href = `${FRONTEND_BASE_URL}/quri/menu/orderPlaced`;
       } else {
-         window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`;
+        window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`;
       }
     } catch (err) {
       console.error('Payment error', err);
-      window.location.href =`${FRONTEND_BASE_URL}/quri/bill/checkout`;
+      window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`;
     }
 
   }
@@ -391,8 +392,6 @@ const NewCardPay = () => {
                     </div>
 
                     <div className="flex justify-center">
-
-
                       <GooglePayButton
                         buttonType="pay"
                         buttonColor="black"
@@ -437,6 +436,12 @@ const NewCardPay = () => {
                       />
 
                     </div>
+
+
+                    <div className="flex justify-center">
+                      <ApplePayButton amount={formattedTotal}/>
+                    </div>
+
                   </div>
 
 
