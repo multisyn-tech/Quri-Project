@@ -26,6 +26,6 @@ router.post("/airpay-payment", getAirpayController)
 
 router.post("/process-gpay-payment", handleGPayPaymentController)
 
-router.post("/handle-applypay-payment", handleApplePayPaymentController)
+router.post("/handle-applepay-payment", handleApplePayPaymentController)
 
 module.exports = router;

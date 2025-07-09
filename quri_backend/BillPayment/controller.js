@@ -1,12 +1,14 @@
-const {
-  addPlateNumberService,
-} = require("./service.js");
+const { addPlateNumberService } = require("./service.js");
 
 const crypto = require("crypto");
-
+const axios = require("axios");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const BASE_URL = process.env.BASE_URL;
+
+const https = require("https");
+const fs = require("fs");
+const path = require("path");
 
 // add platenumber to table
 const addPlateNumber = async (orderInfo) => {
@@ -16,15 +18,13 @@ const addPlateNumber = async (orderInfo) => {
     console.error("Error adding plate number:", err.message);
     throw err;
   }
-}
+};
 
 // full bill pay
 const billPaymentController = async (req, res) => {
   const { amount, orderDetails, orderInfo } = req.body;
 
-
   await addPlateNumber(orderInfo);
-
 
   const lineItems = [
     ...orderDetails.map((item) => ({
@@ -234,7 +234,11 @@ const getStripePaymentsController = async (req, res) => {
     while (allPaidSessions.length < limit && hasMore) {
       const params = {
         limit: 100,
-        expand: ["data.customer", "data.payment_intent", "data.customer_details"],
+        expand: [
+          "data.customer",
+          "data.payment_intent",
+          "data.customer_details",
+        ],
       };
 
       if (startingAfter) {
@@ -249,7 +253,6 @@ const getStripePaymentsController = async (req, res) => {
       hasMore = sessions.has_more;
       startingAfter = sessions.data[sessions.data.length - 1]?.id;
     }
-
 
     const paginated = allPaidSessions.slice(0, limit).map((session) => ({
       paymentId: `${session.id.slice(0, 6)}...${session.id.slice(-4)}`,
@@ -275,27 +278,27 @@ const getNGeniusPaymentController = async (req, res) => {
   const outletRef = process.env.OUTLET_REFERENCE;
   const { formattedTotal, orderID, orderDetails } = req.body;
 
-  const accessTokenAPIURL_Live = "https://api-gateway.ngenius-payments.com/identity/auth/access-token"; // production acount URL
-  const accessTokenAPIURL_Test = "https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token "; // sandbox account URL
+  const accessTokenAPIURL_Live =
+    "https://api-gateway.ngenius-payments.com/identity/auth/access-token"; // production acount URL
+  const accessTokenAPIURL_Test =
+    "https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token "; // sandbox account URL
 
-  const createOrderAPIURL_Live = `https://api-gateway.ngenius-payments.com/transactions/outlets/${outletRef}/orders`;  // production acount URL
+  const createOrderAPIURL_Live = `https://api-gateway.ngenius-payments.com/transactions/outlets/${outletRef}/orders`; // production acount URL
   const createOrderAPIURL_Test = `https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/${outletRef}/orders`; // sandbox account URL
 
-
   if (!formattedTotal) {
-    return res.status(400).json({ error: 'Missing amount' });
+    return res.status(400).json({ error: "Missing amount" });
   }
 
   // console.log("order details: ", orderDetails)
 
   try {
-
     const tokenResponse = await fetch(accessTokenAPIURL_Test, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Basic ${apiKey}`,
-        'Content-Type': 'application/vnd.ni-identity.v1+json'
-      }
+        Authorization: `Basic ${apiKey}`,
+        "Content-Type": "application/vnd.ni-identity.v1+json",
+      },
     });
 
     const tokenData = await tokenResponse.json();
@@ -303,47 +306,45 @@ const getNGeniusPaymentController = async (req, res) => {
     // console.log("Token: ",tokenData)
 
     if (!tokenData.access_token) {
-      return res.status(500).json({ error: 'Failed to get access token' });
+      return res.status(500).json({ error: "Failed to get access token" });
     }
 
     const accessToken = tokenData.access_token;
 
-    const formattedTotalMinorUnits = Math.round(parseFloat(formattedTotal) * 100);
-
+    const formattedTotalMinorUnits = Math.round(
+      parseFloat(formattedTotal) * 100
+    );
 
     const orderPayload = {
       action: "PURCHASE",
       amount: {
         currencyCode: "AED",
-        value: formattedTotalMinorUnits
+        value: formattedTotalMinorUnits,
       },
       payment: {
         // paymentMethods: ["VISA","MASTERCARD","SAMSUNG_PAY","APPLE_PAY","GOOGLE_PAY"]
-        paymentMethods: ["VISA", "MASTERCARD"]
+        paymentMethods: ["VISA", "MASTERCARD"],
       },
       merchantAttributes: {
         redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`,
-        // redirectUrl: `${BASE_URL}/quri/menu/orderPlaced`, 
+        // redirectUrl: `${BASE_URL}/quri/menu/orderPlaced`,
         cancelText: "Order More",
         cancelUrl: `https://fe.quri.co/quri/menu/home`,
-        // cancelUrl: `${BASE_URL}/quri/menu/home`, 
+        // cancelUrl: `${BASE_URL}/quri/menu/home`,
         paymentAttempts: "3",
-        offerOnly: "VISA,MASTERCARD,SAMSUNG_PAY,APPLE_PAY"
+        offerOnly: "VISA,MASTERCARD,SAMSUNG_PAY,APPLE_PAY",
       },
       merchantOrderReference: `${orderID}`,
-
     };
 
-
-
     const orderResponse = await fetch(createOrderAPIURL_Test, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/vnd.ni-payment.v2+json',
-        'Accept': 'application/vnd.ni-payment.v2+json',
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/vnd.ni-payment.v2+json",
+        Accept: "application/vnd.ni-payment.v2+json",
       },
-      body: JSON.stringify(orderPayload)
+      body: JSON.stringify(orderPayload),
     });
 
     const orderData = await orderResponse.json();
@@ -353,39 +354,96 @@ const getNGeniusPaymentController = async (req, res) => {
     const paymentUrl = orderData._links?.payment?.href;
 
     if (!paymentUrl) {
-      return res.status(500).json({ error: 'Payment URL not found' });
+      return res.status(500).json({ error: "Payment URL not found" });
     }
 
     res.json({ payment_url: paymentUrl });
-
   } catch (err) {
-    console.error('N-Genius Error:', err);
-    res.status(500).json({ error: 'Something went wrong with N-Genius payment' });
+    console.error("N-Genius Error:", err);
+    res
+      .status(500)
+      .json({ error: "Something went wrong with N-Genius payment" });
   }
 };
 
 //-----------------------------------------------
-// airpay payment integration 
+// airpay payment integration
 
-const MERCHANT_ID = "your_merchant_id";
-const USER_ID = "your_user_id";
-const PASSWORD = "your_password";
+const Merchant_Name = "FOLKS CAFE";
+const MERCHANT_ID = "247152";
+const USER_ID = "1066103";
+const PASSWORD = "yvufcZ5M";
 const SALT_KEY = "your_salt_key";
-const VENDOR_ID = "your_vendor_id";
-const AGGREGATOR_ID = "your_aggregator_id"; 
-
+const CLIENT_ID = "ca9544";
+const CLIENT_SECRET = "a44da6e8a5d0e64e461bc6b76fe35872";
+const API_KEY = "796XA2V6WAqa9Vaz"; // Used as AES key to decrypt
 
 const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
 const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
+
+// get access token first
+const getAccessToken = async () => {
+  try {
+    const url = "https://kraken.airpay.co.in/airpay/pay/v4/api/oauth2";
+
+    const params = new URLSearchParams();
+    params.append("client_id", CLIENT_ID);
+    params.append("client_secret", CLIENT_SECRET);
+    params.append("grant_type", "client_credentials");
+
+    // Send POST request to Airpay OAuth2
+    const response = await axios.post(url, params.toString(), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    const encryptedBase64 = response.data?.response;
+
+    console.log("excrypted response:", encryptedBase64)
+
+    if (!encryptedBase64) {
+      console.error("❌ Encrypted response not found:", response.data);
+      return;
+    }
+
+    const key = crypto.createHash("sha256").update(API_KEY).digest();
+   
+    const decryptedResponse = decryptFunc(encryptedBase64,key)
+    
+    return decryptedResponse ;
+  } catch (err) {
+    console.error("❌ Error:", err.response?.data || err.message);
+  }
+};
+
+
+// decrypt response
+function decryptFunc(response, encryptionKey) {
+  try {
+    const raw = Buffer.from(response, "base64");
+    const iv = raw.slice(0, 16);
+    const encryptedData = raw.slice(16);
+
+    const decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(encryptionKey), iv);
+    let decrypted = decipher.update(encryptedData);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+    return JSON.parse(decrypted.toString("utf8"));
+  } catch (error) {
+    console.error("Decryption failed:", error.message);
+    return null;
+  }
+}
+
 
 
 const getAirpayController = async (req, res) => {
   try {
     const { orderDetails, orderId, amount } = req.body;
 
-    //  Vendor 1 gets 100% split
-    const SPLIT_DATA = `${VENDOR_ID}^100^^Y`; // replace VENDOR123 with actual vendor ID
-
+    getAccessToken()
+    return 
 
     const paymentData = {
       MERCHANT_ID,
@@ -396,14 +454,16 @@ const getAirpayController = async (req, res) => {
       ORDER_ID: orderId,
       RETURN_URL,
       CANCEL_URL,
-      AGGREGATOR_ID,
-      SPLIT_DATA,
     };
 
     // Generate checksum
     const keys = Object.keys(paymentData).sort();
-    const checksumStr = keys.map(k => paymentData[k]).join("|") + "|" + SALT_KEY;
-    const CHECKSUM = crypto.createHash("sha256").update(checksumStr).digest("hex");
+    const checksumStr =
+      keys.map((k) => paymentData[k]).join("|") + "|" + SALT_KEY;
+    const CHECKSUM = crypto
+      .createHash("sha256")
+      .update(checksumStr)
+      .digest("hex");
 
     // Final payment URL
     const baseUrl = "https://payments.airpay.co.in/index.php";
@@ -411,44 +471,85 @@ const getAirpayController = async (req, res) => {
     const paymentUrl = `${baseUrl}?${params.toString()}`;
 
     return res.json({ paymentUrl });
-
   } catch (error) {
     console.error("Airpay payment error:", error);
     return res.status(500).json({ error: "Failed to generate payment URL" });
   }
 };
 
-
 //-----------------------------------------------
-
 
 // handle GPay token with backend
 
-const handleGPayPaymentController = async(req, res)=>{
-
+const handleGPayPaymentController = async (req, res) => {
   const { token } = req.body;
 
-  console.log("token at backend :", token)
+  console.log("token at backend :", token);
   res.json({ success: true });
-
-}
-
+};
 
 //-----------------------------------------------
 
+// handle apple pay integration with backend
 
-// handle apply pay integration with backend 
+const handleApplePayPaymentController = async (req, res) => {
+  const { validationURL } = req.body;
 
-const handleApplePayPaymentController  = async (req, res)=>{
+  if (!validationURL) {
+    return res.status(400).json({ error: "Missing validationURL" });
+  }
 
-  const { data } = req.body;
+  const cert = fs.readFileSync(
+    path.join(__dirname, "../certs/merchant_id.pem")
+  );
+  const key = fs.readFileSync(path.join(__dirname, "../certs/merchant.key"));
 
-  console.log("data at backend :", data)
-  res.json({ success: true });
+  const requestBody = JSON.stringify({
+    merchantIdentifier: "merchant.com.quri",
+    displayName: "Quri",
+    initiative: "web",
+    initiativeContext: "https://fe.quri.co",
+  });
 
-}
+  const request = https.request(
+    validationURL,
+    {
+      method: "POST",
+      cert,
+      key,
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(requestBody),
+      },
+    },
+    (appleRes) => {
+      let data = "";
 
+      appleRes.on("data", (chunk) => {
+        data += chunk;
+      });
 
+      appleRes.on("end", () => {
+        try {
+          const session = JSON.parse(data);
+          res.json(session);
+        } catch (err) {
+          res
+            .status(500)
+            .json({ error: "Invalid response from Apple", raw: data });
+        }
+      });
+    }
+  );
+
+  request.on("error", (err) => {
+    console.error("Apple Pay session error:", err);
+    res.status(500).json({ error: "Apple Pay validation failed" });
+  });
+
+  request.write(requestBody);
+  request.end();
+};
 
 //-----------------------------------------------
 
@@ -460,5 +561,5 @@ module.exports = {
   getNGeniusPaymentController,
   getAirpayController,
   handleGPayPaymentController,
-  handleApplePayPaymentController
+  handleApplePayPaymentController,
 };
