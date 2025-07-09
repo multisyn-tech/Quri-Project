@@ -7,13 +7,14 @@ const ApplePayButton = ({ amount }) => {
     if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
       document.getElementById("apple-pay-button").style.display = "inline-block";
     } else {
-      console.log("Apply Pay Not supported in this Browser")
+      console.log("Apple Pay not supported in this browser");
     }
   }, []);
 
   const startApplePay = () => {
+    
     const paymentRequest = {
-      countryCode: "AE", // Change if needed
+      countryCode: "AE",
       currencyCode: "AED",
       total: {
         label: "Quri",
@@ -21,16 +22,14 @@ const ApplePayButton = ({ amount }) => {
       },
       supportedNetworks: ["visa", "masterCard"],
       merchantCapabilities: ["supports3DS"],
-      merchantIdentifier: "merchant.com.quri", // Your real merchant ID
+      merchantIdentifier: "merchant.com.quri",
     };
 
     const session = new ApplePaySession(3, paymentRequest);
 
     session.onvalidatemerchant = async (event) => {
-
-
       try {
-        const response = await fetch(`${BASE_URL}/bill/handle-applypay-payment`, {
+        const response = await fetch(`${BASE_URL}/bill/handle-applepay-payment`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -41,25 +40,31 @@ const ApplePayButton = ({ amount }) => {
         });
 
         const merchantSession = await response.json();
-        session.completeMerchantValidation(merchantSession);
 
-        if (merchantSession.success) {
-          window.location.href = `${FRONTEND_BASE_URL}/quri/menu/orderPlaced`;
-        } else {
-          window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`;
+        if (!merchantSession || merchantSession.error) {
+          throw new Error("Invalid merchant session");
         }
-        
-      } catch (err) {
-        console.error("Merchant validation failed", err);
-        session.abort();
-        window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`;
-      }
 
+        session.completeMerchantValidation(merchantSession);
+      } catch (err) {
+        console.error("Merchant validation failed:", err);
+        session.abort();
+        window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`; 
+      }
     };
 
-    session.onpaymentauthorized = (event) => {
-      console.log("Payment authorized (not processed):", event.payment);
-      session.completePayment(ApplePaySession.STATUS_SUCCESS);
+    session.onpaymentauthorized = async (event) => {
+      try {
+       
+        console.log("Apple Pay token:", event.payment.token.paymentData);
+
+        session.completePayment(ApplePaySession.STATUS_SUCCESS);
+        window.location.href = `${FRONTEND_BASE_URL}/quri/menu/orderPlaced`; 
+      } catch (err) {
+        console.error("Payment authorization failed:", err);
+        session.completePayment(ApplePaySession.STATUS_FAILURE);
+        window.location.href = `${FRONTEND_BASE_URL}/quri/bill/checkout`; 
+      }
     };
 
     session.begin();

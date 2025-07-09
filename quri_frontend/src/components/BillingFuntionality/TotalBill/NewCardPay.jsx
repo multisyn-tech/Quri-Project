@@ -178,24 +178,38 @@ const NewCardPay = () => {
   // handle airpay payment 
 
   const handleAirpayPayment = async () => {
-    setLoading(true)
+    setLoading(true);
+    const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
+    const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
     try {
       const res = await fetch(`${BASE_URL}/bill/airpay-payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderDetails, orderID, formattedTotal }),
+        body: JSON.stringify({
+          orderId: orderID,
+          amount: formattedTotal,
+          returnUrl: RETURN_URL,
+          cancelUrl: CANCEL_URL,
+          customerEmail: 'customer@email.com',
+          customerPhone: '9712343412321',
+          splitData: "BANKID1^60|BANKID2^40", // Update with actual split logic
+        }),
       });
 
       const data = await res.json();
+      console.log("response of airpay payment: ", data);
 
-      console.log("response of airpay payment: ", data)
-
-      window.location.href = data.paymentUrl;
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else {
+        alert("Payment initiation failed");
+        setLoading(false);
+      }
     } catch (error) {
-      console.log("Error occured during airpay payment:", error)
+      console.log("Error occurred during airpay payment:", error);
       setLoading(false);
     }
-  }
+  };
 
 
 
@@ -375,6 +389,23 @@ const NewCardPay = () => {
                         Pay with Stripe
                       </button>
 
+                      {/* pay with airpay */}
+                      {/*
+                      <button
+                        type="button"
+                        className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'airpay'
+                          ? 'bg-blue-700 text-white'
+                          : 'bg-blue-100 text-blue-700'
+                          } hover:bg-blue-800 hover:text-white active:bg-blue-900 active:text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        onClick={() => {
+                          const selected = 'airpay';
+                          setPaymentOption(selected);
+                          handleSubmitPayment(selected);
+                        }}
+                      >
+                        Pay with AirPay
+                      </button>
+                      */}
                       {/* <button
                         type="button"
                         className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'ngenius'
@@ -439,7 +470,7 @@ const NewCardPay = () => {
 
 
                     <div className="flex justify-center">
-                      <ApplePayButton amount={formattedTotal}/>
+                      <ApplePayButton amount={formattedTotal} />
                     </div>
 
                   </div>
