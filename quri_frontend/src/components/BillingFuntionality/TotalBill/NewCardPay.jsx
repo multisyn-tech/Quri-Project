@@ -422,7 +422,7 @@ const NewCardPay = () => {
                       </button> */}
                     </div>
 
-                    <div className="flex justify-center">
+                    <div className="flex justify-center my-1">
                       <GooglePayButton
                         buttonType="pay"
                         buttonColor="black"
@@ -469,7 +469,7 @@ const NewCardPay = () => {
                     </div>
 
 
-                    <div className="flex justify-center">
+                    <div className="flex justify-center my-1">
                       <ApplePayButton amount={formattedTotal} />
                     </div>
 

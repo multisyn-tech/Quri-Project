@@ -25,7 +25,7 @@ const OrderPlaced = () => {
 
   if (orderDetails.length == 0) {
     orderDetails = useSelector((state) => state.orders?.orders || []);
-    orderDetailIds = orderDetails[orderDetails.length - 1].OrderID;
+    orderDetailIds = orderDetails[orderDetails.length - 1]?.OrderID;
   }
 
 
@@ -63,7 +63,7 @@ const OrderPlaced = () => {
 
     // first check payment , if payment is done then order statuus is completed
 
-    if (orderID === null) return;
+    if (orderID === null || orderID==undefined ) return;
 
     // console.log("order is  ", orderID)
 
