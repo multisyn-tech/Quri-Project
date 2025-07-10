@@ -6,7 +6,7 @@ import { getQRDetails, reset } from '../../features/qrcode/qrcodeSlice';
 import scanQR from '../../../src/assets/img/scanQR/11136.jpg'
 import { Col, Row } from 'reactstrap';
 import SpinnerComponent from '../../Manage/Fallback-spinner';
-import { getOrdersByTableID, reset as resetOrders } from '../../features/orders/orderSlice';
+import { getOrdersByTableID, resetCartItems, reset as resetOrders } from '../../features/orders/orderSlice';
 
 
 
@@ -24,8 +24,10 @@ const HomeScreen = () => {
             dispatch(reset());
 
             dispatch(resetOrders());   // Reset Orders state
+            dispatch(resetCartItems());   // Reset Orders state
 
             dispatch(getQRDetails(qrCode));
+
         }
     }, [qrCode, dispatch]);
 

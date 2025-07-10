@@ -10,6 +10,9 @@ const BASE_URl = import.meta.env.VITE_API_BASE_URL;
 const OrderPlaced = () => {
 
   const [orderID, setOrderID] = useState(null);
+  const [showOrderList, setShowOrderList] = useState(true);
+  const [orderDetailIds, setOrderDetailIds] = useState([]);
+
 
   const dispatch = useDispatch();
 
@@ -18,15 +21,34 @@ const OrderPlaced = () => {
   };
 
 
-  let orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
-  let orderDetailIds = orderDetails.map(item => item?.OrderDetailID);
+  // let orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+  // let orderDetailIds = orderDetails.map(item => item?.OrderDetailID);
+
+  // if (orderDetails.length == 0) {
+  //   orderDetails = useSelector((state) => state.orders?.orders || []);
+  //   orderDetailIds = orderDetails[orderDetails.length - 1]?.OrderID;
+  // }
 
 
 
-  if (orderDetails.length == 0) {
-    orderDetails = useSelector((state) => state.orders?.orders || []);
-    orderDetailIds = orderDetails[orderDetails.length - 1]?.OrderID;
-  }
+  const orderDetailsFromSingleOrder = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+  const allOrders = useSelector((state) => state.orders?.orders || []);
+
+
+  useEffect(() => {
+    if (orderDetailsFromSingleOrder.length > 0) {
+      setOrderDetailIds(orderDetailsFromSingleOrder.map(item => item?.OrderDetailID));
+      setShowOrderList(true);
+    } else if (allOrders.length > 0) {
+      setOrderDetailIds([allOrders[allOrders.length - 1]?.OrderID]);
+      setShowOrderList(true);
+    } else {
+      setShowOrderList(false); 
+    }
+  }, [orderDetailsFromSingleOrder, allOrders]); // Dependency array
+
+
+  
 
 
   useEffect(() => {
@@ -63,7 +85,10 @@ const OrderPlaced = () => {
 
     // first check payment , if payment is done then order statuus is completed
 
-    if (orderID === null || orderID==undefined ) return;
+    if (orderID == null || orderID == undefined) {
+      showOrderList(false)
+      return
+    };
 
     // console.log("order is  ", orderID)
 
@@ -104,7 +129,8 @@ const OrderPlaced = () => {
       </div>
 
       {/* List component will fill the remaining space */}
-      <List />
+      {/* <List /> */}
+      {showOrderList ? <List /> : <></>}
     </div>
   );
 }
