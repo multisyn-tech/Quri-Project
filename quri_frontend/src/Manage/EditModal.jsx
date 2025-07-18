@@ -72,11 +72,10 @@ const EditModal = ({
         >
           <h2>
             {name}
-            
           </h2>
         </ModalHeader>
 
-        <ModalBody className="flex-grow-1 pb-sm-0 pb-3">
+        <ModalBody className="flex-grow-1 pb-sm-0 pb-1">
           {inputComponent}
         </ModalBody>
       </Modal>

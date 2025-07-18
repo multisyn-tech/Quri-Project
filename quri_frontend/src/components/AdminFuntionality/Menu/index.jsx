@@ -30,7 +30,7 @@ const Index = () => {
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = menus?.slice(indexOfFirstPost, indexOfLastPost);
 
-  console.log(menus);
+  // console.log(menus);
 
 
   const openAddMenu = () => {
@@ -100,7 +100,7 @@ const Index = () => {
             currentPosts.map((menu) => (
               <Grid item xs={10} sm={6} md={4} lg={3} key={menu.MenuID}>
                 <Paper
-                  className="p-4 dark:bg-gray-800 dark:text-gray-100"
+                  className="p-4 dark:bg-gray-800 dark:text-gray-100 h-[100%]"
                   elevation={3}
                   style={{ transition: 'background-color 0.3s ease' }}
                 >

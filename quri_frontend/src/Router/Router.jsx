@@ -12,11 +12,17 @@ import SplitQuri from "../pages/BillingNavigation/SplitQuri";
 import CashPayment from "../pages/BillingNavigation/CashPayment";
 import PaymentSuccessful from "../pages/BillingNavigation/PaymentSuccessful";
 import SignUp from "../components/AdminFuntionality/AdminCredentials/SignUp";
+import CheckRole from "../components/AdminFuntionality/AdminCredentials/CheckRole";
 import Login from "../components/AdminFuntionality/AdminCredentials/Login";
 import AdminRoutes from './AdminRoutes';
 import SuperAdminRoutes from "./SuperAdminRoutes";
 import AuthLayout from '../components/AdminFuntionality/layouts/auth';
 import AdminLayout from "../components/AdminFuntionality/layouts/admin";
+
+import SuperAdminLogin from "../components/AdminFuntionality/AdminCredentials/SuperAdminLogin";
+import SuperAdminSignup from "../components/AdminFuntionality/AdminCredentials/SuperAdminSignUp";
+
+
 
 
 import PrivateRoute from '../components/AdminFuntionality/PrivateRoute/PrivateRoute';
@@ -61,6 +67,18 @@ const ThemeRoutes = [
         path: route.path,
         element: route.component,
       })),
+    ],
+  },
+
+  // super admin login
+  {
+    path: "/superadmin",
+    element: <CheckRole/>,
+    children: [
+      { path: "login", exact: true, element: <SuperAdminLogin /> },
+      { path: "SignUp", exact: true, element: <SuperAdminSignup /> },
+      { path: "VerifyEmail/:token", exact: true, element: <VerifyEmail /> },
+      { path: "VerificationEmail", exact: true, element: <AdminVerifyOtp /> },
     ],
   },
 

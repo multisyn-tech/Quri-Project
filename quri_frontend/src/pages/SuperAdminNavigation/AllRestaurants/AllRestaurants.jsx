@@ -10,6 +10,9 @@ const { Search } = Input;
 
 
 const AllRestaurants = () => {
+
+    console.log("all rest from s.admin")
+
     const [isModalVisible, setIsModalVisible] = useState(false); // State to control modal visibility
     const [filteredRestaurants, setFilteredRestaurants] = useState([]);
     const { restaurants, loading,error } = useSelector(state => state.restaurants);

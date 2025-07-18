@@ -179,8 +179,6 @@ const NewCardPay = () => {
 
   const handleAirpayPayment = async () => {
     setLoading(true);
-    const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
-    const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
     try {
       const res = await fetch(`${BASE_URL}/bill/airpay-payment`, {
         method: "POST",
@@ -188,29 +186,55 @@ const NewCardPay = () => {
         body: JSON.stringify({
           orderId: orderID,
           amount: formattedTotal,
-          returnUrl: RETURN_URL,
-          cancelUrl: CANCEL_URL,
           customerEmail: 'customer@email.com',
           customerPhone: '9712343412321',
-          splitData: "BANKID1^60|BANKID2^40", // Update with actual split logic
+          currency: 'AED',
+          isocurrency: 'AED',
+          splitData: "BANKID1^60|BANKID2^40",
         }),
       });
 
       const data = await res.json();
-      console.log("response of airpay payment: ", data);
+      console.log("Response of Airpay payment:", data);
+
+      if (res.status === 400 && data.errors) {
+        alert("Validation errors: " + Object.values(data.errors).join(", "));
+        setLoading(false);
+        return;
+      }
 
       if (data.paymentUrl) {
-        window.location.href = data.paymentUrl;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = data.paymentUrl;
+
+        const fields = {
+          mid: data.mid,
+          data: data.data,
+          privatekey: data.privatekey,
+          checksum: data.checksum,
+        };
+
+        Object.entries(fields).forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
       } else {
         alert("Payment initiation failed");
         setLoading(false);
       }
     } catch (error) {
-      console.log("Error occurred during airpay payment:", error);
+      console.log("Error occurred during Airpay payment:", error);
+      alert("Payment initiation failed");
       setLoading(false);
     }
   };
-
 
 
 
@@ -390,8 +414,8 @@ const NewCardPay = () => {
                       </button>
 
                       {/* pay with airpay */}
-                      {/*
-                      <button
+
+                      {/* <button
                         type="button"
                         className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'airpay'
                           ? 'bg-blue-700 text-white'
@@ -404,8 +428,8 @@ const NewCardPay = () => {
                         }}
                       >
                         Pay with AirPay
-                      </button>
-                      */}
+                      </button> */}
+
                       {/* <button
                         type="button"
                         className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'ngenius'

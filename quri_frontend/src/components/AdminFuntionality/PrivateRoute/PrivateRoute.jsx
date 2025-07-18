@@ -32,8 +32,8 @@ import SpinnerComponent from '../../../Manage/Fallback-spinner';
 const PrivateRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+  
+  useEffect(() => {    
     const token = localStorage.getItem('authToken');
     if (token && isTokenValid(token)) {
       setIsAuthenticated(true);

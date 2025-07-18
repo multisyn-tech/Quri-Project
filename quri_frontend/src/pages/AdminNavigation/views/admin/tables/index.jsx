@@ -88,7 +88,6 @@ const Orders = () => {
   const getRejectedOrderItems = () => {
     if (rejectedModal?.newStatus == 'Rejected') {
       // console.log("rejected order :", rejectedModal)
-
       dispatch(getDetailsOfOrders(rejectedModal.OrderID))
         .unwrap()
         .then((data) => {
@@ -148,7 +147,6 @@ const Orders = () => {
 
 
 
-
   const getData = () => {
     setLoading(true);
     let obj = {
@@ -156,18 +154,25 @@ const Orders = () => {
       limit: '1000',
       search: ''
     };
-    //console.log('called')
-    //  dispatch(getOrders(obj));
+
     return dispatch(getOrders(obj))
       .unwrap()
       .then((data) => {
+        const newOrderStatus = data.orders.length > 0 ? data.orders[data.orders.length - 1].Status : null;
 
         if (
           prevOrderCountRef.current !== null &&
           data.orders.length > prevOrderCountRef.current &&
+          !["Accepted", "Rejected", "Completed"].includes(newOrderStatus) &&
           isAudioUnlocked.current
         ) {
-          audioRef.current.play();
+          audioRef.current.loop = true; // Enable looping
+          audioRef.current.play().catch((err) => console.error("Audio play error:", err));
+        }
+
+        if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
         }
 
         prevOrderCountRef.current = data.orders.length;
@@ -177,11 +182,49 @@ const Orders = () => {
         console.error("Error fetching orders:", error);
         setErrorMessage(error.message);
         setLoading(false);
-      })
-      .finally(() => {
-        setLoading(false); // Always stop loading regardless of success/fail
-      });;
+      });
   };
+
+
+
+
+  // const getData = () => {
+  //   setLoading(true);
+  //   let obj = {
+  //     page: '1',
+  //     limit: '1000',
+  //     search: ''
+  //   };
+  //   //console.log('called')
+  //   //  dispatch(getOrders(obj));
+  //   return dispatch(getOrders(obj))
+  //     .unwrap()
+  //     .then((data) => {
+
+
+  //       if (
+  //         prevOrderCountRef.current !== null &&
+  //         data.orders.length > prevOrderCountRef.current &&
+  //         isAudioUnlocked.current
+  //       ) {
+  //         audioRef.current.play();
+  //       }
+
+  //       prevOrderCountRef.current = data.orders.length;
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching orders:", error);
+  //       setErrorMessage(error.message);
+  //       setLoading(false);
+  //     })
+  //     .finally(() => {
+  //       setLoading(false); // Always stop loading regardless of success/fail
+  //     });;
+  // };
+
+
+
 
   const handleViewClick = (row) => {
     setSelectedRow(row);

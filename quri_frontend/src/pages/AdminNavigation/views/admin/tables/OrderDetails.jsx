@@ -259,14 +259,14 @@ const OrderDetails = (props) => {
           <Grid item xs={12} md={12} lg={8} xl={8}>
             {formData1 && (
               <>
-                <div style={{ ...invoiceStyle, paddingBottom: '1rem' }}>
+                <div style={{ ...invoiceStyle, paddingBottom: '0rem' }}>
                   <ReactToPrint
                     trigger={() => <Button startIcon={<Print />} color="primary" variant="contained">Print Invoice</Button>}
                     content={() => componentRef.current}
                   />
                 </div>
                 <div>
-                  <Paper sx={{ padding: 2 }}>
+                  <Paper sx={{ padding: 1 }}>
                     <Container ref={componentRef} maxWidth="md">
                       <InvoiceHeader data1={data1} formData1={formData1} />
                       <InvoiceBody data1={data1} />
@@ -306,7 +306,7 @@ const InvoiceHeader = ({ data1, formData1 }) => {
   return (
     <>
       <div style={{ ...invoiceStyle, paddingBottom: '1rem' }}></div>
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
           <Box sx={{ textAlign: 'center', marginBottom: 4 }}>
             <img
@@ -336,11 +336,11 @@ const InvoiceBody = ({ data1 }) => {
   return (
     <>
 
-      <Grid container spacing={2} sx={{ marginTop: 4 }}>
+      <Grid container spacing={2} sx={{ marginTop: 2 }}>
         <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
-          <Typography variant="body1" className='text-nowrap'> <span className='font-bold'>Restaurant Name: </span> {data1.companyInfo.name}</Typography>
+          {/* <Typography variant="body1" className='text-nowrap'> <span className='font-bold'>Restaurant Name: </span> {data1.companyInfo.name}</Typography>
           <Typography variant="body1">{data1.companyInfo.address}</Typography>
-          <Typography variant="body1">{data1.companyInfo.city}</Typography>
+          <Typography variant="body1">{data1.companyInfo.city}</Typography> */}
         </Grid>
         <Grid item xs={6} sm={6} md={6} lg={6} xl={6}>
           <Typography variant="body1" style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -356,18 +356,18 @@ const InvoiceBody = ({ data1 }) => {
       </Grid>
       <TableContainer sx={{ marginTop: 4 }}>
         <Table>
-          <TableHead>
+          {/* <TableHead>
             <TableRow sx={{ backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>
               <TableCell sx={{ fontWeight: 'bold' }}>Payment Method</TableCell>
               <TableCell align="right" sx={{ fontWeight: 'bold' }}>Check #</TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
+          </TableHead> */}
+          {/* <TableBody>
             <TableRow>
               <TableCell>{data1.paymentMethod}</TableCell>
               <TableCell align="right">{data1.checkNumber}</TableCell>
             </TableRow>
-          </TableBody>
+          </TableBody> */}
         </Table>
       </TableContainer>
       <TableContainer sx={{ marginTop: 4 }}>

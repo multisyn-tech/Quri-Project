@@ -43,12 +43,46 @@ const OrderPlaced = () => {
       setOrderDetailIds([allOrders[allOrders.length - 1]?.OrderID]);
       setShowOrderList(true);
     } else {
-      setShowOrderList(false); 
+      setShowOrderList(false);
     }
   }, [orderDetailsFromSingleOrder, allOrders]); // Dependency array
 
 
-  
+  // airpay response handle
+  useEffect(() => {
+    const handleAirpayResponse = async () => {
+      if (window.location.search || document.forms.length > 0) {
+        const formData = new FormData(document.forms[0] || {});
+        const responseData = {};
+        formData.forEach((value, key) => {
+          responseData[key] = value;
+        });
+
+        try {
+          const res = await fetch(`${BASE_URL}/bill/airpay-response`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(responseData),
+          });
+
+          const result = await res.json();
+          console.log('Airpay response processed:', result);
+
+          if (result.TRANSACTIONSTATUS === 'SUCCESS') {
+            alert('Payment successful!');
+          } else {
+            alert(`Payment failed: ${result.MESSAGE}`);
+          }
+        } catch (error) {
+          console.error('Error processing Airpay response:', error);
+          alert('Error processing payment response');
+        }
+      }
+    };
+
+    handleAirpayResponse();
+  }, []);
+
 
 
   useEffect(() => {

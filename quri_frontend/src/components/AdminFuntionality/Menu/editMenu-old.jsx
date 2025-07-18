@@ -7,9 +7,15 @@ import { fetchCategories } from '../../../features/categories/categoriesSlice';
 const formReducer = (state, action) => {
   switch (action.type) {
     case 'SET_FIELD':
-      return { ...state, [action.field]: action.value };
+      return {
+        ...state,
+        [action.field]: action.value
+      };
     case 'SET_FORM':
-      return { ...state, ...action.payload };
+      return {
+        ...state,
+        ...action.payload
+      };
     default:
       return state;
   }
@@ -20,6 +26,11 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
   const { menu, loading, error } = useSelector((state) => state.menus);
   const { menus: categories, loading: categoriesLoading, error: categoriesError } = useSelector((state) => state.categories);
 
+  useEffect(() => {
+    dispatch(fetchMenu(menuId));
+    dispatch(fetchCategories());
+  }, [dispatch, menuId]);
+
   const [form, dispatchForm] = useReducer(formReducer, {
     name: '',
     price: '',
@@ -27,21 +38,25 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
     imageUrl: '',
     category: '',
     availability: '',
+
   });
+
+  // Added state for image upload/file
   const [useFileUpload, setUseFileUpload] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [apiError, setApiError] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchMenu(menuId));
-    dispatch(fetchCategories());
-  }, [dispatch, menuId]);
 
   useEffect(() => {
     if (menu) {
+      // Determine if the image is a file upload or a URL based on its path
       const isFileUpload = menu.Image && menu.Image.startsWith('food-uploads/');
-      setUseFileUpload(isFileUpload);
-      setSelectedImage(null); // Do not pre-set selectedImage to menu.Image
+      setUseFileUpload(isFileUpload); // Set file upload state based on the image source
+
+      if (isFileUpload) {
+        // If it's a file upload, set the selected image to the file path
+        const fileName = menu.Image.split('/').pop(); // Get the file name from the path
+        setSelectedImage(fileName); // Set the selected image file name
+      }
 
       dispatchForm({
         type: 'SET_FORM',
@@ -49,7 +64,7 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
           name: menu.ItemName,
           price: menu.Price,
           description: menu.ItemDescription,
-          imageUrl: isFileUpload ? '' : menu.Image,
+          imageUrl: isFileUpload ? '' : menu.Image, // Clear imageUrl if it's a file
           category: menu.CategoryID,
           availability: menu.MenuStatus,
         },
@@ -57,26 +72,79 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
     }
   }, [menu]);
 
+
+
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     dispatchForm({ type: 'SET_FIELD', field: name, value });
-    setApiError(null); // Clear API error on input change
   }, []);
 
   const handleFileChange = useCallback((e) => {
     setSelectedImage(e.target.files[0]);
-    setApiError(null); // Clear API error on file change
   }, []);
+
+
+  // const handleSave = useCallback(async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append('ItemName', form.name);
+  //     formData.append('ItemDescription', form.description);
+  //     formData.append('Price', form.price);
+  //     formData.append('CategoryID', form.category);
+  //     formData.append('MenuStatus', form.availability);
+
+  //     // Check if the user has chosen to upload a file or use the existing image
+  //     if (useFileUpload) {
+  //       if (selectedImage) {
+  //         // If the user has selected a new file, append it
+  //         formData.append('image', selectedImage);
+  //       } else if (menu.Image) {
+  //         // If no new file is selected, append the current file name (existing image)
+  //         formData.append('image', menu.Image);
+  //       } else {
+  //         throw new Error("Image is required either as a file or a URL.");
+  //       }
+  //     } else {
+  //       // If the user is using an image URL
+  //       if (form.imageUrl) {
+  //         formData.append('Image', form.imageUrl);
+  //       } else {
+  //         throw new Error("Image is required either as a file or a URL.");
+  //       }
+  //     }
+
+  //     console.log("Form Data before sending:", {
+  //       name: form.name,
+  //       description: form.description,
+  //       price: form.price,
+  //       category: form.category,
+  //       availability: form.availability,
+  //       selectedImage: selectedImage ? selectedImage.name : form.imageUrl,
+  //     });
+
+  //     await dispatch(editMenu({ menuId, formData })).unwrap();
+
+  //     onClose();
+
+  //     if (refreshMenus) {
+  //       refreshMenus();
+  //     }
+  //   } catch (error) {
+  //     console.error('Error updating menu item:', error);
+  //   }
+  // }, [dispatch, form, selectedImage, useFileUpload, menu, onClose, menuId, refreshMenus]);
+
+
 
   const handleSave = useCallback(async () => {
     try {
-      // Validate image input
-      if (!useFileUpload && !form.imageUrl.trim()) {
-        setApiError("Please provide an image URL.");
+      // Check if an image is provided
+      if (!useFileUpload && !form.imageUrl) {
+        alert("Please provide an image URL.");
         return;
       }
-      if (useFileUpload && !selectedImage) {
-        setApiError("Please upload an image file.");
+      if (useFileUpload && !selectedImage && !menu.Image) {
+        alert("Please upload an image file.");
         return;
       }
 
@@ -88,26 +156,27 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
       formData.append('MenuStatus', form.availability);
 
       if (useFileUpload) {
-        formData.append('image', selectedImage);
+        // Use the new file if uploaded, otherwise use the existing image
+        formData.append('image', selectedImage || menu.Image);
       } else {
         formData.append('Image', form.imageUrl);
       }
 
       await dispatch(editMenu({ menuId, formData })).unwrap();
-      setApiError(null);
       onClose();
       refreshMenus?.();
     } catch (error) {
       console.error('Error updating menu item:', error);
-      if (error.status === 408) {
-        setApiError("Upload Image or Paste Image URL");
-      }
     }
-  }, [dispatch, form, selectedImage, useFileUpload, menuId, onClose, refreshMenus]);
+  }, [dispatch, form, selectedImage, useFileUpload, menu, onClose, menuId, refreshMenus]);
+
+
 
   useEffect(() => {
+    // Prevent body scroll when the modal is open
     document.body.style.overflow = 'hidden';
     return () => {
+      // Re-enable body scroll when the modal is closed
       document.body.style.overflow = 'auto';
     };
   }, []);
@@ -123,7 +192,6 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
         </div>
         {(loading || categoriesLoading) && <p>Loading...</p>}
         {(error || categoriesError) && <p className="text-red-500">{error || categoriesError}</p>}
-        {apiError && <p className="text-red-500 mb-4">{apiError}</p>}
         {!loading && !categoriesLoading && (
           <>
             <div className="mb-4 text-black">
@@ -156,6 +224,8 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
                 onChange={handleInputChange}
               />
             </div>
+
+            {/* Option to choose between URL and File upload */}
             <div className="mb-4 text-black">
               <label className="block mb-2 font-medium text-black">Image</label>
               <div className="mb-2">
@@ -165,11 +235,7 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
                     name="imageOption"
                     value="url"
                     checked={!useFileUpload}
-                    onChange={() => {
-                      setUseFileUpload(false);
-                      setSelectedImage(null);
-                      setApiError(null);
-                    }}
+                    onChange={() => setUseFileUpload(false)}
                   />
                   <span className="ml-2">Use Image URL</span>
                 </label>
@@ -179,16 +245,12 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
                     name="imageOption"
                     value="file"
                     checked={useFileUpload}
-                    onChange={() => {
-                      setUseFileUpload(true);
-                      dispatchForm({ type: 'SET_FIELD', field: 'imageUrl', value: '' });
-                      setSelectedImage(null); // Clear selectedImage on switch to file mode
-                      setApiError(null);
-                    }}
+                    onChange={() => setUseFileUpload(true)}
                   />
                   <span className="ml-2">Upload Image File</span>
                 </label>
               </div>
+
               {useFileUpload ? (
                 <>
                   <input
@@ -198,12 +260,19 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
                     onChange={handleFileChange}
                     required
                   />
-                  {selectedImage && (
-                    <p className="text-sm mt-1">Selected File: {selectedImage.name}</p>
-                  )}
-                  {/* {!selectedImage && menu.Image && menu.Image.startsWith('food-uploads/') && (
-                    <p className="text-sm mt-1">Current File: {menu.Image.split('/').pop()}</p>
+
+                  {/* {selectedImage && (
+                    typeof selectedImage === 'string' ? (
+                      <p className="text-sm mt-1">Selected File: {selectedImage}</p>
+                    ) : (
+                      <p className="text-sm mt-1">Selected File: {selectedImage.name}</p>
+                    )
                   )} */}
+
+                  {/* If no new file is selected but there's an existing file */}
+                  {!selectedImage && menu.Image && menu.Image.startsWith('food-uploads/') && (
+                    <p className="text-sm mt-1">Current File: {menu.Image.split('/').pop()}</p>
+                  )}
                 </>
               ) : (
                 <input
@@ -216,6 +285,8 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
                 />
               )}
             </div>
+
+
             <div className="mb-4 text-black">
               <label className="block mb-2 font-medium text-black">Category</label>
               <select
