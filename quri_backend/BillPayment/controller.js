@@ -367,115 +367,27 @@ const getNGeniusPaymentController = async (req, res) => {
 };
 
 //-----------------------------------------------
+
 // airpay payment integration
 
 const Merchant_Name = "FOLKS CAFE";
 const MERCHANT_ID = "247152";
 const USER_ID = "1066103";
 const PASSWORD = "yvufcZ5M";
-const SALT_KEY = "your_salt_key";
 const CLIENT_ID = "ca9544";
 const CLIENT_SECRET = "a44da6e8a5d0e64e461bc6b76fe35872";
 const API_KEY = "796XA2V6WAqa9Vaz"; // Used as AES key to decrypt
+const TOKEN_URL = "https://uae-payments.airpay.ninja/oauth2/token.php";
+const PAYMENT_URL = "https://uae-payments.airpay.ninja/pay/v1/index.php";
 
 const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
 const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
 
-// get access token first
-const getAccessToken = async () => {
-  try {
-    const url = "https://kraken.airpay.co.in/airpay/pay/v4/api/oauth2";
 
-    const params = new URLSearchParams();
-    params.append("client_id", CLIENT_ID);
-    params.append("client_secret", CLIENT_SECRET);
-    params.append("grant_type", "client_credentials");
+const handleAirpayPayment = async (req,res)=>{
 
-    // Send POST request to Airpay OAuth2
-    const response = await axios.post(url, params.toString(), {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    const encryptedBase64 = response.data?.response;
-
-    console.log("excrypted response:", encryptedBase64)
-
-    if (!encryptedBase64) {
-      console.error("❌ Encrypted response not found:", response.data);
-      return;
-    }
-
-    const key = crypto.createHash("sha256").update(API_KEY).digest();
-   
-    const decryptedResponse = decryptFunc(encryptedBase64,key)
-    
-    return decryptedResponse ;
-  } catch (err) {
-    console.error("❌ Error:", err.response?.data || err.message);
-  }
-};
-
-
-// decrypt response
-function decryptFunc(response, encryptionKey) {
-  try {
-    const raw = Buffer.from(response, "base64");
-    const iv = raw.slice(0, 16);
-    const encryptedData = raw.slice(16);
-
-    const decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(encryptionKey), iv);
-    let decrypted = decipher.update(encryptedData);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-
-    return JSON.parse(decrypted.toString("utf8"));
-  } catch (error) {
-    console.error("Decryption failed:", error.message);
-    return null;
-  }
 }
 
-
-
-const getAirpayController = async (req, res) => {
-  try {
-    const { orderDetails, orderId, amount } = req.body;
-
-    getAccessToken()
-    return 
-
-    const paymentData = {
-      MERCHANT_ID,
-      USER_ID,
-      PASSWORD,
-      TXN_AMOUNT: amount,
-      CURRENCY: "AED",
-      ORDER_ID: orderId,
-      RETURN_URL,
-      CANCEL_URL,
-    };
-
-    // Generate checksum
-    const keys = Object.keys(paymentData).sort();
-    const checksumStr =
-      keys.map((k) => paymentData[k]).join("|") + "|" + SALT_KEY;
-    const CHECKSUM = crypto
-      .createHash("sha256")
-      .update(checksumStr)
-      .digest("hex");
-
-    // Final payment URL
-    const baseUrl = "https://payments.airpay.co.in/index.php";
-    const params = new URLSearchParams({ ...paymentData, CHECKSUM });
-    const paymentUrl = `${baseUrl}?${params.toString()}`;
-
-    return res.json({ paymentUrl });
-  } catch (error) {
-    console.error("Airpay payment error:", error);
-    return res.status(500).json({ error: "Failed to generate payment URL" });
-  }
-};
 
 //-----------------------------------------------
 
@@ -559,7 +471,7 @@ module.exports = {
   splitBillCheckoutController,
   customBillCheckoutController,
   getNGeniusPaymentController,
-  getAirpayController,
+  handleAirpayPayment,
   handleGPayPaymentController,
   handleApplePayPaymentController,
 };

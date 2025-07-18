@@ -1,9 +1,45 @@
 const {
+  login,
+  register,
   getAllRestaurantsMenus,
   getAllRestaurantOrders,
   getMenuByRestaurantID,
   editMenuItem
 } = require("./service.js");
+
+
+// login of super admin
+const Login = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const result = await login(username, password);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
+
+// register an super-admin
+const Register = async (req, res) => {
+  const { username, password, confirmPassword,role } = req.body;
+
+  console.log(username, password, confirmPassword, role)
+  return;
+
+  try {
+    const result = await register(username, password, confirmPassword,role);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Add admin error:", error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+
 
 // Controller to handle fetching all restaurants' menus for the superAdmin
 const fetchAllRestaurantsMenus = async (req, res) => {
@@ -50,7 +86,7 @@ const editMenuItemController = async (req, res) => {
   const file = req.file;
 
   try {
-    const updated = await editMenuItem( menuID, data, file);
+    const updated = await editMenuItem(menuID, data, file);
     if (updated) {
       res.status(200).json({ message: "Menu item updated successfully." });
     } else {
@@ -63,8 +99,10 @@ const editMenuItemController = async (req, res) => {
 
 
 module.exports = {
+  Login,
+  Register,
   fetchAllRestaurantsMenus,
   getAllRestaurantOrdersController,
   fetchMenuByRestaurantIDController,
-  editMenuItemController, 
+  editMenuItemController,
 };

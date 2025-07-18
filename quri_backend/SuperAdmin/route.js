@@ -1,5 +1,7 @@
 const express = require("express");
 const {
+  Login,
+  Register,
   fetchAllRestaurantsMenus,
   getAllRestaurantOrdersController,
   fetchMenuByRestaurantIDController,
@@ -9,6 +11,9 @@ const {
 const uploadFoodImage = require('../middleWare/foodUpload.js');
 
 const router = express.Router();
+
+router.post("/login", Login);
+router.post("/register", Register);
 
 router.get("/fetchAllMenus", fetchAllRestaurantsMenus);
 

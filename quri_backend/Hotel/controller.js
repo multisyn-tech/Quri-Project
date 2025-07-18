@@ -362,6 +362,11 @@ const editMenu = async (req, res) => {
     console.log("Received data in editMenu:", req.body);
     console.log("File uploaded:", req.file);
 
+    if(req.file=="undefined" || req.file==undefined )
+    {
+      res.status(408).json({ message: "Uplaod Image or Paste Image URL" });
+    }
+
     const updatedMenu = { ...req.body, RestaurantID: restaurantId };
 
     if (!updatedMenu || Object.keys(updatedMenu).length === 0) {
