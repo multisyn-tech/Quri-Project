@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { TbChevronsDownLeft, TbCreditCard } from "react-icons/tb";
 import { IoLogoApple } from "react-icons/io5";
 import { useSelector } from 'react-redux';
@@ -16,9 +16,13 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const FRONTEND_BASE_URL = import.meta.env.VITE_FRONTEND_BASE_URL;
 
 import ApplePayButton from "./utility/ApplePayButton";
+import Airpay from "./utility/Airpay";
 
 
 const NewCardPay = () => {
+
+  const airpayRef = useRef();
+
 
   const [tip, setTip] = useState(0);
   const [loading, setLoading] = useState(false)
@@ -65,6 +69,18 @@ const NewCardPay = () => {
   // store orderdetails to local storage for use in success page
   localStorage.removeItem("billAmount");
   localStorage.setItem("billAmount", JSON.stringify(Number(total).toFixed(2)));
+
+
+  const handleExternalTrigger = () => {
+    if (airpayRef.current) {
+      airpayRef.current.submit(); // triggers handleSubmit from Airpay.jsx
+    }
+  };
+
+
+
+  // --------------------------------------------------
+
 
   const handleStripePayment = async () => {
 
@@ -177,65 +193,72 @@ const NewCardPay = () => {
   // ----------------------------------------------------
   // handle airpay payment 
 
-  const handleAirpayPayment = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${BASE_URL}/bill/airpay-payment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: orderID,
-          amount: formattedTotal,
-          customerEmail: 'customer@email.com',
-          customerPhone: '9712343412321',
-          currency: 'AED',
-          isocurrency: 'AED',
-          splitData: "BANKID1^60|BANKID2^40",
-        }),
-      });
+  // const handleAirpayPayment = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const res = await fetch(`${BASE_URL}/bill/airpay-payment`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         orderId: orderID,
+  //         amount: formattedTotal,
+  //         customerEmail: 'customer@email.com',
+  //         customerPhone: '9712343412321',
+  //         currency: 'AED',
+  //         isocurrency: 'AED',
+  //         splitData: "BANKID1^60|BANKID2^40",
+  //       }),
+  //     });
 
-      const data = await res.json();
-      console.log("Response of Airpay payment:", data);
+  //     const data = await res.json();
+  //     console.log("Response of Airpay payment:", data);
 
-      if (res.status === 400 && data.errors) {
-        alert("Validation errors: " + Object.values(data.errors).join(", "));
-        setLoading(false);
-        return;
-      }
+  //     if (res.status === 400 && data.errors) {
+  //       alert("Validation errors: " + Object.values(data.errors).join(", "));
+  //       setLoading(false);
+  //       return;
+  //     }
 
-      if (data.paymentUrl) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = data.paymentUrl;
+  //     if (data.paymentUrl) {
+  //       const form = document.createElement('form');
+  //       form.method = 'POST';
+  //       form.action = data.paymentUrl;
 
-        const fields = {
-          mid: data.mid,
-          data: data.data,
-          privatekey: data.privatekey,
-          checksum: data.checksum,
-        };
+  //       const fields = {
+  //         mid: data.mid,
+  //         data: data.data,
+  //         privatekey: data.privatekey,
+  //         checksum: data.checksum,
+  //       };
 
-        Object.entries(fields).forEach(([key, value]) => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value;
-          form.appendChild(input);
-        });
+  //       Object.entries(fields).forEach(([key, value]) => {
+  //         const input = document.createElement('input');
+  //         input.type = 'hidden';
+  //         input.name = key;
+  //         input.value = value;
+  //         form.appendChild(input);
+  //       });
 
-        document.body.appendChild(form);
-        form.submit();
-      } else {
-        alert("Payment initiation failed");
-        setLoading(false);
-      }
-    } catch (error) {
-      console.log("Error occurred during Airpay payment:", error);
-      alert("Payment initiation failed");
-      setLoading(false);
-    }
+  //       document.body.appendChild(form);
+  //       form.submit();
+  //     } else {
+  //       alert("Payment initiation failed");
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.log("Error occurred during Airpay payment:", error);
+  //     alert("Payment initiation failed");
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  const handleSubmit = () => {
+    console.log("Airpay Submit from parent triggered");
+    // Put your actual logic here
   };
 
+  // ----------------------------------------------------
 
 
   const openPaymentsModal = () => {
@@ -257,7 +280,7 @@ const NewCardPay = () => {
     } else if (selectedOption === 'ngenius') {
       handleN_GeniusPayment();
     } else if (selectedOption === 'airpay') {
-      handleAirpayPayment()
+      // handleAirpayPayment()
     }
   };
 
@@ -415,22 +438,15 @@ const NewCardPay = () => {
 
                       {/* pay with airpay */}
 
-                      {/* <button
-                        type="button"
-                        className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'airpay'
-                          ? 'bg-blue-700 text-white'
-                          : 'bg-blue-100 text-blue-700'
-                          } hover:bg-blue-800 hover:text-white active:bg-blue-900 active:text-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                        onClick={() => {
-                          const selected = 'airpay';
-                          setPaymentOption(selected);
-                          handleSubmitPayment(selected);
-                        }}
-                      >
-                        Pay with AirPay
-                      </button> */}
+                      {/* <div>
+                        <div className="flex justify-center my-1">
+                          <Airpay ref={airpayRef} order_amount={formattedTotal} order_id={orderID} />
+                        </div>
+                      </div> */}
 
-                      {/* <button
+
+
+                      <button
                         type="button"
                         className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'ngenius'
                           ? 'bg-green-700 text-white'
@@ -443,7 +459,7 @@ const NewCardPay = () => {
                         }}
                       >
                         Pay with N-Genius
-                      </button> */}
+                      </button>
                     </div>
 
                     <div className="flex justify-center my-1">

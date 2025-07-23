@@ -1,0 +1,17 @@
+
+{
+
+    "mercid": "247152", 
+    "username": "1066103", 
+    "password": "yvufcZ5M",
+    "secret": "796XA2V6WAqa9Vaz",
+
+
+    "client_id":"ca9544",
+    "client_secret" :"a44da6e8a5d0e64e461bc6b76fe35872",
+    "tokenUrl" :"https://payments.airpay.ae/pay/v1/api/oauth2/",
+    "url" :"https://payments.airpay.ae/pay/v1/index.php"
+
+
+}
+
