@@ -327,9 +327,11 @@ const getNGeniusPaymentController = async (req, res) => {
       },
       merchantAttributes: {
         redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`,
+        // redirectUrl: `http://40.172.219.148/quri/menu/orderPlaced`,
         // redirectUrl: `${BASE_URL}/quri/menu/orderPlaced`,
         cancelText: "Order More",
         cancelUrl: `https://fe.quri.co/quri/menu/home`,
+        // cancelUrl: `http://40.172.219.148/quri/menu/home`,
         // cancelUrl: `${BASE_URL}/quri/menu/home`,
         paymentAttempts: "3",
         offerOnly: "VISA,MASTERCARD,SAMSUNG_PAY,APPLE_PAY",
@@ -371,11 +373,11 @@ const getNGeniusPaymentController = async (req, res) => {
 // airpay payment integration
 
 const Merchant_Name = "FOLKS CAFE";
-const MERCHANT_ID = "247152";
-const USER_ID = "1066103";
-const PASSWORD = "yvufcZ5M";
-const CLIENT_ID = "ca9544";
-const CLIENT_SECRET = "a44da6e8a5d0e64e461bc6b76fe35872";
+var merchant_id = "247152";
+var username = "1066103"; 
+var password = "yvufcZ5M";
+var client_id = "ca9544";
+var client_secret = "a44da6e8a5d0e64e461bc6b76fe35872";
 const API_KEY = "796XA2V6WAqa9Vaz"; // Used as AES key to decrypt
 const TOKEN_URL = "https://uae-payments.airpay.ninja/oauth2/token.php";
 const PAYMENT_URL = "https://uae-payments.airpay.ninja/pay/v1/index.php";
@@ -384,9 +386,51 @@ const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
 const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
 
 
-const handleAirpayPayment = async (req,res)=>{
+
+const key = crypto.createHash('md5').update(username + "~:~" + password).digest('hex');
+const iv = crypto.randomBytes(8);
+// Convert the random bytes buffer to a hexadecimal string
+const ivHex = iv.toString('hex');
+
+
+const handleAirpayPayment = async (req, res) => {
+  const dataFromClient = req.body;
+
+  var enc_data = encrypt(JSON.stringify(dataFromClient), key);
+  var request = {
+    client_id: client_id,
+    client_secret: client_secret,
+    grant_type: 'client_credentials',
+    merchant_id: merchant_id
+  };
+
+  var encrypteddata = encrypt(JSON.stringify(request), key)
+  const msg = {
+    encdata: enc_data,
+    tokeninput: encrypteddata
+  };
+
+  res.json(msg);
 
 }
+
+
+
+function encrypt(request, secretKey) {
+
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secretKey, 'utf-8'), Buffer.from(ivHex));
+
+  // Update the cipher with the request and finalize
+  const raw = Buffer.concat([cipher.update(request, 'utf-8'), cipher.final()]);
+
+  // Combine IV and raw data, then base64 encode
+  const data = ivHex + raw.toString('base64');
+
+  return data;
+}
+
+
+
 
 
 //-----------------------------------------------

@@ -22,8 +22,7 @@ router.get("/stripe-payments", getStripePaymentsController);
 
 router.post("/n-genius-payment", getNGeniusPaymentController)
 
-router.post("/airpay-payment", handleAirpayPayment)
-
+router.post("/airpay-payment-sendData", handleAirpayPayment)
 
 router.post("/process-gpay-payment", handleGPayPaymentController)
 
