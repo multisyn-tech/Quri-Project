@@ -1,0 +1,37 @@
+name: Deploy Quri to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            # Backend update
+            cd ~/Quri-Project/quri_backend
+            git pull
+            npm install
+            pm2 restart all
+
+            # Frontend update
+            cd ~/Quri-Project/quri_frontend
+            git pull
+            npm install
+            npm run build
+
+            # Move build to NGINX path
+            sudo rm -rf /var/www/html/build/*
+            sudo cp -r dist/* /var/www/html/build/
+          EOF
