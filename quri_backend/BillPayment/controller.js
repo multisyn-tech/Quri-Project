@@ -327,11 +327,11 @@ const getNGeniusPaymentController = async (req, res) => {
       },
       merchantAttributes: {
         // redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`,
-        redirectUrl: `http://40.172.219.148/quri/menu/orderPlaced`,
+        redirectUrl: `https://rest.quri.co/quri/menu/orderPlaced`,
         // redirectUrl: `${BASE_URL}/quri/menu/orderPlaced`,
         cancelText: "Order More",
         // cancelUrl: `https://fe.quri.co/quri/menu/home`,
-        cancelUrl: `http://40.172.219.148/quri/menu/home`,
+        cancelUrl: `https://rest.quri.co/quri/menu/home`,
         // cancelUrl: `${BASE_URL}/quri/menu/home`,
         paymentAttempts: "3",
         offerOnly: "VISA,MASTERCARD,SAMSUNG_PAY,APPLE_PAY",
