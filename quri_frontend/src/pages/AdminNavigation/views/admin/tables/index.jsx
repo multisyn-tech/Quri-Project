@@ -265,13 +265,13 @@ const Orders = () => {
 
   const columns = [
     {
-      name: "OrderID",
+      name: "Order Id",
       selector: row => row.OrderID,
       sortable: true,
       width: 'auto'
     },
     {
-      name: "RestaurantID",
+      name: "Restaurant Id",
       selector: row => row.RestaurantID,
       sortable: true,
       width: 'auto'
@@ -387,12 +387,14 @@ const Orders = () => {
 
           loading ?
             // <Loader />
-            (<QuriTable
-              name={name}
-              columns={columns}
-              setTableData={setTableData}
-              tableData={tableData}
-            />)
+            (
+              <QuriTable
+                name={name}
+                columns={columns}
+                setTableData={setTableData}
+                tableData={tableData}
+              />
+            )
             : (
               <>
                 {/* Display error message if there is one */}

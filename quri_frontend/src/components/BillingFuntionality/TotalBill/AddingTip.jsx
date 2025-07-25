@@ -9,7 +9,7 @@ import Switch from "react-switch";
 import { calculateTip } from './utility/tipCalculator';
 import { LocalLaundryService } from '@mui/icons-material';
 
-import {addPlateNumber} from '../../../features/orders/orderSlice';
+import { addPlateNumber } from '../../../features/orders/orderSlice';
 
 const AddingTip = ({ total, onShowBill }) => {
   const [selectedTip, setSelectedTip] = useState(null);
@@ -72,13 +72,28 @@ const AddingTip = ({ total, onShowBill }) => {
 
 
 
+  // Load plate number from localStorage on mount
+  useEffect(() => {
+    const storedPlateNumber = localStorage.getItem('plateNumber');
+    if (storedPlateNumber) setPlateNumber(storedPlateNumber);
+  }, []);
+
+  // Save plate number to localStorage whenever it changes
+  useEffect(() => {
+    if (plateNumber) {
+      localStorage.setItem('plateNumber', plateNumber);
+    }
+  }, [plateNumber]);
+
+
+
   const handleAddPlate = () => {
     const updatedOrder = {
       ...orderInfo,
-      PlateNumber: plateNumber || '', 
+      PlateNumber: plateNumber || '',
     };
 
-     dispatch(addPlateNumber(updatedOrder)); 
+    dispatch(addPlateNumber(updatedOrder));
   };
 
   useEffect(() => {
@@ -90,7 +105,7 @@ const AddingTip = ({ total, onShowBill }) => {
     return () => clearTimeout(timer);
   }, [plateNumber]);
 
-
+ const handlePlateChange = (e) => setPlateNumber(e.target.value);
 
   return (
     <>
@@ -230,7 +245,8 @@ const AddingTip = ({ total, onShowBill }) => {
               className='my-1 py-3 px-2 w-full border-2'
               type="text"
               value={plateNumber || ''}
-              onChange={(e) => setPlateNumber(e.target.value)}
+              // onChange={(e) => setPlateNumber(e.target.value)}
+              onChange={handlePlateChange}
               required
               placeholder='Enter your car plate number i.e. AXD-144'
             />

@@ -23,6 +23,9 @@ const Loader = () => {
     const animationDurationInMinutes = 5; // 5 minutes
     const animationDuration = animationDurationInMinutes * 60 * 1000; // Convert to milliseconds (5 minutes = 300000 ms)
 
+    const order_id = useSelector((state) => state.orders?.order?.order || []);
+    // console.log(order_id.OrderID)
+
     const [currentStep, setCurrentStep] = useState(0); // Change this to move between steps
 
     // const steps = ['Order Received', 'In the Kitchen', 'Out for Delivery', 'Delivered']; // Example steps
@@ -104,7 +107,10 @@ const Loader = () => {
 
                 <div className='flex flex-col items-start mt-2 p-2'>
                     <h1 className='text-xl'>Your order is in the kitchen</h1>
-                    <p className='text-gray-500'> Order #69</p>
+                    {order_id?.OrderID != null ?
+                        <p className='text-gray-500'>Order# {order_id.OrderID}</p>
+                        : ""
+                    }
                 </div>
 
                 {/* Loader Progress Bar */}

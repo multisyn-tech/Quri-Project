@@ -14,6 +14,8 @@ import ManageSelect from '../../../../../Manage/ManageSelect';
 import QuriLogo from '../../../../../assets/Admin/Quri.svg'
 import toast from 'react-hot-toast';
 
+import { QURI_SERVICE_FEE } from "../../../../../config/constants";
+
 const OrderDetails = (props) => {
 
   const formData1 = props.data
@@ -50,7 +52,7 @@ const OrderDetails = (props) => {
 
   const orderDetails = useSelector(state => state.orders.detailsOfOrders)
   // console.log("Order Details: ", orderDetails)
-  
+
   // const cartItems = useSelector(state => state.orders.cartItems || [] )
   // console.log("cart items: ", cartItems)
 
@@ -323,8 +325,11 @@ const InvoiceHeader = ({ data1, formData1 }) => {
           <Typography variant="body1" style={invoiceStyle}>
             <b>Order Date: </b> {formData1.OrderDate}
           </Typography>
-          <Typography variant="body1" style={invoiceStyle}>
+          {/* <Typography variant="body1" style={invoiceStyle}>
             <b>Due: </b> {data1.dueDate}
+          </Typography> */}
+          <Typography variant="body1" style={invoiceStyle}>
+            {/* <b>Time: </b> {data1.dueDate} */}
           </Typography>
         </Grid>
       </Grid>
@@ -333,6 +338,13 @@ const InvoiceHeader = ({ data1, formData1 }) => {
 };
 
 const InvoiceBody = ({ data1 }) => {
+
+  const totalString = data1.total;
+  const numericTotal = parseFloat(totalString.replace(/[^0-9.]/g, ""));
+  let finalAmount = numericTotal + QURI_SERVICE_FEE;
+
+
+
   return (
     <>
 
@@ -388,9 +400,14 @@ const InvoiceBody = ({ data1 }) => {
               </TableRow>
             ))}
             <TableRow>
+              <TableCell>Service Fee:</TableCell>
+              <TableCell></TableCell>
+              <TableCell align="right">{QURI_SERVICE_FEE}</TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>Total:</TableCell>
               <TableCell></TableCell>
-              <TableCell align="right">{data1.total}</TableCell>
+              <TableCell align="right">AED {finalAmount} </TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -455,11 +472,30 @@ const OrderShippingInfo = ({ dataAvaliable, formData1, selectedStatusOption, han
             <Typography sx={{ fontWeight: 'bold' }}>Payment Status:</Typography>
           </Grid>
           <Grid item>
-            {switchChecked ? "Paid" : "Unpaid"}
+            {/* {switchChecked ? "Paid" : "Unpaid"}
             <Switch
               checked={switchChecked}
               onChange={handleSwitchChange}
-            />
+            /> */}
+            {formData1.Status === "Completed" || formData1.Status === "completed" ? (
+              <>
+                <span>Paid</span>
+                <Switch
+                  checked={true} 
+                  onChange={() => { }}
+                  disabled
+                />
+              </>
+            ) : (
+              <>
+                <span>Unpaid</span>
+                <Switch
+                  checked={switchChecked}
+                  onChange={handleSwitchChange}
+                />
+              </>
+            )}
+
           </Grid>
         </Grid>
       </Paper>

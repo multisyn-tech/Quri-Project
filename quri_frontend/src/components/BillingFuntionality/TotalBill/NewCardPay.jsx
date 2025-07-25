@@ -155,6 +155,8 @@ const NewCardPay = () => {
       });
       const paymentUrl = response.data?.payment_url;
 
+      // console.log("payment url:", paymentUrl)
+
       if (paymentUrl) {
         window.location.href = `${paymentUrl}&slim=0`; // redirect user to payment page
       } else {
@@ -421,7 +423,7 @@ const NewCardPay = () => {
 
                   <div className="mb-4 text-center">
                     <div className="flex flex-col items-center gap-4 mb-6">
-                      <button
+                      {/* <button
                         type="button"
                         className={`w-60 px-4 py-2 rounded font-semibold shadow ${paymentOption === 'stripe'
                           ? 'bg-blue-700 text-white'
@@ -434,7 +436,7 @@ const NewCardPay = () => {
                         }}
                       >
                         Pay with Stripe
-                      </button>
+                      </button> */}
 
                       {/* pay with airpay */}
 
@@ -458,7 +460,7 @@ const NewCardPay = () => {
                           handleSubmitPayment(selected);
                         }}
                       >
-                        Pay with N-Genius
+                        Pay with Card
                       </button>
                     </div>
 
