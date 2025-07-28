@@ -8,40 +8,40 @@ export default function Footer() {
       </p>
       <ul className="flex flex-wrap items-center sm:flex-nowrap">
         <li className="mr-12">
-          <a
+          {/* <a
             target="blank"
             href="mailto:hello@simmmple.com"
             className="text-sm text-gray-600 hover:text-gray-600 md:text-base lg:text-white lg:hover:text-white"
           >
             Support
-          </a>
+          </a> */}
         </li>
         <li className="mr-12">
-          <a
+          {/* <a
             target="blank"
             href="https://simmmple.com/licenses"
             className="text-sm text-gray-600 hover:text-gray-600 md:text-base lg:text-white lg:hover:text-white"
           >
             License
-          </a>
+          </a> */}
         </li>
         <li className="mr-12">
-          <a
+          {/* <a
             target="blank"
             href="https://simmmple.com/terms-of-service"
             className="text-sm text-gray-600 hover:text-gray-600 md:text-base lg:text-white lg:hover:text-white"
           >
             Terms of Use
-          </a>
+          </a> */}
         </li>
         <li>
-          <a
+          {/* <a
             target="blank"
             href="https://blog.horizon-ui.com/"
             className="text-sm text-gray-600 hover:text-gray-600 md:text-base lg:text-white lg:hover:text-white"
           >
             Blog
-          </a>
+          </a> */}
         </li>
       </ul>
     </div>

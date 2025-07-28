@@ -9,40 +9,40 @@ const Footer = () => {
       <div>
         <ul className="flex flex-wrap items-center gap-3 sm:flex-nowrap md:gap-10">
           <li>
-            <a
+            {/* <a
               target="blank"
               href="mailto:hello@simmmple.com"
               className="text-base font-medium text-gray-600 hover:text-gray-600"
             >
               Support
-            </a>
+            </a> */}
           </li>
           <li>
-            <a
+            {/* <a
               target="blank"
               href="https://simmmple.com/licenses"
               className="text-base font-medium text-gray-600 hover:text-gray-600"
             >
               License
-            </a>
+            </a> */}
           </li>
           <li>
-            <a
+            {/* <a
               target="blank"
               href="https://simmmple.com/terms-of-service"
               className="text-base font-medium text-gray-600 hover:text-gray-600"
             >
               Terms of Use
-            </a>
+            </a> */}
           </li>
           <li>
-            <a
+            {/* <a
               target="blank"
               href="https://blog.horizon-ui.com/"
               className="text-base font-medium text-gray-600 hover:text-gray-600"
             >
               Blog
-            </a>
+            </a> */}
           </li>
         </ul>
       </div>

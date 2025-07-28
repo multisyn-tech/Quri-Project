@@ -86,10 +86,10 @@ const Waiting = () => {
         if (lastOrderStatus === "Accepted") {
             timer = setTimeout(() => {
                 navigate('/quri/home/bill');
-            }, 10000); 
+            }, 5000);
         }
 
-        return () => clearTimeout(timer); 
+        return () => clearTimeout(timer);
     }, [lastOrderStatus, navigate, showRejectedItems]);
 
 
@@ -98,20 +98,28 @@ const Waiting = () => {
         const interval = setInterval(() => {
             console.log("waiting...");
             // console.log("lastOrderStatus:", lastOrderStatus)
-            
+
             dispatch(getDetailsOfOrders(lastOrderId)).then((res) => {
                 const orderStatus = res.payload;
                 setLastOrderStatus(orderStatus.orderDetails.Status);
 
-              
+
                 dispatch(getDetailsOfRejectedOrders(lastOrderId)).then((res2) => {
-                    const items = JSON.parse(res2?.payload?.RejectedOrder || '[]');
+                    let items = []
+                    items = JSON.parse(res2?.payload?.RejectedOrder || '[]');
+
                     setShowRejectedItems(items);
 
-                    const status = orderStatus?.orderDetails?.Status || lastOrderStatus;
-                    // console.log("status of order:", status)
+                    let status = null
+                    status = orderStatus?.orderDetails?.Status || lastOrderStatus;
 
-                    if (status==="Rejected" && items.length > 0) {
+            
+                    // console.log("status of order:", status)
+                    // console.log("rejected items :", items)
+
+
+
+                    if (status === "Rejected" && items.length > 0) {
                         clearInterval(interval); //  Stop polling if order is rejected
                         navigate('/quri/menu/orderSummary', {
                             state: { rejectedItems: items },
@@ -119,10 +127,13 @@ const Waiting = () => {
                     }
                 });
             });
-        }, 20000); 
+        }, 5000);
 
-        return () => clearInterval(interval); 
+        return () => clearInterval(interval);
     }, [dispatch, lastOrderId, navigate]);
+
+
+
 
 
 

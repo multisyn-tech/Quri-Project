@@ -407,7 +407,7 @@ const InvoiceBody = ({ data1 }) => {
             <TableRow>
               <TableCell>Total:</TableCell>
               <TableCell></TableCell>
-              <TableCell align="right">AED {finalAmount} </TableCell>
+              <TableCell align="right">AED {finalAmount.toFixed(2)} </TableCell>
             </TableRow>
           </TableBody>
         </Table>

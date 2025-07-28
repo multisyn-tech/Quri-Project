@@ -11,7 +11,8 @@ import StepProgressBar from './StepProgressBar';
 import { useSelector } from 'react-redux';
 import leftDesign from '../../../../../assets/waiting/left-design.png';
 import rightDesign from '../../../../../assets/waiting/right-design.png';
-import logo from '../../../../../assets/waiting/logo.png';
+// import logo from '../../../../../assets/waiting/logo.png';
+import logo from '../../../../../assets/waiting/Quri-Heading.png';
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

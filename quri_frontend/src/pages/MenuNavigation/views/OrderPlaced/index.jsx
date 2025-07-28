@@ -89,8 +89,17 @@ const OrderPlaced = () => {
     getOrderID();
     handleResetCart()
 
+    removePlatNumberFromScreen()
+
   }, [orderDetailIds]);
 
+
+  const removePlatNumberFromScreen = () => {
+    const storedPlateNumber = localStorage.getItem('plateNumber');
+    if (storedPlateNumber) {
+      localStorage.removeItem('plateNumber');  
+    }
+  }
 
   // console.log("order detail:-: ",orderDetailIds);
 

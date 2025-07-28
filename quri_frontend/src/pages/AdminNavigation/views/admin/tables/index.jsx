@@ -5,7 +5,7 @@ import { Eye, Loader } from 'react-feather';
 import { useDispatch, useSelector } from 'react-redux';
 import QuriTable from '../../../../../Manage/QuriTable';
 import EditModal from '../../../../../Manage/EditModal';
-import { getOrders, getDetailsOfOrders, addRejectedOrder, resetRejectedOrderItems, resetDetailsOfOrder } from '../../../../../features/orders/orderSlice';
+import { getOrders, getDetailsOfOrders, addRejectedOrder, resetRejectedOrderItems, resetDetailsOfOrder, rejectedItemsAdded } from '../../../../../features/orders/orderSlice';
 import notificationSound from '../../../../../assets/audio/order.mp3';
 
 const Orders = () => {
@@ -29,7 +29,7 @@ const Orders = () => {
 
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.orders.orders);
-  // console.log("order:", orders)
+  console.log("order:", orders)
 
 
   const prevOrderCountRef = useRef(null);
@@ -39,6 +39,7 @@ const Orders = () => {
 
   useEffect(() => {
     dispatch(resetDetailsOfOrder());
+    dispatch(rejectedItemsAdded(false))
   }, []);
 
 
@@ -126,7 +127,8 @@ const Orders = () => {
 
   const handleSubmitUnavailableItems = () => {
 
-    const unavailableItems = [
+    let unavailableItems = [];
+    unavailableItems = [
       {
         orderId: rejectedItems?.orderDetails?.OrderID,
         rejectedItems: rejectedItems?.orderDetails?.items
@@ -139,6 +141,8 @@ const Orders = () => {
 
     // dispatch(resetRejectedOrderItems());
     dispatch(addRejectedOrder(unavailableItems));
+    
+    dispatch(rejectedItemsAdded(true))
 
     // close modal on submit
     setRejectedModal({});
@@ -265,23 +269,23 @@ const Orders = () => {
 
   const columns = [
     {
-      name: "Order Id",
+      name: "Order ID",
       selector: row => row.OrderID,
       sortable: true,
       width: 'auto'
     },
     {
-      name: "Restaurant Id",
+      name: "Restaurant ID",
       selector: row => row.RestaurantID,
       sortable: true,
       width: 'auto'
     },
-    // {
-    //   name: "CustomerID",
-    //   selector: row => row.CustomerID,
-    //   sortable: true,
-    //   width: 'auto'
-    // },
+    {
+      name: "Table ID",
+      selector: row => row.TableID,
+      sortable: true,
+      width: 'auto'
+    },
     {
       name: "Status",
       cell: (row) => (
@@ -477,8 +481,6 @@ const Orders = () => {
 
 
 
-
-
       <EditModal
         tableData={tableData}
         setTableData={setTableData}
@@ -495,6 +497,7 @@ const Orders = () => {
         rejectedModalStatus={rejectedModal}
         setRejectedModalStatus={setRejectedModal}
       />
+
     </div>
   );
 };

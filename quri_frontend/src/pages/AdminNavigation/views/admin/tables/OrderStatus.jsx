@@ -10,6 +10,7 @@ import ManageSelect from '../../../../../Manage/ManageSelect'
 import { getOrders, updateOrderStatus } from '../../../../../features/orders/orderSlice'
 import { CropLandscapeOutlined } from '@mui/icons-material'
 
+
 const OrderStatus = (props) => {
 
     const modalName = props.modalName
@@ -21,6 +22,8 @@ const OrderStatus = (props) => {
     const tableForm = props.tableForm
     const setTableData = props.setTableData
 
+    const isRejectedItemsAdded = useSelector((state) => state.orders.isRejectedItemsAdded);
+    // console.log("isRejectedItemsAdded", isRejectedItemsAdded)
 
     const dataAvaliable = formData1 !== undefined
 
@@ -74,7 +77,12 @@ const OrderStatus = (props) => {
                         search: ''
                     };
                     console.log('called');
-                    dispatch(getOrders(obj));
+
+
+                    // console.log("isRejectedItemsAdded", isRejectedItemsAdded)
+                    // if (isRejectedItemsAdded) {
+                        dispatch(getOrders(obj));
+                    // }
 
                     resolve(result);
                 })
@@ -108,9 +116,17 @@ const OrderStatus = (props) => {
         if (errorMessage == "" && obj.newStatus !== '') {
             if (dataAvaliable) {
                 const updatedObj = Object.assign(obj, { OrderID: formData1.OrderID });
+                console.log("updated obj", updatedObj)
                 setUpdatedData(updatedObj);
             }
-            handleTimeoutAlert(obj);
+
+            handleTimeoutAlert(obj); // promise to update order status'
+
+            // console.log("isRejectedItemsAdded: ", isRejectedItemsAdded)
+            // if (isRejectedItemsAdded) {
+            //     handleTimeoutAlert(obj); // promise to update order status'
+            // }
+
         }
     };
 

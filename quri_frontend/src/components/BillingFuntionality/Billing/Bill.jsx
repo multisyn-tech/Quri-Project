@@ -125,7 +125,7 @@ const Bill = () => {
                                 <p className="absolute left-1/2 transform -translate-x-1/2 text-xl">Pay now</p>
 
                                 <button onClick={customerRegisteration} className="flex-shrink-0 p-2 rounded-full transition-transform transform hover:scale-110 active:scale-90 focus:outline-none">
-                                    <BiUser size={24} />
+                                    {/* <BiUser size={24} /> */}
                                 </button>
                             </section>
 

@@ -207,6 +207,7 @@ const orderSlice = createSlice({
     cartItems: [], // Add cartItems to the state
     totalPrice: 0, // Add totalPrice to the state
     rejectedOrderItems: [],
+    isRejectedItemsAdded: false,
   },
 
   reducers: {
@@ -249,6 +250,10 @@ const orderSlice = createSlice({
       // state.detailsOfOrders = [];
       // console.log("details of order:", JSON.stringify(state))
     },
+    rejectedItemsAdded: (state, action) => {
+      state.isRejectedItemsAdded = action.payload
+    },
+
 
     reset: (state) => {
       state.orders = [];
@@ -262,7 +267,8 @@ const orderSlice = createSlice({
       state.error = null;
       state.cartItems = [];
       state.totalPrice = 0;
-      state.rejectedOrderItems = []
+      state.rejectedOrderItems = [],
+      state.isRejectedItemsAdded = false
     }
 
 
@@ -354,7 +360,7 @@ const orderSlice = createSlice({
   },
 });
 
-export const { addItemToCart, removeItemFromCart, updateItemQuantity, addPlateNumber, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, reset } = orderSlice.actions;
+export const { addItemToCart, removeItemFromCart, updateItemQuantity, addPlateNumber, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, rejectedItemsAdded, reset } = orderSlice.actions;
 
 //Memoized purposes
 export const selectQrCodeDetails = (state) => state.qrcode.qrCodeDetails?.data;

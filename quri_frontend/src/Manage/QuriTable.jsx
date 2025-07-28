@@ -34,6 +34,7 @@ createTheme('dark', {
 
 const QuriTable = ({ propsData, columns, tableData = [], name, setTableData }) => {
 
+  console.log(tableData)
   // Initialize theme state from localStorage
   //const [theme, setTheme] = useState(localStorage.getItem('darkmode') === 'true' ? 'dark' : 'light');
   // console.log(theme)

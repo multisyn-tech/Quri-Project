@@ -74,7 +74,7 @@ const Home = () => {
                 <div className='w-full'>
                     <Card sx={{ width: '100%', boxShadow: 3, position: 'relative', borderRadius: '19px' }}>
                         {/* Buttons Container - Positioned Absolutely on the CardMedia */}
-                        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex justify-between items-center w-5/6">
+                        {/* <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex justify-between items-center w-5/6">
                             <button
                                 className="bg-white text-black px-2 py-2 rounded-full shadow-md hover:bg-gray-200 active:bg-gray-400 active:shadow-inner active:scale-95 transition-transform duration-150 ease-in-out"
                                 onClick={toggleDrawer}
@@ -87,7 +87,7 @@ const Home = () => {
                             >
                                 <IoPersonOutline size={20} />
                             </button>
-                        </div>
+                        </div> */}
 
                         <CardMedia
                             component="img"

@@ -17,7 +17,8 @@ const EditModal = ({
   tableData,
   setTableData,
   rejectedModalStatus,
-  setRejectedModalStatus
+  setRejectedModalStatus,
+
 }) => {
   const dispatch = useDispatch();
 
