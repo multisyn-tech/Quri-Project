@@ -5,7 +5,7 @@ const db = require("../db/db.js");
 const addPlateNumberService = async (orderInfo) => {
     try {
         const {
-            OrderID,            
+            OrderID,
             PlateNumber,
         } = orderInfo;
 
@@ -14,7 +14,7 @@ const addPlateNumberService = async (orderInfo) => {
        VALUES (?, ?) 
        ON DUPLICATE KEY UPDATE PlateNumber = VALUES(PlateNumber)`,
             [
-                OrderID,                
+                OrderID,
                 PlateNumber,
             ]
         );
@@ -25,6 +25,23 @@ const addPlateNumberService = async (orderInfo) => {
     }
 };
 
+
+const getPlateNumberRecord = async () => {
+
+    const query = 'SELECT PlateNumber, OrderID FROM platenumber';
+
+    return new Promise((resolve, reject) => {
+        db.query(query, (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(results);
+        });
+    });
+}
+
+
 module.exports = {
     addPlateNumberService,
+    getPlateNumberRecord
 };

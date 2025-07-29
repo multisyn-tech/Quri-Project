@@ -130,11 +130,11 @@ const register = async (username, password, confirmPassword, role) => {
       );
 
     // if (["restaurant", "admin"].includes(normalizedRole)) {
-      const insertRestaurantQuery =
-        "INSERT INTO restaurants (RestaurantID, RestaurantName, Address, PhoneNumber, CreatedAt) VALUES (?, ?, null, null, NOW())";
-      await db
-        .promise()
-        .query(insertRestaurantQuery, [restaurantID, restaurantName]);
+    const insertRestaurantQuery =
+      "INSERT INTO restaurants (RestaurantID, RestaurantName, Address, PhoneNumber, CreatedAt) VALUES (?, ?, null, null, NOW())";
+    await db
+      .promise()
+      .query(insertRestaurantQuery, [restaurantID, restaurantName]);
     // }
 
     // Send verification email
@@ -168,6 +168,105 @@ const register = async (username, password, confirmPassword, role) => {
     throw error;
   }
 };
+
+
+
+const generateRandomRestaurantID = async () => {
+  let isUnique = false;
+  let restaurantID;
+
+  while (!isUnique) {
+
+    restaurantID = Math.floor(1000 + Math.random() * 9000);
+
+    const [rows] = await db
+      .promise()
+      .query(`SELECT RestaurantID FROM restaurantadmins WHERE RestaurantID = ?`, [restaurantID]);
+
+    if (rows.length === 0) {
+      isUnique = true;
+    }
+  }
+
+  return restaurantID;
+};
+
+// register restaurant by super admin side.
+const registerRestaurantService = async (username, password, role, restName, address, phoneNumber) => {
+
+
+  try {
+    // Validate password length
+    if (password.length < 8) {
+      throw new Error("Password must be at least 8 characters long");
+    }
+
+    // Validate role
+    if (!role) {
+      throw new Error("Role is required");
+    }
+
+    // Check if the username already exists
+    const [existingAdmins] = await db
+      .promise()
+      .query("SELECT * FROM restaurantadmins WHERE username = ?", [username]);
+    if (existingAdmins.length > 0) {
+      throw new Error("Email already exists");
+    }
+
+    // Generate Restaurant ID and name
+    const restaurantID = await generateRandomRestaurantID();
+    const restaurantName = restName;
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate a verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    const isVerified = 1;
+    const status = "active"
+
+    // Insert the restaurant with the verification token, role, and unverified status
+    const [result] = await db
+      .promise()
+      .query(
+        "INSERT INTO restaurantadmins (username, password, RestaurantID, verificationToken, Role, isVerified) VALUES (?, ?, ?, ?, ?, ?)",
+        [
+          username,
+          hashedPassword,
+          restaurantID,
+          verificationToken,
+          role,
+          isVerified,
+        ]
+      );
+
+
+    const insertRestaurantQuery = `
+      INSERT INTO restaurants 
+      (RestaurantID, RestaurantName, Address, PhoneNumber, CreatedAt, status) 
+      VALUES (?, ?, ?, ?, NOW(), ?)`;
+    await db
+      .promise()
+      .query(insertRestaurantQuery,
+        [
+          restaurantID,
+          restaurantName,
+          address,
+          phoneNumber,
+          status
+        ]);
+
+
+    return { message: "Restaurant added successfully." };
+  } catch (error) {
+    throw error;
+  }
+
+
+}
+
 
 
 
@@ -386,8 +485,10 @@ const editMenuItem = async (menuId, data, file) => {
 module.exports = {
   login,
   register,
+  registerRestaurantService,
+
   getAllRestaurantsMenus,
   getAllRestaurantOrders,
   getMenuByRestaurantID,
-  editMenuItem  
+  editMenuItem
 };

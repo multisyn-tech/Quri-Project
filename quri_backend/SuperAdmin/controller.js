@@ -1,6 +1,8 @@
 const {
   login,
   register,
+  registerRestaurantService,
+
   getAllRestaurantsMenus,
   getAllRestaurantOrders,
   getMenuByRestaurantID,
@@ -23,19 +25,34 @@ const Login = async (req, res) => {
 
 // register an super-admin
 const Register = async (req, res) => {
-  const { username, password, confirmPassword,role } = req.body;
+  const { username, password, confirmPassword, role } = req.body;
 
   console.log(username, password, confirmPassword, role)
   return;
 
   try {
-    const result = await register(username, password, confirmPassword,role);
+    const result = await register(username, password, confirmPassword, role);
     res.status(200).json(result);
   } catch (error) {
     console.error("Add admin error:", error);
     res.status(400).json({ message: error.message });
   }
 };
+
+
+
+const restaurantRegisteration = async (req, res) => {
+
+  const {email, password, role, restName,address,phoneNumber } = req.body 
+
+  try {
+    const resp = await registerRestaurantService(email, password, role, restName,address,phoneNumber )
+    res.status(200).json(resp)
+  }
+  catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
 
 
 
@@ -101,6 +118,8 @@ const editMenuItemController = async (req, res) => {
 module.exports = {
   Login,
   Register,
+  restaurantRegisteration,
+
   fetchAllRestaurantsMenus,
   getAllRestaurantOrdersController,
   fetchMenuByRestaurantIDController,

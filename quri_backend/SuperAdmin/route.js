@@ -2,6 +2,8 @@ const express = require("express");
 const {
   Login,
   Register,
+  restaurantRegisteration,
+
   fetchAllRestaurantsMenus,
   getAllRestaurantOrdersController,
   fetchMenuByRestaurantIDController,
@@ -14,6 +16,9 @@ const router = express.Router();
 
 router.post("/login", Login);
 router.post("/register", Register);
+
+router.post("/restaurant-registeration", restaurantRegisteration);
+
 
 router.get("/fetchAllMenus", fetchAllRestaurantsMenus);
 

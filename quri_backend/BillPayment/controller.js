@@ -1,4 +1,4 @@
-const { addPlateNumberService } = require("./service.js");
+const { addPlateNumberService, getPlateNumberRecord } = require("./service.js");
 
 const crypto = require("crypto");
 const axios = require("axios");
@@ -276,7 +276,10 @@ const getStripePaymentsController = async (req, res) => {
 const getNGeniusPaymentController = async (req, res) => {
   const apiKey = process.env.N_GENIUS_API_KEY;
   const outletRef = process.env.OUTLET_REFERENCE;
-  const { formattedTotal, orderID, orderDetails } = req.body;
+  const { formattedTotal, orderID, orderDetails, orderInfo } = req.body;
+
+  await addPlateNumber(orderInfo);
+
 
   const accessTokenAPIURL_Live =
     "https://api-gateway.ngenius-payments.com/identity/auth/access-token"; // production acount URL
@@ -310,7 +313,6 @@ const getNGeniusPaymentController = async (req, res) => {
     }
 
     const accessToken = tokenData.access_token;
-
     const formattedTotalMinorUnits = Math.round(
       parseFloat(formattedTotal) * 100
     );
@@ -374,7 +376,7 @@ const getNGeniusPaymentController = async (req, res) => {
 
 const Merchant_Name = "FOLKS CAFE";
 var merchant_id = "247152";
-var username = "1066103"; 
+var username = "1066103";
 var password = "yvufcZ5M";
 var client_id = "ca9544";
 var client_secret = "a44da6e8a5d0e64e461bc6b76fe35872";
@@ -438,8 +440,9 @@ function encrypt(request, secretKey) {
 // handle GPay token with backend
 
 const handleGPayPaymentController = async (req, res) => {
-  const { token } = req.body;
+  const { token, orderInfo } = req.body;
 
+  await addPlateNumber(orderInfo);
   console.log("token at backend :", token);
   res.json({ success: true });
 };
@@ -449,7 +452,10 @@ const handleGPayPaymentController = async (req, res) => {
 // handle apple pay integration with backend
 
 const handleApplePayPaymentController = async (req, res) => {
-  const { validationURL } = req.body;
+  const { validationURL, orderInfo } = req.body;
+
+  await addPlateNumber(orderInfo);
+
 
   if (!validationURL) {
     return res.status(400).json({ error: "Missing validationURL" });
@@ -464,7 +470,7 @@ const handleApplePayPaymentController = async (req, res) => {
     merchantIdentifier: "merchant.com.quri",
     displayName: "Quri",
     initiative: "web",
-    initiativeContext: "https://fe.quri.co",
+    initiativeContext: "https://rest.quri.co",
   });
 
   const request = https.request(
@@ -509,6 +515,21 @@ const handleApplePayPaymentController = async (req, res) => {
 
 //-----------------------------------------------
 
+const getPlateNumbers = async (req, res) => {
+
+  try {
+    const plate_numbers = await getPlateNumberRecord();
+    // console.log("plate numebr:" ,plate_numbers)
+    res.status(200).json({ success: true, data: plate_numbers });
+  } catch (error) {
+    console.error('Error fetching plate numbers:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+}
+
+
+//-----------------------------------------------
+
 module.exports = {
   billPaymentController,
   getStripePaymentsController,
@@ -518,4 +539,5 @@ module.exports = {
   handleAirpayPayment,
   handleGPayPaymentController,
   handleApplePayPaymentController,
+  getPlateNumbers
 };

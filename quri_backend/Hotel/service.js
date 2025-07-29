@@ -728,6 +728,12 @@ const editMenuService = async (restaurantId, MenuID, data, file) => {
 // Delete a menu item
 const deleteMenuService = async (MenuID, RestaurantID) => {
   try {
+
+    await db.promise().query(
+      `DELETE FROM orderdetails WHERE MenuID = ?`,
+      [MenuID]
+    );
+
     const [result] = await db
       .promise()
       .query(`DELETE FROM menus WHERE MenuID = ? AND RestaurantID = ?`, [
@@ -1124,8 +1130,8 @@ const FetchQRCodeService = async (QRCode) => {
 
 const fetchPopularDishesService = async (restaurantID) => {
   try {
-  
-    
+
+
     const [rows] = await db.promise().query(
       `SELECT 
           m.MenuID,
@@ -1153,7 +1159,7 @@ const fetchPopularDishesService = async (restaurantID) => {
         LIMIT 10`,
       [restaurantID, restaurantID]
     );
-    
+
 
     return {
       success: true,
