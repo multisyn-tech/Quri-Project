@@ -5,7 +5,7 @@ import { Eye, Loader } from 'react-feather';
 import { useDispatch, useSelector } from 'react-redux';
 import QuriTable from '../../../../../Manage/QuriTable';
 import EditModal from '../../../../../Manage/EditModal';
-import { getOrders, getDetailsOfOrders, addRejectedOrder, resetRejectedOrderItems, resetDetailsOfOrder, rejectedItemsAdded } from '../../../../../features/orders/orderSlice';
+import { getOrders, getDetailsOfOrders, addRejectedOrder, resetRejectedOrderItems, resetDetailsOfOrder, rejectedItemsAdded, getPlateNumber } from '../../../../../features/orders/orderSlice';
 import notificationSound from '../../../../../assets/audio/order.mp3';
 
 const Orders = () => {
@@ -26,10 +26,13 @@ const Orders = () => {
   const [rejectedModal, setRejectedModal] = useState({});
   const [rejectedItems, setRejectedItems] = useState({});
 
+  const [plateNumberData, setPlateNumberData] = useState([]);
+  const [isLoadingPlateNumber, setIsLoadingPlateNumber] = useState(true);
+
 
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.orders.orders);
-  console.log("order:", orders)
+  // console.log("order:", orders)
 
 
   const prevOrderCountRef = useRef(null);
@@ -50,7 +53,7 @@ const Orders = () => {
 
     fetchData(); // initial load
 
-    const interval = setInterval(fetchData, 10000); // every 10s
+    const interval = setInterval(fetchData, 6000); // every 10s
 
     return () => clearInterval(interval); // cleanup
   }, []);
@@ -75,6 +78,8 @@ const Orders = () => {
   useEffect(() => {
     getRejectedOrderItems()
   }, [rejectedModal?.newStatus])
+
+
 
 
   const unlockAudio = () => {
@@ -141,7 +146,7 @@ const Orders = () => {
 
     // dispatch(resetRejectedOrderItems());
     dispatch(addRejectedOrder(unavailableItems));
-    
+
     dispatch(rejectedItemsAdded(true))
 
     // close modal on submit
@@ -151,43 +156,98 @@ const Orders = () => {
 
 
 
-  const getData = () => {
+  const getData = async () => {
     setLoading(true);
+    setIsLoadingPlateNumber(true);
     let obj = {
       page: '1',
       limit: '1000',
       search: ''
     };
 
-    return dispatch(getOrders(obj))
-      .unwrap()
-      .then((data) => {
-        const newOrderStatus = data.orders.length > 0 ? data.orders[data.orders.length - 1].Status : null;
+    try {
+      const plateData = await getPlateNumberRecord();
 
-        if (
-          prevOrderCountRef.current !== null &&
-          data.orders.length > prevOrderCountRef.current &&
-          !["Accepted", "Rejected", "Completed"].includes(newOrderStatus) &&
-          isAudioUnlocked.current
-        ) {
-          audioRef.current.loop = true; // Enable looping
-          audioRef.current.play().catch((err) => console.error("Audio play error:", err));
-        }
+      return dispatch(getOrders(obj))
+        .unwrap()
+        .then((data) => {
 
-        if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
-          audioRef.current.pause();
-          audioRef.current.currentTime = 0;
-        }
+          // console.log("order data --> ", data.orders)
+          const orders = data.orders || [];
 
-        prevOrderCountRef.current = data.orders.length;
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching orders:", error);
-        setErrorMessage(error.message);
-        setLoading(false);
-      });
+          // Append plate numbers to orders
+          const updated = filteringPlateNumber(orders, plateData);
+          setTableData(updated);
+
+          const newOrderStatus = data.orders.length > 0 ? data.orders[data.orders.length - 1].Status : null;
+          if (
+            prevOrderCountRef.current !== null &&
+            data.orders.length > prevOrderCountRef.current &&
+            !["Accepted", "Rejected", "Completed"].includes(newOrderStatus) &&
+            isAudioUnlocked.current
+          ) {
+            audioRef.current.loop = true; // Enable looping
+            audioRef.current.play().catch((err) => console.error("Audio play error:", err));
+          }
+
+          if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
+
+          prevOrderCountRef.current = data.orders.length;
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching orders:", error);
+          setErrorMessage(error.message);
+          setLoading(false);
+        });
+
+    }
+    catch (error) {
+      console.error("Error fetching orders:", error);
+      setIsLoadingPlateNumber(false);
+    }
+    finally {
+      setIsLoadingPlateNumber(false);
+    }
   };
+
+
+
+
+  const getPlateNumberRecord = async () => {
+    try {
+      const data = await dispatch(getPlateNumber()).unwrap();
+      setPlateNumberData(data);
+      return data;
+    } catch (err) {
+      console.error("Error fetching plate numbers:", err);
+      return [];
+    }
+  };
+
+
+
+  const filteringPlateNumber = (orders, plateData) => {
+
+    const plateMap = new Map();
+
+    plateData.forEach(({ OrderID, PlateNumber }) => {
+      if (PlateNumber) {
+        // Only keep the latest PlateNumber if multiple exist
+        plateMap.set(OrderID, PlateNumber);
+      }
+    });
+
+    setIsLoadingPlateNumber(false);
+    return orders.map(order => ({
+      ...order,
+      PlateNumber: plateMap.get(order.OrderID) || '-',
+    }));
+
+  }
 
 
 
@@ -283,6 +343,13 @@ const Orders = () => {
     {
       name: "Table ID",
       selector: row => row.TableID,
+      sortable: true,
+      width: 'auto'
+    },
+    {
+      name: "Plate Number",
+      // selector: row => isLoadingPlateNumber ? 'Loading...' : row.PlateNumber,
+      selector: row => row.PlateNumber,
       sortable: true,
       width: 'auto'
     },

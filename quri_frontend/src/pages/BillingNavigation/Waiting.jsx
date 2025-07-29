@@ -86,7 +86,7 @@ const Waiting = () => {
         if (lastOrderStatus === "Accepted") {
             timer = setTimeout(() => {
                 navigate('/quri/home/bill');
-            }, 5000);
+            }, 4000);
         }
 
         return () => clearTimeout(timer);
@@ -127,7 +127,7 @@ const Waiting = () => {
                     }
                 });
             });
-        }, 5000);
+        }, 20000);
 
         return () => clearInterval(interval);
     }, [dispatch, lastOrderId, navigate]);

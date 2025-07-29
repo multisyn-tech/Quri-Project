@@ -189,6 +189,20 @@ export const getDetailsOfRejectedOrders = createAsyncThunk(
 );
 
 
+export const getPlateNumber = createAsyncThunk(
+  'orders/getPlateNumber',
+  async (_,thunkAPI) => {
+    try {
+      const res = await axios.get(`${BASE_URL}/bill/get-platenumbers`);
+      // console.log("plate number data:", res)
+      return res.data.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
 
 
 const orderSlice = createSlice({
@@ -268,7 +282,7 @@ const orderSlice = createSlice({
       state.cartItems = [];
       state.totalPrice = 0;
       state.rejectedOrderItems = [],
-      state.isRejectedItemsAdded = false
+        state.isRejectedItemsAdded = false
     }
 
 
@@ -353,6 +367,17 @@ const orderSlice = createSlice({
         state.status = 'succeeded';
         state.orderStatus = action.payload; // Ensure correct data structure
       })
+      .addCase(getPlateNumber.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getPlateNumber.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.plateNumbers = action.payload;
+      })
+      .addCase(getPlateNumber.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || action.error.message;
+      });
     // .addCase(addRejectedOrder.fulfilled, (state, action) => {
     //   const { orderId, rejectedItems } = action.payload;
     //   state.rejectedOrderItems.push({ orderId, rejectedItems });

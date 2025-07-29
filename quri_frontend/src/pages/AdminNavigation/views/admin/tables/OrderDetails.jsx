@@ -82,6 +82,7 @@ const OrderDetails = (props) => {
     }
   }, [orderDetails]);
 
+
   // Fetch order details whenever the orderID changes
   useEffect(() => {
     if (orderID) {
@@ -181,8 +182,6 @@ const OrderDetails = (props) => {
 
 
   const handleTimeoutAlert = (obj) => {
-
-
     const myPromise = new Promise(async (resolve, reject) => {
       dispatch(updateOrderStatus(obj, dataAvaliable && formData1.OrderID)).then((response) => {
         const result = response
@@ -395,8 +394,13 @@ const InvoiceBody = ({ data1 }) => {
             {data1.items.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{item.description}</TableCell>
-                <TableCell>{item.Quantity}</TableCell>
-                <TableCell align="right">{item.price}</TableCell>
+                <TableCell>{item.Quantity} &nbsp; { <small>({item.Quantity} x {(item?.price ?? "0").replace(/[^0-9.]/g, "")} AED)</small>} </TableCell>
+                <TableCell align="right">
+                  {(
+                    Number((item?.price ?? "0").replace(/[^0-9.]/g, "")) *
+                    Number(item?.Quantity ?? 0)
+                  ).toFixed(2)}
+                </TableCell>
               </TableRow>
             ))}
             <TableRow>
@@ -481,7 +485,7 @@ const OrderShippingInfo = ({ dataAvaliable, formData1, selectedStatusOption, han
               <>
                 <span>Paid</span>
                 <Switch
-                  checked={true} 
+                  checked={true}
                   onChange={() => { }}
                   disabled
                 />
@@ -492,6 +496,7 @@ const OrderShippingInfo = ({ dataAvaliable, formData1, selectedStatusOption, han
                 <Switch
                   checked={switchChecked}
                   onChange={handleSwitchChange}
+                  disabled
                 />
               </>
             )}

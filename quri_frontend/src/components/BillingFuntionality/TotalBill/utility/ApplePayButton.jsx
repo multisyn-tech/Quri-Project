@@ -2,7 +2,7 @@ import { useEffect } from "react";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const FRONTEND_BASE_URL = import.meta.env.VITE_FRONTEND_BASE_URL;
 
-const ApplePayButton = ({ amount }) => {
+const ApplePayButton = ({ amount, orderInfo }) => {
   useEffect(() => {
     if (window.ApplePaySession && ApplePaySession.canMakePayments()) {
       document.getElementById("apple-pay-button").style.display = "inline-block";
@@ -36,6 +36,7 @@ const ApplePayButton = ({ amount }) => {
           },
           body: JSON.stringify({
             validationURL: event.validationURL,
+            orderInfo
           }),
         });
 

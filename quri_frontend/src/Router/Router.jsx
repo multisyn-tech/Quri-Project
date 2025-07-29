@@ -21,6 +21,7 @@ import AdminLayout from "../components/AdminFuntionality/layouts/admin";
 
 import SuperAdminLogin from "../components/AdminFuntionality/AdminCredentials/SuperAdminLogin";
 import SuperAdminSignup from "../components/AdminFuntionality/AdminCredentials/SuperAdminSignUp";
+import RestaurantRegisteration from "../pages/SuperAdminNavigation/AllRestaurants/RestaurantRegisterationPage";
 
 
 
@@ -77,6 +78,9 @@ const ThemeRoutes = [
     children: [
       { path: "login", exact: true, element: <SuperAdminLogin /> },
       { path: "SignUp", exact: true, element: <SuperAdminSignup /> },
+
+      { path: "restaurant/registeration", exact: true, element: <RestaurantRegisteration /> },
+      
       { path: "VerifyEmail/:token", exact: true, element: <VerifyEmail /> },
       { path: "VerificationEmail", exact: true, element: <AdminVerifyOtp /> },
     ],

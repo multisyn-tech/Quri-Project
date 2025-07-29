@@ -151,7 +151,8 @@ const NewCardPay = () => {
       const response = await axios.post(`${BASE_URL}/bill/n-genius-payment`, {
         formattedTotal,
         orderID,
-        orderDetails
+        orderDetails,
+        orderInfo
       });
       const paymentUrl = response.data?.payment_url;
 
@@ -299,7 +300,7 @@ const NewCardPay = () => {
       const res = await fetch(`${BASE_URL}/bill/process-gpay-payment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, orderInfo }),
       });
 
       const result = await res.json();
@@ -512,7 +513,7 @@ const NewCardPay = () => {
 
 
                     <div className="flex justify-center my-1">
-                      <ApplePayButton amount={formattedTotal} />
+                      <ApplePayButton amount={formattedTotal} orderInfo={orderInfo} />
                     </div>
 
                   </div>
