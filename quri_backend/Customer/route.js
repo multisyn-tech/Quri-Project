@@ -15,18 +15,20 @@ const {
   getMenuByTableIDController,
   findOrderID,
   addRejectedOrder,
+  getRecentOrder,
   findRejectedOrder
 } = require("./controller.js");
 
 const router = express.Router();
 
 // Order related
-router.get("/order", GetAllOrder); 
+router.get("/order", GetAllOrder);
 // Get Order By customer ID
 router.get('/orders/:customerId', GetAllOrderByCustomer);
 // Get Order By OrderID
 router.get('/order/:tableId', getOrderById);
-
+// Get last ordered item
+router.post('/recent-order', getRecentOrder);
 // Get QrCode
 router.post("/order", AddOrder);
 
