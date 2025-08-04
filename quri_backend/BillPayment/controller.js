@@ -276,7 +276,9 @@ const getStripePaymentsController = async (req, res) => {
 const getNGeniusPaymentController = async (req, res) => {
   const apiKey = process.env.N_GENIUS_API_KEY;
   const outletRef = process.env.OUTLET_REFERENCE;
-  const { formattedTotal, orderID, orderDetails, orderInfo } = req.body;
+  const { formattedTotal, orderID, orderDetails, orderInfo, isApplePayOnly } = req.body;
+
+
 
   await addPlateNumber(orderInfo);
 
@@ -296,7 +298,7 @@ const getNGeniusPaymentController = async (req, res) => {
   // console.log("order details: ", orderDetails)
 
   try {
-    const tokenResponse = await fetch(accessTokenAPIURL_Live, {
+    const tokenResponse = await fetch(accessTokenAPIURL_Test, {
       method: "POST",
       headers: {
         Authorization: `Basic ${apiKey}`,
@@ -317,6 +319,13 @@ const getNGeniusPaymentController = async (req, res) => {
       parseFloat(formattedTotal) * 100
     );
 
+
+    const paymentMethods = isApplePayOnly
+      ? ["APPLE_PAY"]
+      : ["VISA", "MASTERCARD", "APPLE_PAY", "SAMSUNG_PAY"];
+
+    const offerOnlyOption = isApplePayOnly ? "APPLE_PAY" : "VISA,MASTERCARD";
+
     const orderPayload = {
       action: "PURCHASE",
       amount: {
@@ -324,9 +333,12 @@ const getNGeniusPaymentController = async (req, res) => {
         value: formattedTotalMinorUnits,
       },
       payment: {
-        // paymentMethods: ["VISA","MASTERCARD","SAMSUNG_PAY","APPLE_PAY","GOOGLE_PAY"]
-        paymentMethods: ["VISA", "MASTERCARD"],
+        paymentMethods: paymentMethods,
       },
+      // payment: {
+      //   // paymentMethods: ["VISA","MASTERCARD","SAMSUNG_PAY","APPLE_PAY","GOOGLE_PAY"]
+      //   paymentMethods: ["VISA", "MASTERCARD"],
+      // },
       merchantAttributes: {
         // redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`,
         redirectUrl: `https://rest.quri.co/quri/menu/orderPlaced`,
@@ -336,12 +348,13 @@ const getNGeniusPaymentController = async (req, res) => {
         cancelUrl: `https://rest.quri.co/quri/menu/home`,
         // cancelUrl: `${BASE_URL}/quri/menu/home`,
         paymentAttempts: "3",
-        offerOnly: "VISA,MASTERCARD,SAMSUNG_PAY,APPLE_PAY",
+        offerOnly: offerOnlyOption
+        // offerOnly: "VISA,MASTERCARD,SAMSUNG_PAY,APPLE_PAY",
       },
       merchantOrderReference: `${orderID}`,
     };
 
-    const orderResponse = await fetch(createOrderAPIURL_Live, {
+    const orderResponse = await fetch(createOrderAPIURL_Test, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
