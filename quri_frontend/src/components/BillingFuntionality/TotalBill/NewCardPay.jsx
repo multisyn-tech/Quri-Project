@@ -8,6 +8,9 @@ import { loadStripe } from '@stripe/stripe-js';
 import Swal from 'sweetalert2';
 
 import { QURI_SERVICE_FEE } from '../../../config/constants';
+
+import AppleIcon from '../../../../src/assets/svg/apple-icon.svg';
+
 import axios from "axios";
 
 import GooglePayButton from '@google-pay/button-react';
@@ -144,7 +147,7 @@ const NewCardPay = () => {
 
   // ----------------------------------------------------
   // handle Network Genius Payment
-  const handleN_GeniusPayment = async () => {
+  const handleN_GeniusPayment = async (isApplePay = false) => {
 
     setLoading(true)
     try {
@@ -152,7 +155,8 @@ const NewCardPay = () => {
         formattedTotal,
         orderID,
         orderDetails,
-        orderInfo
+        orderInfo,
+        isApplePayOnly: isApplePay,
       });
       const paymentUrl = response.data?.payment_url;
 
@@ -282,7 +286,11 @@ const NewCardPay = () => {
       handleStripePayment();
     } else if (selectedOption === 'ngenius') {
       handleN_GeniusPayment();
-    } else if (selectedOption === 'airpay') {
+    }
+    else if (selectedOption === 'applePay') {
+      handleN_GeniusPayment(true);
+    }
+    else if (selectedOption === 'airpay') {
       // handleAirpayPayment()
     }
   };
@@ -513,7 +521,45 @@ const NewCardPay = () => {
 
 
                     <div className="flex justify-center my-1">
-                      <ApplePayButton amount={formattedTotal} orderInfo={orderInfo} />
+                      {/* <ApplePayButton amount={formattedTotal} orderInfo={orderInfo} /> */}
+
+
+
+                      <button
+                        onClick={() => handleSubmitPayment('applePay')}
+                        style={{
+                          display: 'block',
+                          width: '240px',
+                          height: '40px',
+                          backgroundColor: 'black',
+                          color: 'white',
+                          fontSize: '15px',
+                          borderRadius: '0px',
+                          cursor: 'pointer',
+                          fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+                          border: 'none',
+                          outline: 'none',
+                          padding: '0',
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          lineHeight: 'normal', 
+                        }}
+                      >
+                        <img
+                          src={AppleIcon}
+                          alt="Apple Pay"
+                          style={{
+                            height: '24px', 
+                            marginRight: '6px',
+                            verticalAlign: 'middle', 
+                          }}
+                        />
+                        <span style={{ fontWeight: 'bold' }}>Pay</span>
+                      </button>
+
+
+
                     </div>
 
                   </div>
