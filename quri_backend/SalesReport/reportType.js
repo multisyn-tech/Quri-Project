@@ -3,7 +3,7 @@
       query: `
         SELECT SUM(TotalAmount) as total_sales
         FROM orders
-        WHERE RestaurantID = ?;
+        WHERE RestaurantID = ? AND Status = "Completed";
       `,
       params: (RestaurantID) => [RestaurantID],
     },

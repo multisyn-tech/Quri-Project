@@ -272,7 +272,9 @@ const getStripePaymentsController = async (req, res) => {
   }
 };
 
-// payment integration of n-genius gateway
+//-----------------------------------------------
+
+// payment integration of n-genius gateway (correct)
 const getNGeniusPaymentController = async (req, res) => {
   const apiKey = process.env.N_GENIUS_API_KEY;
   const outletRef = process.env.OUTLET_REFERENCE;
@@ -340,11 +342,11 @@ const getNGeniusPaymentController = async (req, res) => {
       //   paymentMethods: ["VISA", "MASTERCARD"],
       // },
       merchantAttributes: {
-        // redirectUrl: `https://fe.quri.co/quri/menu/orderPlaced`,
-        redirectUrl: `https://rest.quri.co/quri/menu/orderPlaced`,
+        // redirectUrl: `https://rest.quri.co/quri/menu/orderPlaced`,
+        redirectUrl: `https://rest.quri.co/quri/menu/orderPlaced?reference=${orderID}&status=success`,
+
         // redirectUrl: `${BASE_URL}/quri/menu/orderPlaced`,
-        cancelText: "Order More",
-        // cancelUrl: `https://fe.quri.co/quri/menu/home`,
+        cancelText: "Cancel Order",
         cancelUrl: `https://rest.quri.co/quri/menu/home`,
         // cancelUrl: `${BASE_URL}/quri/menu/home`,
         paymentAttempts: "3",
@@ -370,6 +372,7 @@ const getNGeniusPaymentController = async (req, res) => {
 
     const paymentUrl = orderData._links?.payment?.href;
 
+
     if (!paymentUrl) {
       return res.status(500).json({ error: "Payment URL not found" });
     }
@@ -383,66 +386,131 @@ const getNGeniusPaymentController = async (req, res) => {
   }
 };
 
+
+// || ------------------------- ||
+
+
+// const getNGeniusPaymentController = async (req, res) => {
+//   const apiKey = process.env.N_GENIUS_API_KEY;
+//   const outletRef = process.env.OUTLET_REFERENCE;
+//   const { sessionId, amount, orderID } = req.body;
+
+//   const IDENTITY_API_URL = 'https://api-gateway.sandbox.ngenius-payments.com/identity/auth/access-token';
+//   const TRANSACTIONS_API_URL = `https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/${outletRef}/payment/hosted-session`;
+
+//   if (!sessionId || !amount || !orderID) {
+//     return res.status(400).json({ error: 'Missing required fields (sessionId, amount, or orderID)' });
+//   }
+
+//   try {
+//     // Get access token
+//     const tokenResponse = await axios.post(
+//       IDENTITY_API_URL,
+//       'grant_type=client_credentials',
+//       {
+//         headers: {
+//           Authorization: `Basic ${apiKey}`,
+//           'Content-Type': 'application/x-www-form-urlencoded',
+//         },
+//       }
+//     );
+
+//     console.log("Ngenius token:", tokenResponse)
+
+//     const accessToken = tokenResponse.data.access_token;
+//     if (!accessToken) {
+//       return res.status(500).json({ error: 'Failed to get access token' });
+//     }
+
+//     // Complete the Hosted Session payment
+//     const paymentResponse = await axios.post(
+//       `${TRANSACTIONS_API_URL}/${sessionId}`,
+//       {
+//         action: 'SALE',
+//         amount: { currencyCode: 'AED', value: amount },
+//         merchantOrderReference: orderID,
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           'Content-Type': 'application/vnd.ni-payment.v2+json',
+//           Accept: 'application/vnd.ni-payment.v2+json',
+//         },
+//       }
+//     );
+
+//     res.status(200).json(paymentResponse.data);
+//   } catch (error) {
+//     console.error('N-Genius Error:', error);
+//     res.status(500).json({ error: 'Something went wrong with N-Genius payment' });
+//   }
+// };
+
+
+
+
+// ||/ ------------------------- /||
+
 //-----------------------------------------------
 
 // airpay payment integration
 
-const Merchant_Name = "FOLKS CAFE";
-var merchant_id = "247152";
-var username = "1066103";
-var password = "yvufcZ5M";
-var client_id = "ca9544";
-var client_secret = "a44da6e8a5d0e64e461bc6b76fe35872";
-const API_KEY = "796XA2V6WAqa9Vaz"; // Used as AES key to decrypt
-const TOKEN_URL = "https://uae-payments.airpay.ninja/oauth2/token.php";
-const PAYMENT_URL = "https://uae-payments.airpay.ninja/pay/v1/index.php";
+// const Merchant_Name = "FOLKS CAFE";
+// var merchant_id = "247152";
+// var username = "1066103";
+// var password = "yvufcZ5M";
+// var client_id = "ca9544";
+// var client_secret = "a44da6e8a5d0e64e461bc6b76fe35872";
+// const API_KEY = "796XA2V6WAqa9Vaz"; // Used as AES key to decrypt
+// const TOKEN_URL = "https://uae-payments.airpay.ninja/oauth2/token.php";
+// const PAYMENT_URL = "https://uae-payments.airpay.ninja/pay/v1/index.php";
 
-const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
-const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
+// const RETURN_URL = "https://fe.quri.co/quri/menu/orderPlaced";
+// const CANCEL_URL = "https://fe.quri.co/quri/menu/home";
 
 
 
-const key = crypto.createHash('md5').update(username + "~:~" + password).digest('hex');
-const iv = crypto.randomBytes(8);
-// Convert the random bytes buffer to a hexadecimal string
-const ivHex = iv.toString('hex');
+// const key = crypto.createHash('md5').update(username + "~:~" + password).digest('hex');
+// const iv = crypto.randomBytes(8);
+// // Convert the random bytes buffer to a hexadecimal string
+// const ivHex = iv.toString('hex');
 
 
 const handleAirpayPayment = async (req, res) => {
-  const dataFromClient = req.body;
+  // const dataFromClient = req.body;
 
-  var enc_data = encrypt(JSON.stringify(dataFromClient), key);
-  var request = {
-    client_id: client_id,
-    client_secret: client_secret,
-    grant_type: 'client_credentials',
-    merchant_id: merchant_id
-  };
+  // var enc_data = encrypt(JSON.stringify(dataFromClient), key);
+  // var request = {
+  //   client_id: client_id,
+  //   client_secret: client_secret,
+  //   grant_type: 'client_credentials',
+  //   merchant_id: merchant_id
+  // };
 
-  var encrypteddata = encrypt(JSON.stringify(request), key)
-  const msg = {
-    encdata: enc_data,
-    tokeninput: encrypteddata
-  };
+  // var encrypteddata = encrypt(JSON.stringify(request), key)
+  // const msg = {
+  //   encdata: enc_data,
+  //   tokeninput: encrypteddata
+  // };
 
-  res.json(msg);
+  // res.json(msg);
 
 }
 
 
 
-function encrypt(request, secretKey) {
+// function encrypt(request, secretKey) {
 
-  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secretKey, 'utf-8'), Buffer.from(ivHex));
+//   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secretKey, 'utf-8'), Buffer.from(ivHex));
 
-  // Update the cipher with the request and finalize
-  const raw = Buffer.concat([cipher.update(request, 'utf-8'), cipher.final()]);
+//   // Update the cipher with the request and finalize
+//   const raw = Buffer.concat([cipher.update(request, 'utf-8'), cipher.final()]);
 
-  // Combine IV and raw data, then base64 encode
-  const data = ivHex + raw.toString('base64');
+//   // Combine IV and raw data, then base64 encode
+//   const data = ivHex + raw.toString('base64');
 
-  return data;
-}
+//   return data;
+// }
 
 
 
