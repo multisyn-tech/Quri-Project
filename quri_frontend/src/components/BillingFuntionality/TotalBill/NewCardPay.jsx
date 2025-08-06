@@ -20,6 +20,7 @@ const FRONTEND_BASE_URL = import.meta.env.VITE_FRONTEND_BASE_URL;
 
 import ApplePayButton from "./utility/ApplePayButton";
 import Airpay from "./utility/Airpay";
+import PaymentForm from "./utility/PaymentForm";
 
 
 const NewCardPay = () => {
@@ -146,6 +147,7 @@ const NewCardPay = () => {
   };
 
   // ----------------------------------------------------
+
   // handle Network Genius Payment
   const handleN_GeniusPayment = async (isApplePay = false) => {
 
@@ -540,19 +542,19 @@ const NewCardPay = () => {
                           border: 'none',
                           outline: 'none',
                           padding: '0',
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          lineHeight: 'normal', 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          lineHeight: 'normal',
                         }}
                       >
                         <img
                           src={AppleIcon}
                           alt="Apple Pay"
                           style={{
-                            height: '24px', 
+                            height: '24px',
                             marginRight: '6px',
-                            verticalAlign: 'middle', 
+                            verticalAlign: 'middle',
                           }}
                         />
                         <span style={{ fontWeight: 'bold' }}>Pay</span>
@@ -561,6 +563,16 @@ const NewCardPay = () => {
 
 
                     </div>
+
+
+                    {/* <div className="flex justify-center my-1">
+                      <PaymentForm
+                        formattedTotal={formattedTotal}
+                        orderID={orderID}
+                        orderDetails={orderDetails}
+                        orderInfo={orderInfo}
+                      />
+                    </div> */}
 
                   </div>
 

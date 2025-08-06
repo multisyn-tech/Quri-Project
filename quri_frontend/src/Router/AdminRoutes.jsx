@@ -64,13 +64,13 @@ const AdminRoutes = [
     icon: <MdReviews className="h-6 w-6" />,
     component: <Reviews />,
   },
-  {
-    name: "Payments",
-    layout: "/admin",
-    path: "manage/payments",
-    icon: <MdPayment className="h-6 w-6" />,
-    component: <Payments />,
-  },
+  // {
+  //   name: "Payments",
+  //   layout: "/admin",
+  //   path: "manage/payments",
+  //   icon: <MdPayment className="h-6 w-6" />,
+  //   component: <Payments />,
+  // },
   {
     name: "Settings",
     layout: "/admin",

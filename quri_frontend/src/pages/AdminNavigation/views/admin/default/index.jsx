@@ -35,7 +35,6 @@ const Dashboard = () => {
 
   const dispatch = useDispatch()
   const dashDetails = useSelector(state=>state.dashboard.dashboardDetails)
-  
 
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -130,7 +129,7 @@ const Dashboard = () => {
           />
         </Link>
 
-        <Link to="/admin/manage/payments">
+        <Link >
         <Widget
           icon={<MoneyOffRounded className="h-6 w-6" />}
           title={"Total Revenue"}

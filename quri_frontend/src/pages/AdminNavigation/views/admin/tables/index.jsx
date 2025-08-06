@@ -53,7 +53,7 @@ const Orders = () => {
 
     fetchData(); // initial load
 
-    const interval = setInterval(fetchData, 6000); // every 10s
+    const interval = setInterval(fetchData, 3000);
 
     return () => clearInterval(interval); // cleanup
   }, []);
@@ -322,7 +322,7 @@ const Orders = () => {
     cancelled: 'danger',
     paid: 'success',
     refunded: 'warning',
-    accepted: 'success',
+    accepted: 'info',
     rejected: 'danger'
 
   };
