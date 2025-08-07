@@ -34,6 +34,7 @@ const Home = () => {
 
     // Find the setting with KeyID 'image' for the header image
     const headerImageUrl = settings?.find(setting => setting.KeyID === 'image')?.Value || HeaderImage;
+    const bgImageUrl = settings?.find(setting => setting.KeyID === 'bg')?.Value || HeaderImage;
 
     const { isDrawerOpen, toggleDrawer, toggleRewardsModal } = useDrawer();
 
@@ -91,7 +92,7 @@ const Home = () => {
 
                         <CardMedia
                             component="img"
-                            image="https://media-cdn.tripadvisor.com/media/photo-s/0e/1b/40/3f/fine-dining-restaurant.jpg"
+                            image={`${BASE_URL}/${bgImageUrl}`}
                             alt="Random Image"
                             sx={{ width: '100%', height: 'auto', borderBottomRightRadius: '19px', borderBottomLeftRadius: '19px' }}
                         />

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
 import Logo from './Logo';
+import BackgroundCover from './BackgroundCover';
 import RestaurantInfo from './RestaurantInfo';
 import WorkingHours from './WorkingHours';
 
@@ -39,6 +40,14 @@ const Settings = () => {
                   className={classnames({ active: activeTab === '3','cursor-pointer': true  })}
                   onClick={() => { toggle('3'); }}
                 >
+                 Background cover
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: activeTab === '4','cursor-pointer': true  })}
+                  onClick={() => { toggle('4'); }}
+                >
                   Working Hours
                 </NavLink>
               </NavItem>
@@ -53,6 +62,9 @@ const Settings = () => {
                 <Logo />
               </TabPane>
               <TabPane tabId="3">
+                <BackgroundCover />
+              </TabPane>
+              <TabPane tabId="4">
                 <WorkingHours />
               </TabPane>
             </TabContent>

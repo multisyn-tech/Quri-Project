@@ -74,7 +74,7 @@ const Logo = () => {
                   onChange={(e) => handleUpload('image', e.target.files[0])}
                 />
               </label>
-              <p className="text-sm mt-1">Allowed JPG, GIF or PNG.</p>
+              <p className="text-sm mt-1">Allowed JPG or PNG.</p>
             </div>
           </div>
         </div>

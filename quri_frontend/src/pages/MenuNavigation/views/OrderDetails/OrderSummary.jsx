@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 const OrderSummary = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isSwalOpen, setIsSwalOpen] = useState(false);
 
   const tableID = useSelector((state) => state.qrcode.qrCodeDetails.data?.TableID);
   // console.log("Table ID: ",tableID);
@@ -50,13 +51,69 @@ const OrderSummary = () => {
         .map(item => `• ${item.ItemName} is not available`)
         .join('<br>');
 
+
+
       Swal.fire({
         icon: 'warning',
         title: 'Some items are unavailable',
         html: unavailableNames,
         toast: false,
         showConfirmButton: true,
+        backdrop: `rgba(0, 0, 0, 0.3) blur(5px)`,
+
+        willOpen: () => {
+          setIsSwalOpen(true); // Enable background blur
+        },
+        willClose: () => {
+          setIsSwalOpen(false); // Disable background blur
+        },
+
+        didOpen: () => {
+          const popup = document.querySelector('.swal2-popup');
+          if (popup) {
+            popup.style.background = '#fff';
+            popup.style.borderRadius = '15px';
+            popup.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+            popup.style.padding = '25px';
+          }
+
+          const title = document.querySelector('.swal2-title');
+          if (title) {
+            title.style.color = '#e3342f';
+            title.style.fontSize = '20px';
+          }
+
+          const content = document.querySelector('.swal2-html-container');
+          if (content) {
+            content.style.color = '#333';
+            content.style.fontSize = '14px';
+            content.style.marginTop = '10px';
+          }
+
+          const icon = document.querySelector('.swal2-icon');
+          if (icon) {
+            icon.style.borderColor = '#e3342f';
+            icon.style.color = '#e3342f';
+          }
+
+          const iconInner = document.querySelector('.swal2-icon-content');
+          if (iconInner) {
+            iconInner.style.color = '#e3342f';
+          }
+
+          const confirmBtn = document.querySelector('.swal2-confirm');
+          if (confirmBtn) {
+            confirmBtn.style.backgroundColor = '#e3342f';
+            confirmBtn.style.color = '#fff';
+            confirmBtn.style.padding = '8px 16px';
+            confirmBtn.style.borderRadius = '8px';
+          }
+        }
       });
+
+
+
+
 
       setHasShownSwal(true); // Prevent re-show on same render
 
@@ -70,8 +127,7 @@ const OrderSummary = () => {
 
 
   return (
-    <div className='flex flex-col min-h-screen'> {/* Use min-h-screen to ensure it covers full height */}
-
+    <div className={`flex flex-col min-h-screen transition-all duration-300 ${isSwalOpen ? 'blur-sm' : ''}`}>
       {/* Heading Part */}
       <section className="flex items-center p-4">
         {/* Back button with LeftOutline icon */}

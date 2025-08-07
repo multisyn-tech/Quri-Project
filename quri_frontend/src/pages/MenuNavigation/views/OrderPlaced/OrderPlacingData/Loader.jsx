@@ -20,6 +20,9 @@ const Loader = () => {
 
     const headerImageUrl = settings?.find(setting => setting.KeyID === 'image')?.Value || HeaderImage;
 
+    const bgImageUrl = settings?.find(setting => setting.KeyID === 'bg')?.Value || HeaderImage;
+
+
     const animationDurationInMinutes = 5; // 5 minutes
     const animationDuration = animationDurationInMinutes * 60 * 1000; // Convert to milliseconds (5 minutes = 300000 ms)
 
@@ -82,7 +85,7 @@ const Loader = () => {
 
                         <CardMedia
                             component="img"
-                            image="https://media-cdn.tripadvisor.com/media/photo-s/0e/1b/40/3f/fine-dining-restaurant.jpg"
+                            image={`${BASE_URL}/${bgImageUrl}`}
                             alt="Random Image"
                             sx={{ width: '100%', height: 'auto' }}
                         />

@@ -11,7 +11,7 @@ export const getSettings = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('authToken');
-      const resID = localStorage.getItem('RestaurantID'); 
+      const resID = localStorage.getItem('RestaurantID');
       if (!token) {
         throw new Error('No token found');
       }
@@ -66,10 +66,11 @@ export const addSettings = createAsyncThunk(
       }
 
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append(key, selectedImage);
       formData.append('RestaurantID', resID);
       formData.append('KeyID', key);
       formData.append('Value', '');
+
 
       const response = await axios.post(`${BASE_URL}/setting`, formData, {
         headers: {
@@ -84,6 +85,10 @@ export const addSettings = createAsyncThunk(
     }
   }
 );
+
+
+
+
 // Thunk for creating or updating settings
 export const createOrUpdateSettings = createAsyncThunk(
   'settings/createOrUpdateSettings',
