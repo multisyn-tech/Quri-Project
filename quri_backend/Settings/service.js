@@ -2,7 +2,7 @@ const db = require("../db/db.js");
 const path = require("path");
 
 
- const createSettingService = async function ({
+const createSettingService = async function ({
   RestaurantID,
   KeyID,
   Value,
@@ -13,8 +13,15 @@ const path = require("path");
       throw new Error("All fields are required");
     }
 
-    // Ensure the stored value is a URL that can be accessed by the frontend
-    const fileUrl = `uploads/${path.basename(Value)}`;
+
+
+    let fileUrl = null;
+
+    if (KeyID === 'bg') {
+      fileUrl = `uploads/bg/${path.basename(Value)}`;
+    } else {
+      fileUrl = `uploads/${path.basename(Value)}`;
+    }
 
     // Check if the setting already exists
     const [existingSetting] = await db
@@ -47,7 +54,7 @@ const path = require("path");
 };
 
 // Create a service to fetch all settings
- const fetchAllSettingsService = async function (RestaurantID) {
+const fetchAllSettingsService = async function (RestaurantID) {
   try {
     const query = "SELECT * FROM settings WHERE RestaurantID = ?";
     const values = [RestaurantID];
@@ -60,7 +67,7 @@ const path = require("path");
 };
 
 // Updating the Services
- const createOrUpdateSettingsService = async (settings, RestaurantID) => {
+const createOrUpdateSettingsService = async (settings, RestaurantID) => {
   try {
     for (const { KeyID, Value } of settings) {
       // Check if the setting already exists
@@ -97,7 +104,7 @@ const path = require("path");
   }
 };
 
- const fetchSettingsService = async (RestaurantID) => {
+const fetchSettingsService = async (RestaurantID) => {
   try {
     const [settings] = await db.promise().query("SELECT * FROM settings WHERE RestaurantID = ?", [RestaurantID]);
 
@@ -133,7 +140,7 @@ const path = require("path");
  * @param {string} workingHours.saturday - Working hours for Saturday.
  * @param {string} workingHours.sunday - Working hours for Sunday.
  */
- const WorkingHoursService = async (RestaurantID, workingHours) => {
+const WorkingHoursService = async (RestaurantID, workingHours) => {
   try {
     // Validate input
     if (!RestaurantID || !workingHours || typeof workingHours !== 'object') {
@@ -187,7 +194,7 @@ const path = require("path");
  * @param {number} RestaurantID - The ID of the restaurant.
  * @returns {Object} An object containing working hours for each day of the week.
  */
- const fetchWorkingHoursService = async (RestaurantID) => {
+const fetchWorkingHoursService = async (RestaurantID) => {
   try {
     // Validate input
     if (!RestaurantID) {

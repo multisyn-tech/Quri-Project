@@ -9,15 +9,17 @@ const {
 
 
 // Controller to handle setting creation
- const createSettingController = async (req, res) => {
+const createSettingController = async (req, res) => {
   try {
     const { RestaurantID, KeyID } = req.body;
     let Value = req.body.Value;
 
-    if (req.file) {
-      // If there's a file, set the Value to the file path
-      Value = req.file.path;
+    const uploadedFile = req.files?.[KeyID]?.[0]; 
+
+    if (uploadedFile) {
+      Value = uploadedFile.path;
     }
+
 
     const result = await createSettingService({ RestaurantID, KeyID, Value });
     res.status(201).json({ message: "Setting created successfully", result });
@@ -27,7 +29,7 @@ const {
 };
 
 // Controller to fetch all settings
- const fetchAllSettingsController = async (req, res) => {
+const fetchAllSettingsController = async (req, res) => {
   try {
     const { RestaurantID } = req.query; // Assuming restaurant ID is passed as a query parameter
     const result = await fetchAllSettingsService(RestaurantID);
@@ -38,7 +40,7 @@ const {
 };
 
 // Controller to create or update settings
- const createOrUpdateSettingsController = async (req, res) => {
+const createOrUpdateSettingsController = async (req, res) => {
   try {
     const { settings } = req.body;
     const RestaurantID = req.body.RestaurantID;
@@ -55,7 +57,7 @@ const {
 };
 
 // Controller to fetch settings
- const fetchSettingsController = async (req, res) => {
+const fetchSettingsController = async (req, res) => {
   try {
     const RestaurantID = req.params.RestaurantID;
     console.log(RestaurantID);
@@ -73,12 +75,12 @@ const {
 /**
  * Working hours logic
  */
- const workingHoursController = async (req, res) => {
+const workingHoursController = async (req, res) => {
   try {
     const { RestaurantID, workingHours } = req.body;
 
     // Log the incoming request body
-   // console.log("Request Body:", req.body);
+    // console.log("Request Body:", req.body);
 
     // Validate input
     if (!RestaurantID || !workingHours || !Array.isArray(workingHours)) {
@@ -121,7 +123,7 @@ const {
 
     // Call the service and log the result
     const result = await WorkingHoursService(RestaurantID, workingHoursObject);
-   //console.log("Service Result:", result);
+    //console.log("Service Result:", result);
 
     // Respond with the result
     res.status(200).json(result);
@@ -133,7 +135,7 @@ const {
 /**
  * Fetch Working Hours Controller
  */
- const fetchWorkingHoursController = async (req, res) => {
+const fetchWorkingHoursController = async (req, res) => {
   try {
     const { RestaurantID } = req.params;
 

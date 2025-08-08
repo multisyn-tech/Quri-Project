@@ -12,7 +12,12 @@ const upload = require("../middleWare/middleware.js");
 
 const router = express.Router();
 
-router.post("/", upload.single("image"), createSettingController);
+router.post("/", upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'bg', maxCount: 1 }
+]), createSettingController);
+
+
 router.get("/", fetchAllSettingsController);
 router.post("/data", createOrUpdateSettingsController);
 router.get("/fetch/:RestaurantID", fetchSettingsController);

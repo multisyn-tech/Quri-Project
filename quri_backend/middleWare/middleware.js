@@ -14,7 +14,17 @@ if (!fs.existsSync(uploadsDir)) {
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir); // Specify the directory to store the files
+    let targetFolder = path.join(__dirname, '../uploads');
+
+    if (file.fieldname === 'bg') {
+      targetFolder = path.join(__dirname, '../uploads/bg');
+    }
+
+    if (!fs.existsSync(targetFolder)) {
+      fs.mkdirSync(targetFolder, { recursive: true });
+    }
+
+    cb(null, targetFolder);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname)); // Append extension
