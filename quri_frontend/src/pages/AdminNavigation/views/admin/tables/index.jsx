@@ -180,15 +180,15 @@ const Orders = () => {
           setTableData(updated);
 
           const newOrderStatus = data.orders.length > 0 ? data.orders[data.orders.length - 1].Status : null;
-          if (
-            prevOrderCountRef.current !== null &&
-            data.orders.length > prevOrderCountRef.current &&
-            !["Accepted", "Rejected", "Completed"].includes(newOrderStatus) &&
-            isAudioUnlocked.current
-          ) {
+          // if (
+          //   prevOrderCountRef.current !== null &&
+          //   data.orders.length > prevOrderCountRef.current &&
+          //   !["Accepted", "Rejected", "Completed"].includes(newOrderStatus) &&
+          //   isAudioUnlocked.current
+          // ) {
             audioRef.current.loop = true; // Enable looping
             audioRef.current.play().catch((err) => console.error("Audio play error:", err));
-          }
+          // }
 
           if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
             audioRef.current.pause();

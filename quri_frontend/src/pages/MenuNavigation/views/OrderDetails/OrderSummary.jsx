@@ -62,10 +62,10 @@ const OrderSummary = () => {
         backdrop: `rgba(0, 0, 0, 0.3) blur(5px)`,
 
         willOpen: () => {
-          setIsSwalOpen(true); // Enable background blur
+          setIsSwalOpen(true); 
         },
         willClose: () => {
-          setIsSwalOpen(false); // Disable background blur
+          setIsSwalOpen(false);
         },
 
         didOpen: () => {
@@ -115,7 +115,7 @@ const OrderSummary = () => {
 
 
 
-      setHasShownSwal(true); // Prevent re-show on same render
+      setHasShownSwal(true);
 
       setTimeout(() => {
         dispatch(resetRejectedOrderItems());

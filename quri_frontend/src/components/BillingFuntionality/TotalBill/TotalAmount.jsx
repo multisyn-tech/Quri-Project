@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import TotalItems from './TotalItems';
 import AddingTip from './AddingTip';
+import AddingNote from './AddingNote';
 import Fee from './Fee';
 import BillProceeding from './BillProceeding';
 import { viewOrder } from '../../../features/orders/orderSlice';
@@ -57,6 +58,8 @@ const TotalAmount = () => {
         total={total}
         onShowBill={openBill}
       />
+
+      <AddingNote/>
 
     </>
   );

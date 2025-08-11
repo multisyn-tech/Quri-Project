@@ -194,10 +194,10 @@ const MenuItems = () => {
 
 
         {/* Menu items */}
-
-        <div className="mt-4">
+        <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
           {filteredItems.map((item, index) => (
             <React.Fragment key={item?.MenuID || index}>
+              {/* menu item rendering */}
               <div
                 className="flex items-center justify-between mb-4 cursor-pointer"
                 onClick={() => handleMenuItemClick(item)}
@@ -239,27 +239,64 @@ const MenuItems = () => {
               )}
             </React.Fragment>
           ))}
-
-          {filteredItems.length <= 3 && (
-            <div className="flex items-center justify-center mt-8">
-              <Image lazy src={cardImg} alt="Special Offer Image" fit="cover" />
-            </div>
-          )}
         </div>
+
+
+        {cartItems.length > 0 && (
+          <div
+            style={{
+              position: 'fixed',
+              bottom: "2%",
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: 'white',
+              padding: '10px 0',
+              zIndex: 1000,
+              width: '90%',
+              maxWidth: '500px',
+              display: 'flex',
+              justifyContent: 'center',
+              boxShadow: '0 -2px 8px rgba(0,0,0,0.15)',
+            }}
+          >
+            <ViewOrderButton totalPrice={totalPrice} />
+          </div>
+        )}
+
 
 
 
         {/* Modal Component */}
-        <ItemModal
-          visible={visible}
-          item={selectedItem}
-          onClose={handleCloseModal}
-        />
+        {visible && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              zIndex: 1100,
+              backgroundColor: 'rgba(0,0,0,0.5)', 
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <ItemModal
+              visible={visible}
+              item={selectedItem}
+              onClose={handleCloseModal}
+            />
+          </div>
+        )}
+
+
+
 
         {/* Conditionally render ViewOrderButton if there are cart items */}
-        {cartItems.length > 0 && (
+        {/* {cartItems.length > 0 && (
           <ViewOrderButton totalPrice={totalPrice} />
-        )}
+        )} */}
 
 
         {/* <PlaceOrderButton /> */}

@@ -96,8 +96,12 @@ const OrderPlaced = () => {
 
   const removePlatNumberFromScreen = () => {
     const storedPlateNumber = localStorage.getItem('plateNumber');
+    const userNote = localStorage.getItem('userNote');
     if (storedPlateNumber) {
       localStorage.removeItem('plateNumber');  
+    }
+    if (userNote) {
+      localStorage.removeItem('userNote');  
     }
   }
 

@@ -19,6 +19,7 @@ const AddingTip = ({ total, onShowBill }) => {
   const [plateNumber, setPlateNumber] = useState('');
   const [debouncedPlate, setDebouncedPlate] = useState('');
 
+  const [tipsAvailable, setTipsAvailable] = useState(true);
 
   const [isClicked, setIsClicked] = useState(false);
   const [isToggled, setIsToggled] = useState(false); // Toggle state
@@ -105,7 +106,7 @@ const AddingTip = ({ total, onShowBill }) => {
     return () => clearTimeout(timer);
   }, [plateNumber]);
 
- const handlePlateChange = (e) => setPlateNumber(e.target.value);
+  const handlePlateChange = (e) => setPlateNumber(e.target.value);
 
   return (
     <>
@@ -113,45 +114,56 @@ const AddingTip = ({ total, onShowBill }) => {
         <div className='p-6'>
           <div className='mb-3'>
             <h1 className='font-medium text-xl'>Leave a tip?</h1>
-            <p className='flex items-center space-y-1'>
-              <span className='mr-2'>
-                <Image lazy src={HeartImage} width={24} height={24} />
-              </span>
-              <span className='font-light text-gray-600'> Your tip amount:</span>
-              {/* Display calculated tip */}
-              <span className='ml-2'>{tipAmount.toFixed(2)} AED</span>
-            </p>
+            {tipsAvailable ? (
+              <p className='flex items-center space-y-1'>
+                <span className='mr-2'>
+                  <Image lazy src={HeartImage} width={24} height={24} />
+                </span>
+                <span className='font-light text-gray-600'> Your tip amount:</span>
+                {/* Display calculated tip */}
+                <span className='ml-2'>{tipAmount.toFixed(2)} AED</span>
+              </p>
+            ) : (<></>)}
           </div>
 
-          <div className="flex space-x-2">
-            {[5, 10, 15].map((tip) => (
-              <button
-                key={tip}
-                className={`flex items-center justify-center w-[66px] h-[66px] border-2 rounded-[8px] cursor-pointer transition-all ${selectedTip === tip ? 'border-transparent' : 'border-gray-300'
-                  }`}
-                onClick={() => handleTipClick(tip)}
-                style={
-                  selectedTip === tip
-                    ? {
-                      border: '2px solid transparent',
-                      backgroundImage:
-                        'linear-gradient(black, black), linear-gradient(to right, #F8E152 0%, #FF366D 43%, #FF7B02 100%)',
-                      backgroundOrigin: 'border-box',
-                      backgroundClip: 'padding-box, border-box',
-                      color: 'white',
+          {tipsAvailable ? (
+            <>
+              <div className="flex space-x-2">
+                {[5, 10, 15].map((tip) => (
+                  <button
+                    key={tip}
+                    className={`flex items-center justify-center w-[66px] h-[66px] border-2 rounded-[8px] cursor-pointer transition-all ${selectedTip === tip ? 'border-transparent' : 'border-gray-300'
+                      }`}
+                    onClick={() => handleTipClick(tip)}
+                    style={
+                      selectedTip === tip
+                        ? {
+                          border: '2px solid transparent',
+                          backgroundImage:
+                            'linear-gradient(black, black), linear-gradient(to right, #F8E152 0%, #FF366D 43%, #FF7B02 100%)',
+                          backgroundOrigin: 'border-box',
+                          backgroundClip: 'padding-box, border-box',
+                          color: 'white',
+                        }
+                        : { backgroundColor: 'white', color: 'black' }
                     }
-                    : { backgroundColor: 'white', color: 'black' }
-                }
-              >
-                <span className="font-normal text-lg">{tip}%</span>
-              </button>
-            ))}
-          </div>
+                  >
+                    <span className="font-normal text-lg">{tip}%</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) :
+            (<></>)
+          }
 
 
-          <span className='relative text-center bottom-2 left-0 bg-black px-2 text-white rounded-xl '>
-            Common
-          </span>
+
+          {tipsAvailable ? (
+            <span className='relative text-center bottom-2 left-0 bg-black px-2 text-white rounded-xl '>
+              Common
+            </span>
+          ) : (<></>)}
 
           {/* Custom Tip */}
           <div className='flex items-center ml-2 space-y-1 space-x-1'>
@@ -160,7 +172,7 @@ const AddingTip = ({ total, onShowBill }) => {
               <span className='text-gray-400 underline'>{selectedTip} AED</span>
             ) : (
               <>
-                <span onClick={() => setSelectCustomTip(prev => !prev)} className='text-gray-400'>Pay custom tip</span>
+                <span onClick={() => setSelectCustomTip(prev => !prev, setTipsAvailable(false))} className='text-gray-400'>Pay custom tip</span>
 
                 {selectCustomTip ? (
                   <input
