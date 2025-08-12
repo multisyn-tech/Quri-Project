@@ -1,19 +1,19 @@
 import React, { useEffect } from 'react';
 import Home from '../../components/BillingFuntionality/Dashboard/Home';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getQRDetails, reset } from '../../features/qrcode/qrcodeSlice';
 import scanQR from '../../../src/assets/img/scanQR/11136.jpg'
 import { Col, Row } from 'reactstrap';
 import SpinnerComponent from '../../Manage/Fallback-spinner';
 import { getOrdersByTableID, resetCartItems, reset as resetOrders } from '../../features/orders/orderSlice';
-
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
 const HomeScreen = () => {
     const { qrCode } = useParams();
     const dispatch = useDispatch();
-
+    const navigate = useNavigate();
     const qrdetails = useSelector((state) => state.qrcode.qrCodeDetails);
     const OrderByTableID = useSelector((state) => state.qrcode.ordersByTableID);
     const loading12 = useSelector((state) => state.qrcode.loading);
@@ -21,13 +21,11 @@ const HomeScreen = () => {
 
     useEffect(() => {
         if (qrCode) {
-            dispatch(reset());
-
-            dispatch(resetOrders());   // Reset Orders state
-            dispatch(resetCartItems());   // Reset Orders state
+            // dispatch(reset());
+            // dispatch(resetOrders());   // Reset Orders state
+            // dispatch(resetCartItems());   
 
             dispatch(getQRDetails(qrCode));
-
         }
     }, [qrCode, dispatch]);
 
@@ -37,6 +35,45 @@ const HomeScreen = () => {
             dispatch(getOrdersByTableID(qrdetails?.data?.TableID));
         }
     }, [qrdetails, dispatch, loading12]);
+
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            await conditionalRedirection()
+        }
+        fetchOrders()
+    }, [])
+
+    const conditionalRedirection = async () => {
+        // console.log("qrdetails", qrdetails)
+        // if (['Received', 'Accepted', 'Rejected'].includes(qrdetails.data.orderStatus)) {
+        //     navigate('/quri/home/waiting');
+        // }
+
+        const tableID = qrdetails.data.TableID
+
+        try {
+            const res = await fetch(`${BASE_URL}/customers/allOrders/${tableID}`);
+            if (!res.ok) {
+                throw new Error(`HTTP error! Status: ${res.status}`);
+            }
+            const records = await res.json();
+
+            if (['Received', 'Accepted', 'Rejected'].includes(records.order.order.Status)) {
+                navigate('/quri/home/waiting');
+            } 
+            // else if (['Completed'].includes(records.order.order.Status)) {
+            //     navigate('/quri/menu/orderPlaced');
+            // }
+
+
+            // console.log("order by table", records);
+        } catch (err) {
+            console.error("Error fetching order by table:", err);
+        }
+
+    }
+
 
     if (loading12) {
         return <SpinnerComponent />;

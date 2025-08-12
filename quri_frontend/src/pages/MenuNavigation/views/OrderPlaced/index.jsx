@@ -4,6 +4,8 @@ import Loader from './OrderPlacingData/Loader';
 import { useSelector, useDispatch } from 'react-redux';
 import { resetCartItems } from '../../../../features/orders/orderSlice';
 
+import { reset } from '../../../../features/orders/orderSlice';
+
 const BASE_URl = import.meta.env.VITE_API_BASE_URL;
 
 

@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card } from '@mui/material';
 import { Button } from 'reactstrap';
-import { Eye, Loader } from 'react-feather';
+import { Eye, Loader, Download } from 'react-feather';
 import { useDispatch, useSelector } from 'react-redux';
 import QuriTable from '../../../../../Manage/QuriTable';
 import EditModal from '../../../../../Manage/EditModal';
 import { getOrders, getDetailsOfOrders, addRejectedOrder, resetRejectedOrderItems, resetDetailsOfOrder, rejectedItemsAdded, getPlateNumber } from '../../../../../features/orders/orderSlice';
 import notificationSound from '../../../../../assets/audio/order.mp3';
+
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
 
 const Orders = () => {
   const name = "Order";
@@ -29,6 +33,7 @@ const Orders = () => {
   const [plateNumberData, setPlateNumberData] = useState([]);
   const [isLoadingPlateNumber, setIsLoadingPlateNumber] = useState(true);
 
+  const [allOrders, setAllOrders] = useState([]);
 
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.orders.orders);
@@ -179,6 +184,7 @@ const Orders = () => {
           const updated = filteringPlateNumber(orders, plateData);
           setTableData(updated);
 
+          setAllOrders(updated)
           const newOrderStatus = data.orders.length > 0 ? data.orders[data.orders.length - 1].Status : null;
           // if (
           //   prevOrderCountRef.current !== null &&
@@ -186,8 +192,8 @@ const Orders = () => {
           //   !["Accepted", "Rejected", "Completed"].includes(newOrderStatus) &&
           //   isAudioUnlocked.current
           // ) {
-            audioRef.current.loop = true; // Enable looping
-            audioRef.current.play().catch((err) => console.error("Audio play error:", err));
+          audioRef.current.loop = true; // Enable looping
+          audioRef.current.play().catch((err) => console.error("Audio play error:", err));
           // }
 
           if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
@@ -249,6 +255,41 @@ const Orders = () => {
 
   }
 
+
+  const downloadPDF = () => {
+    // console.log((allOrders.length))
+
+    const completedOrders = allOrders.filter(order => order.Status == "Completed");
+
+    // Create a new PDF instance
+    const doc = new jsPDF();
+
+    // Add a title
+    doc.setFontSize(16);
+    doc.text("Completed Orders", 14, 15);
+
+    // Convert orders into table rows
+    const tableRows = completedOrders.map(o => [
+      o.OrderID,
+      o.RestaurantID,
+      o.OrderDate,
+      o.TableID,
+      o.PlateNumber,
+      o.TotalAmount,
+    ]);
+
+    // Add the table
+    doc.autoTable({
+      head: [["Order ID", "Restaurant ID",  "Order Date", "Table ID","Plate Number","Total Amount",]],
+      body: tableRows,
+      startY: 20,
+    });
+
+    // Save the PDF
+    doc.save("completed_orders.pdf");
+
+
+  }
 
 
 
@@ -459,27 +500,37 @@ const Orders = () => {
           loading ?
             // <Loader />
             (
-              <QuriTable
-                name={name}
-                columns={columns}
-                setTableData={setTableData}
-                tableData={tableData}
-              />
-            )
-            : (
               <>
-                {/* Display error message if there is one */}
-                {errorMessage && (
-                  <div className="alert alert-danger" role="alert">
-                    {errorMessage}
-                  </div>
-                )}
+                <div class="text-right p-2">
+                  <button className='btn btn-info' onClick={downloadPDF}><Download size={20} color="#000" /></button>
+                </div>
                 <QuriTable
                   name={name}
                   columns={columns}
                   setTableData={setTableData}
                   tableData={tableData}
                 />
+              </>
+            )
+            : (
+              <>
+
+                {/* Display error message if there is one */}
+                {errorMessage && (
+                  <div className="alert alert-danger" role="alert">
+                    {errorMessage}
+                  </div>
+                )}
+                <div class="text-right p-2">
+                  <button className='btn btn-info' onClick={downloadPDF}><Download size={20} color="#000" /></button>
+                </div>
+                <QuriTable
+                  name={name}
+                  columns={columns}
+                  setTableData={setTableData}
+                  tableData={tableData}
+                />
+
               </>
             )}
       </Card>

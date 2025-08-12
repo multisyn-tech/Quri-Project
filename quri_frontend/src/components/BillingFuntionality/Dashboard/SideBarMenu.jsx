@@ -20,7 +20,7 @@ const SideBarMenu = () => {
   const settings = useSelector((state) => state.qrcode.qrCodeDetails.data?.settings);
 
   // Find the setting with KeyID 'RestaurantName'
-  const restaurantName = settings?.find(setting => setting.KeyID === 'RestaurantName')?.Value || 'Unknown Restaurant';
+  const restaurantName = settings?.find(setting => setting.KeyID === 'RestaurantName')?.Value || '';
 
   // Find the setting with KeyID 'image' for the header image
   const headerImageUrl = settings?.find(setting => setting.KeyID === 'image')?.Value || HeaderImage;

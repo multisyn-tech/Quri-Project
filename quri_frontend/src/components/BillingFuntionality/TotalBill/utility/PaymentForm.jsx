@@ -103,7 +103,7 @@ const PaymentForm = ({ formattedTotal, orderID, orderDetails, orderInfo }) => {
       if (status === window.NI.paymentStates.CAPTURED || status === window.NI.paymentStates.AUTHORISED) {
         window.location.href = `/success?reference=${orderID}&status=success`;
       } else if (status) {
-        alert('Payment failed: ' + (error || 'Unknown status: ' + status));
+        alert('Payment failed: ' + (error || 'status: ' + status));
       } else {
         alert('Invalid response from payment gateway');
       }

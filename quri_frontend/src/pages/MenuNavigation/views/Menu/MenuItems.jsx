@@ -37,7 +37,7 @@ const MenuItems = () => {
   // console.log('menu Items', menuItems)
 
   // const categories = [...new Set(menuItems.map(item => item.CategoryName))];
-  const categories = [...new Set(menuItems.map(item => item?.CategoryName || 'Unknown'))];
+  const categories = [...new Set(menuItems.map(item => item?.CategoryName || ''))];
 
 
   const cartItems = useSelector((state) => state.orders.cartItems);
