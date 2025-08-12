@@ -1132,16 +1132,45 @@ const fetchPopularDishesService = async (restaurantID) => {
   try {
 
 
+    // const [rows] = await db.promise().query(
+    //   `SELECT 
+    //       m.MenuID,
+    //       m.ItemName,
+    //       m.Price,
+    //       m.ItemDescription,
+    //       m.Image,
+    //       c.CategoryID,
+    //       c.CategoryName,
+    //       COUNT(od.MenuID) AS total_orders
+    //     FROM 
+    //       orderdetails od
+    //     JOIN 
+    //       orders o ON od.OrderID = o.OrderID
+    //     JOIN 
+    //       menus m ON od.MenuID = m.MenuID
+    //     JOIN 
+    //       categories c ON m.CategoryID = c.CategoryID
+    //     WHERE 
+    //       o.RestaurantID = ? AND m.RestaurantID = ?
+    //     GROUP BY 
+    //       m.MenuID, m.itemName, m.itemDescription, m.Image, m.Price, c.CategoryName
+    //     ORDER BY 
+    //       total_orders DESC
+    //     LIMIT 10`,
+    //   [restaurantID, restaurantID]
+    // );
+
+
     const [rows] = await db.promise().query(
       `SELECT 
-          m.MenuID,
-          m.ItemName,
-          m.Price,
-          m.ItemDescription,
-          m.Image,
-          c.CategoryID,
-          c.CategoryName,
-          COUNT(od.MenuID) AS total_orders
+        m.MenuID,
+        m.ItemName,
+        m.Price,
+        m.ItemDescription,
+        m.Image,
+        c.CategoryID,
+        c.CategoryName,
+        COUNT(od.MenuID) AS total_orders
         FROM 
           orderdetails od
         JOIN 
@@ -1151,13 +1180,15 @@ const fetchPopularDishesService = async (restaurantID) => {
         JOIN 
           categories c ON m.CategoryID = c.CategoryID
         WHERE 
-          o.RestaurantID = ? AND m.RestaurantID = ?
+          o.RestaurantID = ? 
+          AND m.RestaurantID = ?
+          AND c.RestaurantID = ?
         GROUP BY 
-          m.MenuID, m.itemName, m.itemDescription, m.Image, m.Price, c.CategoryName
+          m.MenuID, m.ItemName, m.ItemDescription, m.Image, m.Price, c.CategoryID, c.CategoryName
         ORDER BY 
           total_orders DESC
         LIMIT 10`,
-      [restaurantID, restaurantID]
+      [restaurantID, restaurantID, restaurantID]
     );
 
 

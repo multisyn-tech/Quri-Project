@@ -188,6 +188,62 @@ const getOrderByTableIdService = async (TableID) => {
   }
 };
 
+
+
+const getAllOrderByTableIdService = async (TableID) => {
+  if (!TableID) {
+    throw new Error("TableID is required");
+  }
+
+  try {
+    console.log("Fetching order for TableID:", TableID); // Log the TableID
+
+    // Fetch the latest order for the given TableID that is not completed
+    const [orders] = await db
+      .promise()
+      .query(
+        "SELECT * FROM orders WHERE TableID = ? ORDER BY OrderID DESC LIMIT 1",
+        [TableID]
+      );
+
+    if (orders.length === 0) {
+      console.log("No order found for TableID:", TableID); // Log if no order is found
+      throw new Error("Order not found");
+    }
+
+    const latestOrder = orders[0];
+    console.log("Order details:", latestOrder); // Log the order details
+    const OrderID = latestOrder.OrderID;
+
+    // Fetch order details with menu information
+    const [orderDetails] = await db.promise().query(
+      `SELECT od.OrderDetailID, od.MenuID, od.Quantity, od.Price, od.isServed,
+              m.ItemName, m.ItemDescription, m.CategoryID,
+              c.CategoryName
+       FROM orderdetails od
+       JOIN menus m ON od.MenuID = m.MenuID
+       JOIN categories c ON m.CategoryID = c.CategoryID
+       WHERE od.OrderID = ?
+       ORDER BY od.OrderDetailID DESC`, // Ensuring the order details are fetched in descending order by OrderDetailID
+      [OrderID]
+    );
+
+    console.log("Order details fetched:", orderDetails); // Log the order details
+
+    return {
+      OrderID: OrderID,
+      order: latestOrder,
+      orderDetails: orderDetails,
+    };
+  } catch (error) {
+    console.error("Error fetching order by TableID:", error);
+    throw error;
+  }
+};
+
+
+
+
 // Adding a customer
 const addCustomer = async (data) => {
   const { Name, PhoneNumber, Email, RestaurantID } = data;
@@ -635,6 +691,7 @@ const findRejectedOrderService = async (orderId) => {
 module.exports = {
   addOrderService,
   getOrderByTableIdService,
+  getAllOrderByTableIdService,
   addCustomer,
   findAllCustomers,
   getCustomerById,

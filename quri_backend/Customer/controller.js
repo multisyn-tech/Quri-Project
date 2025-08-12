@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const {
   addOrderService,
   getOrderByTableIdService,
+  getAllOrderByTableIdService,
   addCustomer,
   findAllCustomers,
   getCustomerById,
@@ -41,13 +42,30 @@ const AddOrder = async (req, res) => {
   }
 };
 
-// Fetch Order By TableID
+// Fetch completed Order By TableID
 const getOrderById = async (req, res) => {
   // console.log("Received order request:", req.params); // Log the request parameters
   const { tableId } = req.params;
 
   try {
     const order = await getOrderByTableIdService(tableId);
+
+    console.log("Order fetched successfully:", order); // Log the fetched order
+
+    res.status(200).json({ order });
+  } catch (error) {
+    console.error("Error fetching order:", error.message); // Log the error
+    res.status(404).json({ message: error.message });
+  }
+};
+
+// get all orders by table id
+const getAllOrdersByTableId = async (req, res) => {
+  // console.log("Received order request:", req.params); // Log the request parameters
+  const { tableId } = req.params;
+
+  try {
+    const order = await getAllOrderByTableIdService(tableId);
 
     console.log("Order fetched successfully:", order); // Log the fetched order
 
@@ -421,6 +439,7 @@ const findRejectedOrder = async (req, res) => {
 module.exports = {
   AddOrder,
   getOrderById,
+  getAllOrdersByTableId,
   GetAllOrder,
   GetAllOrderByCustomer,
   AddCustomers,

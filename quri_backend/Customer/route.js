@@ -2,6 +2,7 @@ const express = require("express");
 const {
   AddOrder,
   getOrderById,
+  getAllOrdersByTableId,
   FindAllCustomers,
   AddCustomers,
   getCustomerByIdController,
@@ -25,8 +26,10 @@ const router = express.Router();
 router.get("/order", GetAllOrder);
 // Get Order By customer ID
 router.get('/orders/:customerId', GetAllOrderByCustomer);
-// Get Order By OrderID
+// Get completed Order By table id
 router.get('/order/:tableId', getOrderById);
+// get all order by table id
+router.get('/allOrders/:tableId', getAllOrdersByTableId);
 // Get last ordered item
 router.post('/recent-order', getRecentOrder);
 // Get QrCode
