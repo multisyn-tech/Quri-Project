@@ -1,1 +1,1 @@
-export const QURI_SERVICE_FEE = 2.99;
+export const QURI_SERVICE_FEE = 0.99;
