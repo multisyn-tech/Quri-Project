@@ -21,9 +21,9 @@ const HomeScreen = () => {
 
     useEffect(() => {
         if (qrCode) {
-            // dispatch(reset());
-            // dispatch(resetOrders());   // Reset Orders state
-            // dispatch(resetCartItems());   
+            dispatch(reset());
+            dispatch(resetOrders());   // Reset Orders state
+            dispatch(resetCartItems());   
 
             dispatch(getQRDetails(qrCode));
         }
@@ -41,7 +41,7 @@ const HomeScreen = () => {
         const fetchOrders = async () => {
             await conditionalRedirection()
         }
-        fetchOrders()
+        // fetchOrders()
     }, [])
 
     const conditionalRedirection = async () => {
@@ -51,6 +51,7 @@ const HomeScreen = () => {
         // }
 
         const tableID = qrdetails.data.TableID
+        // send rest id as well
 
         try {
             const res = await fetch(`${BASE_URL}/customers/allOrders/${tableID}`);
