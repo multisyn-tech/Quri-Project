@@ -28,7 +28,7 @@ const persistConfig = {
   // storage:storageSession,
   storage: storage,
   // whitelist: ['qrCodeDetails', 'cartItems', 'menus', 'BillSplit', 'auth', 'ordersByTableID'],
-  whitelist: ['qrcode', 'menus', 'BillSplit', 'auth', 'orders'],
+  whitelist: ['qrcode', 'menus', 'BillSplit', 'auth', 'orders', 'activity'],
 
 }
 

@@ -15,7 +15,7 @@ export const orderStatusOptions = [
   { label: "Received", value: "received" },
   { label: "Accepted", value: "accepted" },
   { label: "Rejected", value: "rejected" },
-  { label: "Completed", value: "completed" },
+  { label: "", value: "completed" , disable:true},
   // { label: "Processing", value: "processing" },
   // { label: "Ready for pickup", value: "ready_for_pickup" },
   // { label: "Saved", value: "saved" },

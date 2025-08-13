@@ -15,6 +15,7 @@ import dashboardReducer from '../features/dashboard/dashboardSlice';
 import superMenuReducer from '../features/SuperAdmin/superAdminSlice';
 import superOrderReducer from '../features/SuperAdmin/superAdminSlice';
 import paymentReducer from '../features/payments/paymentSlice';
+import activityReducer  from '../features/activity/activitySlice';
 
 const rootReducer = combineReducers({
   menus: menuReducer,
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
   superMenus: superMenuReducer,
   superOrder: superOrderReducer,
   payments: paymentReducer,
+  activity:activityReducer,
 });
 
 export default rootReducer;

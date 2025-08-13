@@ -7,6 +7,7 @@ import QuriTable from '../../../../../Manage/QuriTable';
 import EditModal from '../../../../../Manage/EditModal';
 import { getOrders, getDetailsOfOrders, addRejectedOrder, resetRejectedOrderItems, resetDetailsOfOrder, rejectedItemsAdded, getPlateNumber } from '../../../../../features/orders/orderSlice';
 import notificationSound from '../../../../../assets/audio/order.mp3';
+import { Box, TextField, InputAdornment } from '@mui/material';
 
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -32,12 +33,17 @@ const Orders = () => {
 
   const [plateNumberData, setPlateNumberData] = useState([]);
   const [isLoadingPlateNumber, setIsLoadingPlateNumber] = useState(true);
+  const [loader, setLoader] = useState(false);
 
   const [allOrders, setAllOrders] = useState([]);
 
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.orders.orders);
   // console.log("order:", orders)
+
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
 
   const prevOrderCountRef = useRef(null);
@@ -52,6 +58,7 @@ const Orders = () => {
 
 
   useEffect(() => {
+    if (isDatePickerOpen) return; // pause polling
     const fetchData = async () => {
       await getData();
     };
@@ -61,7 +68,7 @@ const Orders = () => {
     const interval = setInterval(fetchData, 3000);
 
     return () => clearInterval(interval); // cleanup
-  }, []);
+  }, [isDatePickerOpen]);
 
 
 
@@ -256,40 +263,82 @@ const Orders = () => {
   }
 
 
-  const downloadPDF = () => {
-    // console.log((allOrders.length))
 
-    const completedOrders = allOrders.filter(order => order.Status == "Completed");
+  const normalizeDate = (date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  };
 
-    // Create a new PDF instance
-    const doc = new jsPDF();
+  const downloadCSV = async () => {
+    setLoader(true); // show spinner
+    const start = startDate ? normalizeDate(startDate) : null;
+    const end = endDate ? normalizeDate(endDate) : null;
 
-    // Add a title
-    doc.setFontSize(16);
-    doc.text("Completed Orders", 14, 15);
+    const completedOrders = allOrders.filter(order => {
 
-    // Convert orders into table rows
-    const tableRows = completedOrders.map(o => [
+      if (!order.Status || order.Status.trim().toLowerCase() !== "completed") return false;
+
+
+      const [month, day, year] = order.OrderDate.trim().split("-");
+      const orderDate = normalizeDate(new Date(year, month - 1, day));
+
+
+      if (start && orderDate < start) return false;
+      if (end && orderDate > end) return false;
+
+      return true;
+    });
+
+    if (completedOrders.length === 0) {
+      alert("No completed orders in this date range!");
+      setLoader(false);
+      return;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // CSV header
+    const header = [
+      "Order ID",
+      "Restaurant ID",
+      "Order Date",
+      "Table ID",
+      "Plate Number",
+      "Total Amount"
+    ];
+
+    // CSV rows
+    const rows = completedOrders.map(o => [
       o.OrderID,
       o.RestaurantID,
       o.OrderDate,
       o.TableID,
       o.PlateNumber,
-      o.TotalAmount,
+      o.TotalAmount
     ]);
 
-    // Add the table
-    doc.autoTable({
-      head: [["Order ID", "Restaurant ID",  "Order Date", "Table ID","Plate Number","Total Amount",]],
-      body: tableRows,
-      startY: 20,
-    });
+    // Combine header + rows
+    const csvContent =
+      [header, ...rows]
+        .map(row => row.map(val => `"${val}"`).join(",")) // quote values for safety
+        .join("\n");
 
-    // Save the PDF
-    doc.save("completed_orders.pdf");
+    // Create Blob and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "completed_orders.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
 
-  }
+
+    setLoader(false); // hide spinner
+  };
+
 
 
 
@@ -388,6 +437,16 @@ const Orders = () => {
       width: 'auto'
     },
     {
+      name: "Date",
+      selector: row => {
+        if (!row.OrderDate) return "";
+        const [month, day, year] = row.OrderDate.split("-");
+        return `${day}-${month}-${year}`;
+      },
+      sortable: true,
+      width: 'auto'
+    },
+    {
       name: "Plate Number",
       // selector: row => isLoadingPlateNumber ? 'Loading...' : row.PlateNumber,
       selector: row => row.PlateNumber,
@@ -405,6 +464,8 @@ const Orders = () => {
           style={{ width: '100px', fontSize: 'small' }}
           outline
         >
+
+          
           <span title={
             (row.Status === "received" || row.Status === "Received") ? 'Received'
               : (row.Status === "processing" || row.Status === "Processing") ? 'Processing'
@@ -502,8 +563,48 @@ const Orders = () => {
             (
               <>
                 <div class="text-right p-2">
-                  <button className='btn btn-info' onClick={downloadPDF}><Download size={20} color="#000" /></button>
+                  <div class="d-flex justify-content-between align-items-center">
+
+
+                    <TextField
+                      label="Date Wise Filter"
+                      type="date"
+                      variant="outlined"
+                      size="small"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      onFocus={() => setIsDatePickerOpen(true)}
+                      onBlur={() => setIsDatePickerOpen(false)}
+                      InputLabelProps={{ shrink: true }}
+                    />
+
+                    <TextField
+                      label="Date Wise Filter"
+                      type="date"
+                      variant="outlined"
+                      size="small"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      onFocus={() => setIsDatePickerOpen(true)}
+                      onBlur={() => setIsDatePickerOpen(false)}
+                      InputLabelProps={{ shrink: true }}
+                    />
+
+                    <button
+                      className="btn btn-info"
+                      onClick={downloadCSV}
+                      disabled={loader}
+                    >
+                      {loader ? (
+                        <Loader />
+                      ) : (
+                        <Download size={20} color="#000" />
+                      )}
+                    </button>
+
+                  </div>
                 </div>
+
                 <QuriTable
                   name={name}
                   columns={columns}
@@ -521,9 +622,49 @@ const Orders = () => {
                     {errorMessage}
                   </div>
                 )}
+
                 <div class="text-right p-2">
-                  <button className='btn btn-info' onClick={downloadPDF}><Download size={20} color="#000" /></button>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <TextField
+                      label="Date Wise Filter"
+                      type="date"
+                      variant="outlined"
+                      size="small"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      onFocus={() => setIsDatePickerOpen(true)}
+                      onBlur={() => setIsDatePickerOpen(false)}
+                      InputLabelProps={{ shrink: true }}
+                    />
+
+                    <TextField
+                      label="Date Wise Filter"
+                      type="date"
+                      variant="outlined"
+                      size="small"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      onFocus={() => setIsDatePickerOpen(true)}
+                      onBlur={() => setIsDatePickerOpen(false)}
+                      InputLabelProps={{ shrink: true }}
+                    />
+
+                    <button
+                      className="btn btn-info"
+                      onClick={downloadCSV}
+                      disabled={loader} // disable while loading
+                    >
+                      {loader ? (
+                        <Loader />
+                      ) : (
+                        <Download size={20} color="#000" />
+                      )}
+                    </button>
+
+                  </div>
                 </div>
+
+
                 <QuriTable
                   name={name}
                   columns={columns}

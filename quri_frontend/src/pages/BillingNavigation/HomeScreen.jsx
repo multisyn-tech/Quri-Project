@@ -7,6 +7,7 @@ import scanQR from '../../../src/assets/img/scanQR/11136.jpg'
 import { Col, Row } from 'reactstrap';
 import SpinnerComponent from '../../Manage/Fallback-spinner';
 import { getOrdersByTableID, resetCartItems, reset as resetOrders } from '../../features/orders/orderSlice';
+import { v4 as uuidv4 } from "uuid";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -23,7 +24,7 @@ const HomeScreen = () => {
         if (qrCode) {
             dispatch(reset());
             dispatch(resetOrders());   // Reset Orders state
-            dispatch(resetCartItems());   
+            dispatch(resetCartItems());
 
             dispatch(getQRDetails(qrCode));
         }
@@ -37,43 +38,64 @@ const HomeScreen = () => {
     }, [qrdetails, dispatch, loading12]);
 
 
+    // useEffect(() => {
+    //     const fetchOrders = async () => {
+    //         await conditionalRedirection()
+    //     }
+    //     // fetchOrders()
+    // }, [])
+
+    // const conditionalRedirection = async () => {
+    //     // console.log("qrdetails", qrdetails)
+    //     // if (['Received', 'Accepted', 'Rejected'].includes(qrdetails.data.orderStatus)) {
+    //     //     navigate('/quri/home/waiting');
+    //     // }
+
+    //     const tableID = qrdetails.data.TableID
+    //     // send rest id as well
+
+    //     try {
+    //         const res = await fetch(`${BASE_URL}/customers/allOrders/${tableID}`);
+    //         if (!res.ok) {
+    //             throw new Error(`HTTP error! Status: ${res.status}`);
+    //         }
+    //         const records = await res.json();
+
+    //         if (['Received', 'Accepted', 'Rejected'].includes(records.order.order.Status)) {
+    //             navigate('/quri/home/waiting');
+    //         } 
+    //         // else if (['Completed'].includes(records.order.order.Status)) {
+    //         //     navigate('/quri/menu/orderPlaced');
+    //         // }
+
+
+    //         // console.log("order by table", records);
+    //     } catch (err) {
+    //         console.error("Error fetching order by table:", err);
+    //     }
+
+    // }
+
+
     useEffect(() => {
-        const fetchOrders = async () => {
-            await conditionalRedirection()
-        }
-        // fetchOrders()
+
+        // const userId = getOrCreateUserId();
+        // console.log("User ID:", userId);
+
     }, [])
 
-    const conditionalRedirection = async () => {
-        // console.log("qrdetails", qrdetails)
-        // if (['Received', 'Accepted', 'Rejected'].includes(qrdetails.data.orderStatus)) {
-        //     navigate('/quri/home/waiting');
-        // }
 
-        const tableID = qrdetails.data.TableID
-        // send rest id as well
-
-        try {
-            const res = await fetch(`${BASE_URL}/customers/allOrders/${tableID}`);
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: ${res.status}`);
-            }
-            const records = await res.json();
-
-            if (['Received', 'Accepted', 'Rejected'].includes(records.order.order.Status)) {
-                navigate('/quri/home/waiting');
-            } 
-            // else if (['Completed'].includes(records.order.order.Status)) {
-            //     navigate('/quri/menu/orderPlaced');
-            // }
-
-
-            // console.log("order by table", records);
-        } catch (err) {
-            console.error("Error fetching order by table:", err);
+    function getOrCreateUserId() {
+        let id = localStorage.getItem("user_id");
+        if (!id) {
+            id = uuidv4();
+            localStorage.setItem("user_id", id);
         }
-
+        return id;
     }
+
+
+
 
 
     if (loading12) {
