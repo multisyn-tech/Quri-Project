@@ -688,6 +688,43 @@ const findRejectedOrderService = async (orderId) => {
 
 
 
+const saveUserActivityService = async ({ userId, tableId, restaurantId, stage }) => {
+
+  const query = `
+    INSERT INTO logs (user_id, table_id, rest_id, stage)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  const [result] = await db
+    .promise()
+    .query(query, [userId, tableId, restaurantId, stage]);
+
+
+  return {
+    id: result.insertId,
+    userId,
+    tableId,
+    restaurantId,
+    stage
+  };
+}
+
+
+
+const getAllActivityService = async () => {
+  const query = `
+    SELECT DISTINCT user_id, table_id, rest_id, stage, created_at
+    FROM logs
+    ORDER BY created_at DESC
+  `;
+  const [rows] = await db.promise().query(query);
+  return rows;
+};
+
+
+
+
+
 module.exports = {
   addOrderService,
   getOrderByTableIdService,
@@ -705,6 +742,8 @@ module.exports = {
   getMenuByTableID,
   findOrderIDService,
   addRejectedOrderService,
-  findRejectedOrderService
+  findRejectedOrderService,
+  saveUserActivityService,
+  getAllActivityService
 
 };

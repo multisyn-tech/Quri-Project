@@ -17,7 +17,9 @@ const {
   getMenuByTableID,
   findOrderIDService,
   addRejectedOrderService,
-  findRejectedOrderService
+  findRejectedOrderService,
+  saveUserActivityService,
+  getAllActivityService
 } = require("./service.js");
 
 dotenv.config();
@@ -436,6 +438,41 @@ const findRejectedOrder = async (req, res) => {
 };
 
 
+const saveUserActivity = async (req, res) => {
+  try {
+    const { userId, tableId, restaurantId, stage } = req.body;
+
+    const result = await saveUserActivityService({
+      userId,
+      tableId,
+      restaurantId,
+      stage
+    });
+
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    console.error("Error saving user activity:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+
+
+const getAllActivity = async (req, res) => {
+  try {
+    const result = await getAllActivityService();
+
+    console.log(result)
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching activity logs:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
 module.exports = {
   AddOrder,
   getOrderById,
@@ -455,4 +492,6 @@ module.exports = {
   addRejectedOrder,
   getRecentOrder,
   findRejectedOrder,
+  saveUserActivity,
+  getAllActivity
 };
