@@ -7,12 +7,17 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const addStage = createAsyncThunk(
   "activity/addStage",
   async (stage, { getState, rejectWithValue }) => {
-    const { userId } = getState().activity;
+    const { userId, tableId, restaurantId } = getState().activity;
     if (!userId) return rejectWithValue("User ID not set");
 
     try {
-      await axios.post(`${BASE_URL}/customers/activity`, { userId, stage });
-      return stage; // return for reducer to store locally
+      await axios.post(`${BASE_URL}/customers/activity`, {
+        userId,
+        tableId,
+        restaurantId,
+        stage
+      });
+      return stage;
     } catch (err) {
       console.error("Error saving stage:", err);
       return rejectWithValue(err.response?.data || err.message);
@@ -20,21 +25,28 @@ export const addStage = createAsyncThunk(
   }
 );
 
+
 const activitySlice = createSlice({
   name: "activity",
   initialState: {
     userId: null,
+    tableId: null,
+    restaurantId: null,
     stages: [],
     loading: false,
     error: null
   },
   reducers: {
     setUser: (state, action) => {
-      state.userId = action.payload;
+      state.userId = action.payload.userId;
+      state.tableId = action.payload.tableId || null;
+      state.restaurantId = action.payload.restaurantId || null;
       state.stages = [];
     },
     resetActivity: (state) => {
       state.userId = null;
+      state.tableId = null;
+      state.restaurantId = null;
       state.stages = [];
       state.error = null;
     }

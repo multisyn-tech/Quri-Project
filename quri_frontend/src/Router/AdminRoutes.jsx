@@ -2,13 +2,14 @@ import MainDashboard from "../pages/AdminNavigation/views/admin/default";
 import Tables from "../pages/AdminNavigation/views/admin/marketplace";
 import Menu from "../pages/AdminNavigation/views/admin/profile";
 import Orders from "../pages/AdminNavigation/views/admin/tables";
+import Logs from "../pages/AdminNavigation/views/admin/activity";
 import Customers from "../pages/AdminNavigation/views/admin/customers";
 import Settings from "../pages/AdminNavigation/views/admin/settings";
 import Categories from "../pages/AdminNavigation/views/admin/categories";
 import Reviews from "../pages/AdminNavigation/views/admin/reviews";
 import Payments from "../pages/AdminNavigation/views/admin/payments";
 import { MdHome, MdRestaurantMenu, MdTableRestaurant, MdOutlineEventNote,MdReviews, MdPayment  } from "react-icons/md";
-import { FaPeopleGroup } from "react-icons/fa6";
+import { FaPeopleGroup,FaClipboardList  } from "react-icons/fa6";
 import FoodBankIcon from '@mui/icons-material/FoodBank';
 import { SettingsAccessibilitySharp } from "@mui/icons-material";
 import FirstTimeSettings from "../pages/AdminNavigation/views/FirstTimeSettings";
@@ -49,6 +50,13 @@ const AdminRoutes = [
     path: "manage/menu",
     icon: <MdRestaurantMenu className="h-6 w-6" />,
     component: <Menu/>,
+  },
+  {
+    name: "Logs",
+    layout: "/admin",
+    path: "manage/logs",
+    icon: <FaClipboardList  className="h-5 w-5" />,
+    component: <Logs />,
   },
   {
     name: "Customers",

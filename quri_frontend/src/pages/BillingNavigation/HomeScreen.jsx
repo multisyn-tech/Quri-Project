@@ -8,6 +8,8 @@ import { Col, Row } from 'reactstrap';
 import SpinnerComponent from '../../Manage/Fallback-spinner';
 import { getOrdersByTableID, resetCartItems, reset as resetOrders } from '../../features/orders/orderSlice';
 import { v4 as uuidv4 } from "uuid";
+import storeStage from "../../components/utility/storeStage";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -19,6 +21,8 @@ const HomeScreen = () => {
     const OrderByTableID = useSelector((state) => state.qrcode.ordersByTableID);
     const loading12 = useSelector((state) => state.qrcode.loading);
     const error = useSelector((state) => state.qrcode.error);
+
+
 
     useEffect(() => {
         if (qrCode) {
@@ -77,12 +81,15 @@ const HomeScreen = () => {
     // }
 
 
-    useEffect(() => {
+    // useEffect(() => {
+    //     // let tableId = qrdetails.data.TableID
+    //     // let restId = qrdetails.data.RestaurantID
 
-        // const userId = getOrCreateUserId();
-        // console.log("User ID:", userId);
+    //     // const userId = getOrCreateUserId();
+    //     // storeStage("initial", userId, tableId, restId); 
+    //     // console.log("User ID:", userId);
 
-    }, [])
+    // }, [])
 
 
     function getOrCreateUserId() {

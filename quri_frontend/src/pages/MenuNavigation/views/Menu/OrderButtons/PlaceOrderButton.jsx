@@ -6,6 +6,8 @@ import { BiBookmarkAltPlus } from "react-icons/bi";
 import { addOrder, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, reset } from '../../../../../features/orders/orderSlice';
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
+import storeStage from "../../../../../components/utility/storeStage";
+
 
 //Order Date
 const orderDate = dayjs().format('MM-DD-YYYY');
@@ -44,6 +46,8 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
             OrderDetails: orderDetails,
             OrderDate: orderDate
         }));
+
+        storeStage("confirmed");
 
         // Show  success message
         Swal.fire({

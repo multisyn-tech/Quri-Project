@@ -18,6 +18,8 @@ import { viewOrder } from '../../../features/orders/orderSlice.jsx';
 import { QURI_SERVICE_FEE } from "../../../config/constants.js";
 import SideBarMenu from '../../BillingFuntionality/Dashboard/SideBarMenu.jsx';
 
+import storeStage from '../../../components/utility/storeStage.js'
+
 const Bill = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -55,6 +57,7 @@ const Bill = () => {
     };
 
     const payFullBill = () => {
+        storeStage('accepted')
         navigate('/quri/bill/checkout');
     };
 

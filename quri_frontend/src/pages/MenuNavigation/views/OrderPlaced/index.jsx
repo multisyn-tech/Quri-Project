@@ -6,8 +6,10 @@ import { resetCartItems } from '../../../../features/orders/orderSlice';
 
 import { reset } from '../../../../features/orders/orderSlice';
 
-const BASE_URl = import.meta.env.VITE_API_BASE_URL;
+import { resetActivity } from '../../../../features/activity/activitySlice';
 
+const BASE_URl = import.meta.env.VITE_API_BASE_URL;
+import storeStage from '../../../../components/utility/storeStage';
 
 const OrderPlaced = () => {
 
@@ -35,6 +37,7 @@ const OrderPlaced = () => {
 
   const orderDetailsFromSingleOrder = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
   const allOrders = useSelector((state) => state.orders?.orders || []);
+  const logs = useSelector((state) => state.activity);
 
 
   useEffect(() => {
@@ -96,14 +99,30 @@ const OrderPlaced = () => {
   }, [orderDetailIds]);
 
 
+  useEffect(() => {
+    storeStage('completed')
+  }, [])
+
+  useEffect(() => {
+    if (
+      logs.stages.includes("completed") &&
+      logs.userId &&
+      logs.tableId
+    ) {
+      dispatch(resetActivity());
+      localStorage.removeItem('user_id')
+    }
+  }, [logs.stages, logs.userId, logs.tableId]);
+
+
   const removePlatNumberFromScreen = () => {
     const storedPlateNumber = localStorage.getItem('plateNumber');
     const userNote = localStorage.getItem('userNote');
     if (storedPlateNumber) {
-      localStorage.removeItem('plateNumber');  
+      localStorage.removeItem('plateNumber');
     }
     if (userNote) {
-      localStorage.removeItem('userNote');  
+      localStorage.removeItem('userNote');
     }
   }
 
