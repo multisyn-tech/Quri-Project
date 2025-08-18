@@ -463,7 +463,6 @@ const getAllActivity = async (req, res) => {
   try {
     const result = await getAllActivityService();
 
-    console.log(result)
 
     res.status(200).json(result);
   } catch (error) {

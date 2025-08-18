@@ -22,7 +22,8 @@ const {
   editCategory,
   deleteCategory,
   fetchQRCodeDetailsController,
-  fetchPopularDishesController
+  fetchPopularDishesController,
+  changeMenuStatus,
 } = require("./controller.js");
 
 const uploadFoodImage = require('../middleWare/foodUpload.js');
@@ -62,6 +63,9 @@ router.get("/menu/:MenuId", getMenuItem);
 router.put("/menu/edit/:MenuID", uploadFoodImage.single('image'), editMenu);
 
 router.delete("/menu/delete/:MenuID", deleteMenu);
+
+router.put("/menu/status/:MenuID", uploadFoodImage.single('image'), editMenu);
+
 
 // Order Details
 
