@@ -10,7 +10,6 @@ export default function Logs() {
     try {
       const response = await fetch(`${BASE_URL}/customers/get_all_activity`);
       if (!response.ok) throw new Error("Failed to fetch activity");
-
       const data = await response.json();
       setLogs(data);
     } catch (err) {
@@ -23,22 +22,29 @@ export default function Logs() {
   // Auto refresh every 10 seconds
   useEffect(() => {
     fetchAllActivity();
-    const interval = setInterval(fetchAllActivity, 10000); // 10 sec
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchAllActivity, 10000);
+    // return () => clearInterval(interval);
   }, []);
 
   if (loading) return <div>Loading logs...</div>;
 
+
+
   // Group logs by user
-  const groupedLogs = logs.reduce((acc, log) => {
-    if (!acc[log.user_id]) acc[log.user_id] = [];
-    acc[log.user_id].push(log);
-    return acc;
-  }, {});
+  const groupedLogs = {};
+  for (const log of logs) {
+    if (!groupedLogs[log.user_id]) {
+      groupedLogs[log.user_id] = [];
+    }
+    groupedLogs[log.user_id].push(log);
+  }
+
+
 
   return (
-      <div className='w-full min-h-screen px-4 sm:px-8 lg:px-16 mt-5'>
-      <h2>User Activity Logs</h2>
+    <div className='w-full min-h-screen px-4 sm:px-8 lg:px-16 mt-5'>
+      <h1>User Logs</h1>
+      <br />
       {Object.keys(groupedLogs).length === 0 ? (
         <p>No activity found.</p>
       ) : (

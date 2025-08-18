@@ -26,7 +26,8 @@ const Orders = () => {
   const [openName, setOpenName] = useState('');
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [showModal, setShowModal] = useState(true);
+  // const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   const [rejectedModal, setRejectedModal] = useState({});
   const [rejectedItems, setRejectedItems] = useState({});
@@ -193,20 +194,23 @@ const Orders = () => {
 
           setAllOrders(updated)
           const newOrderStatus = data.orders.length > 0 ? data.orders[data.orders.length - 1].Status : null;
+          // if new order arrive then ring the bell and if order is rejected and then came again then dont ring bell
           // if (
           //   prevOrderCountRef.current !== null &&
           //   data.orders.length > prevOrderCountRef.current &&
           //   !["Accepted", "Rejected", "Completed"].includes(newOrderStatus) &&
           //   isAudioUnlocked.current
           // ) {
-          audioRef.current.loop = true; // Enable looping
-          audioRef.current.play().catch((err) => console.error("Audio play error:", err));
+
+          // audioRef.current.loop = true; // Enable looping
+          // audioRef.current.play().catch((err) => console.error("Audio play error:", err));
+          
           // }
 
-          if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-          }
+          // if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
+          //   audioRef.current.pause();
+          //   audioRef.current.currentTime = 0;
+          // }
 
           prevOrderCountRef.current = data.orders.length;
           setLoading(false);
@@ -465,7 +469,7 @@ const Orders = () => {
           outline
         >
 
-          
+
           <span title={
             (row.Status === "received" || row.Status === "Received") ? 'Received'
               : (row.Status === "processing" || row.Status === "Processing") ? 'Processing'
@@ -533,29 +537,33 @@ const Orders = () => {
     <div className='w-full min-h-screen px-4 sm:px-8 lg:px-16 mt-5 '>
       <Card className='p-2 dark:bg-gray-900 '>
         {showModal ? (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center max-w-sm">
-              <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-                🔔 New feature! You’ll now hear this sound every time a new order hits — no more missed activity!
-              </p>
+          <>
 
-              {/* Audio player for user interaction */}
-              <audio controls>
-                <source src={notificationSound} type="audio/mp3" />
-                Your browser does not support the audio element.
-              </audio>
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center max-w-sm">
+                <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                  🔔 New feature! You’ll now hear this sound every time a new order hits — no more missed activity!
+                </p>
 
-              <button
-                onClick={() => {
-                  unlockAudio();
-                  setShowModal(false);
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              >
-                OK
-              </button>
+                {/* Audio player for user interaction */}
+                <audio controls>
+                  <source src={notificationSound} type="audio/mp3" />
+                  Your browser does not support the audio element.
+                </audio>
+
+                <button
+                  onClick={() => {
+                    unlockAudio();
+                    setShowModal(false);
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                >
+                  OK
+                </button>
+              </div>
             </div>
-          </div>
+          </>
+
         ) :
 
           loading ?

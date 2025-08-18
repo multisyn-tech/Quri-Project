@@ -17,9 +17,6 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-
-
-
     const orderDetails = useSelector(state => state.orders.detailsOfOrders)
     // console.log("Order Details: ", orderDetails)
 
@@ -65,16 +62,16 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
      
 
         // Navigate after some time
-        // setTimeout(() => {
-        //     // navigate('/quri/menu/orderPlaced');  
-        //     navigate('/quri/home/bill');  // temperory navigation
-        // }, 3000);
+        setTimeout(() => {
+            // navigate('/quri/menu/orderPlaced');  
+            navigate('/quri/home/bill');  // temperory navigation
+        }, 3000);
 
 
         //  waiting screen
-        setTimeout(() => {
-            navigate(`/quri/home/waiting`);  // temperory navigation
-        }, 3000);
+        // setTimeout(() => {
+        //     navigate(`/quri/home/waiting`);  // temperory navigation
+        // }, 3000);
 
     }
 
