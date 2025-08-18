@@ -51,13 +51,13 @@ const AdminRoutes = [
     icon: <MdRestaurantMenu className="h-6 w-6" />,
     component: <Menu/>,
   },
-  // {
-  //   name: "Logs",
-  //   layout: "/admin",
-  //   path: "manage/logs",
-  //   icon: <FaClipboardList  className="h-5 w-5" />,
-  //   component: <Logs />,
-  // },
+  {
+    name: "Logs",
+    layout: "/admin",
+    path: "manage/logs",
+    icon: <FaClipboardList  className="h-5 w-5" />,
+    component: <Logs />,
+  },
   {
     name: "Customers",
     layout: "/admin",

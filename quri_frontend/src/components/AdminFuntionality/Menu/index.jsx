@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, IconButton, Typography, Paper, Grid } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Button, IconButton, Typography, Paper, Grid, Switch, FormControlLabel } from '@mui/material';
+import { Add, Edit, Delete, CheckCircle, Cancel } from '@mui/icons-material';
 import Pagination from './Pagination';
 import AddMenu from './addMenu';
 import EditMenu from './editMenu';
 import { fetchMenus, deleteMenu } from '../../../features/menu/menuSlice';
+import { editMenu, fetchMenu } from '../../../features/menu/menuSlice';
+import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -16,6 +18,7 @@ const Index = () => {
   const loading = useSelector((state) => state.menus.loading);
   const error = useSelector((state) => state.menus.error);
 
+  const [active, setActive] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(8);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
@@ -66,6 +69,25 @@ const Index = () => {
   const getStatusColor = (status) => {
     return status === 'active' ? 'text-green-500' : 'text-red-500';
   };
+
+
+
+  const handleToggleStatus = async (menu) => {
+    const formData = new FormData();
+    formData.append('MenuStatus', menu.MenuStatus === 'active' ? 'inactive' : 'active');
+
+    await axios.put(`${BASE_URL}/restaurant/menu/status/${menu.MenuID}`, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        'Content-Type': 'multipart/form-data'
+      },
+    });
+
+    refreshMenus?.();
+  };
+
+
+
 
   return (
     <>
@@ -155,6 +177,19 @@ const Index = () => {
                     >
                       <Delete fontSize="inherit" />
                     </IconButton>
+
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={menu.MenuStatus === "active"}
+                          onChange={() => handleToggleStatus(menu)}
+                          color="success"
+                        />
+                      }
+                      label={menu.MenuStatus === "active" ? "Active" : "Inactive"}
+                    />
+
+
                   </div>
                 </Paper>
               </Grid>

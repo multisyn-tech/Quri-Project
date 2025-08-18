@@ -49,9 +49,10 @@ export default function Logs() {
         <p>No activity found.</p>
       ) : (
         Object.entries(groupedLogs).map(([userId, userLogs]) => (
-          <div key={userId} style={{ marginBottom: "20px" }}>
+          <div key={userId} style={{ marginBottom: "20px", border:"2px solid black", padding:"10px", borderRadius:"20px" }}>
             <h3>User: {userId}</h3>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <br></br>
+            <div style={{ display: "flex", justifyContent:"space-around", flexDirection:"row-reverse", gap: "10px", flexWrap: "wrap" }}>
               {userLogs.map((log) => (
                 <div
                   key={log.id}

@@ -57,7 +57,7 @@ const Bill = () => {
     };
 
     const payFullBill = () => {
-        storeStage('accepted')
+        // storeStage('accepted')
         navigate('/quri/bill/checkout');
     };
 
