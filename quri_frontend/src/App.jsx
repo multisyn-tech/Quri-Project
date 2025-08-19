@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ThemeRoutes from './Router/Router';
 
 const App = () => {
+  const basename = import.meta.env.VITE_APP_BASE || '/';
   return (
-    <Router>
+    <Router basename={basename}>
       <Routes>
         {ThemeRoutes.map((route, index) => (
           route.children ? (
