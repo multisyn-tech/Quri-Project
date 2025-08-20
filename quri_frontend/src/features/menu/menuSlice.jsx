@@ -117,7 +117,7 @@ export const editMenu = createAsyncThunk(
       if (!token) {
         throw new Error('No token found');
       }
-
+      
       // Sending FormData (which may include image/file)
       const response = await axios.put(`${BASE_URL}/restaurant/menu/edit/${menuId}`, formData, {
         headers: {

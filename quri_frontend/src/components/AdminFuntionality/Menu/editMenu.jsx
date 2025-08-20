@@ -68,42 +68,83 @@ const EditMenu = ({ onClose, menuId, refreshMenus }) => {
     setApiError(null); // Clear API error on file change
   }, []);
 
-  const handleSave = useCallback(async () => {
-    try {
-      // Validate image input
-      if (!useFileUpload && !form.imageUrl.trim()) {
-        setApiError("Please provide an image URL.");
-        return;
-      }
-      if (useFileUpload && !selectedImage) {
-        setApiError("Please upload an image file.");
-        return;
-      }
 
-      const formData = new FormData();
-      formData.append('ItemName', form.name);
-      formData.append('ItemDescription', form.description);
-      formData.append('Price', form.price);
-      formData.append('CategoryID', form.category);
-      formData.append('MenuStatus', form.availability);
 
-      if (useFileUpload) {
-        formData.append('image', selectedImage);
-      } else {
-        formData.append('Image', form.imageUrl);
-      }
+  // const handleSave = useCallback(async () => {
+  //   try {
+  //     // Validate image input
+  //     if (!useFileUpload && !form.imageUrl.trim()) {
+  //       setApiError("Please provide an image URL.");
+  //       return;
+  //     }
+  //     if (useFileUpload && !selectedImage) {
+  //       setApiError("Please upload an image file.");
+  //       return;
+  //     }
 
-      await dispatch(editMenu({ menuId, formData })).unwrap();
-      setApiError(null);
-      onClose();
-      refreshMenus?.();
-    } catch (error) {
-      console.error('Error updating menu item:', error);
-      if (error.status === 408) {
-        setApiError("Upload Image or Paste Image URL");
-      }
+  //     const formData = new FormData();
+  //     formData.append('ItemName', form.name);
+  //     formData.append('ItemDescription', form.description);
+  //     formData.append('Price', form.price);
+  //     formData.append('CategoryID', form.category);
+  //     formData.append('MenuStatus', form.availability);
+
+  //     if (useFileUpload) {
+  //       formData.append('image', selectedImage);
+  //     } else {
+  //       formData.append('Image', form.imageUrl);
+  //     }
+
+  //     await dispatch(editMenu({ menuId, formData })).unwrap();
+  //     setApiError(null);
+  //     onClose();
+  //     refreshMenus?.();
+  //   } catch (error) {
+  //     console.error('Error updating menu item:', error);
+  //     if (error.status === 408) {
+  //       setApiError("Upload Image or Paste Image URL");
+  //     }
+  //   }
+  // }, [dispatch, form, selectedImage, useFileUpload, menuId, onClose, refreshMenus]);
+
+
+
+
+
+const handleSave = useCallback(async () => {
+  try {
+
+    setApiError(null);
+
+
+    const formData = new FormData();
+    formData.append('ItemName', form.name);
+    formData.append('ItemDescription', form.description);
+    formData.append('Price', form.price);
+    formData.append('CategoryID', form.category);
+    formData.append('MenuStatus', form.availability);
+
+   
+    if (useFileUpload && selectedImage) {
+      formData.append('image', selectedImage);
+    } else {
+      formData.append('Image', form.imageUrl.trim()); 
     }
-  }, [dispatch, form, selectedImage, useFileUpload, menuId, onClose, refreshMenus]);
+
+   
+
+    await dispatch(editMenu({ menuId, formData })).unwrap();
+    setApiError(null);
+    onClose();
+    refreshMenus?.();
+  } catch (error) {
+    console.error('Error updating menu item:', error);
+    setApiError(error.message || 'Failed to update menu item');
+  }
+}, [dispatch, form, selectedImage, useFileUpload, menuId, onClose, refreshMenus]);
+
+
+
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';

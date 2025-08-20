@@ -73,17 +73,22 @@ const Index = () => {
 
 
   const handleToggleStatus = async (menu) => {
-    const formData = new FormData();
-    formData.append('MenuStatus', menu.MenuStatus === 'active' ? 'inactive' : 'active');
 
-    await axios.put(`${BASE_URL}/restaurant/menu/status/${menu.MenuID}`, formData, {
+    const newStatus = menu.MenuStatus === 'active' ? 'inactive' : 'active';
+
+
+    const response = await axios.put(`${BASE_URL}/restaurant/menu/status/${menu.MenuID}`, {
+      MenuStatus: newStatus
+    }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'application/json'
       },
     });
 
-    refreshMenus?.();
+    dispatch(fetchMenus());
+
+
   };
 
 
@@ -177,6 +182,7 @@ const Index = () => {
                     >
                       <Delete fontSize="inherit" />
                     </IconButton>
+
 
                     <FormControlLabel
                       control={
