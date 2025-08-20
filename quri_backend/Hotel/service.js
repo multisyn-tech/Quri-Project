@@ -604,11 +604,11 @@ const fetchAllMenusService = async (restaurantId) => {
   }
 };
 
-// Edit a menu
 
-// const editMenuService = async (restaurantId, MenuID, data) => {
+// const editMenuService = async (restaurantId, MenuID, data, file) => {
 //   const { ItemName, ItemDescription, Price, Image, CategoryID, MenuStatus } =
 //     data;
+
 
 //   // Validate MenuStatus
 //   const validMenuStatuses = ["active", "inactive"];
@@ -629,21 +629,33 @@ const fetchAllMenusService = async (restaurantId) => {
 //       throw new Error("Invalid CategoryID for the given RestaurantID");
 //     }
 
+//     let imageUrl;
+
+//     if (file) {
+//       // If a file was uploaded, save its path as the image URL
+//       imageUrl = `food-uploads/${path.basename(file.path)}`;
+//     } else if (Image) {
+//       // If no file but Image URL is provided, use that
+//       imageUrl = Image;
+//     } else {
+//       throw new Error("Image is required either as a file or a URL.");
+//     }
+
 //     // Proceed with updating the menu item
 //     const [result] = await db.promise().query(
-//       `UPDATE menus
-//          SET ItemName = ?,
-//              ItemDescription = ?,
-//              Price = ?,
-//              Image = ?,
-//              CategoryID = ?,
-//              MenuStatus = ?
+//       `UPDATE menus 
+//          SET ItemName = ?, 
+//              ItemDescription = ?, 
+//              Price = ?, 
+//              Image = ?, 
+//              CategoryID = ?, 
+//              MenuStatus = ? 
 //          WHERE MenuID = ? AND RestaurantID = ?`,
 //       [
 //         ItemName,
 //         ItemDescription,
 //         Price,
-//         Image,
+//         imageUrl, // Use the generated or provided image URL
 //         CategoryID,
 //         MenuStatus,
 //         MenuID,
@@ -651,28 +663,26 @@ const fetchAllMenusService = async (restaurantId) => {
 //       ]
 //     );
 
-//     return result.affectedRows > 0;
+//     return result.affectedRows > 0; // Returns true if the menu item was updated successfully
 //   } catch (error) {
 //     console.error("Error executing query:", error.message);
 //     throw new Error(error.message);
 //   }
 // };
 
-const editMenuService = async (restaurantId, MenuID, data, file) => {
-  const { ItemName, ItemDescription, Price, Image, CategoryID, MenuStatus } =
-    data;
 
-  console.log("Received MenuStatus:", MenuStatus);
-  console.log("Received file:", file);
+
+const editMenuService = async (restaurantId, MenuID, data, file) => {
+  const { ItemName, ItemDescription, Price, CategoryID, MenuStatus, Image } = data;
 
   // Validate MenuStatus
-  const validMenuStatuses = ["active", "inactive"];
+  const validMenuStatuses = ['active', 'inactive'];
   if (!validMenuStatuses.includes(MenuStatus)) {
     throw new Error("Invalid MenuStatus. Must be 'active' or 'inactive'");
   }
 
   try {
-    // Verify CategoryID exists for the given RestaurantID
+    
     const [categories] = await db
       .promise()
       .query(
@@ -681,49 +691,90 @@ const editMenuService = async (restaurantId, MenuID, data, file) => {
       );
 
     if (categories.length === 0) {
-      throw new Error("Invalid CategoryID for the given RestaurantID");
+      throw new Error('Invalid CategoryID for the given RestaurantID');
     }
 
-    let imageUrl;
+    const [menu] = await db
+      .promise()
+      .query(
+        `SELECT MenuID FROM menus WHERE MenuID = ? AND RestaurantID = ?`,
+        [MenuID, restaurantId]
+      );
 
+    if (menu.length === 0) {
+      return false; 
+    }
+
+    let imageUrl = null;
     if (file) {
-      // If a file was uploaded, save its path as the image URL
+    
       imageUrl = `food-uploads/${path.basename(file.path)}`;
-    } else if (Image) {
-      // If no file but Image URL is provided, use that
+    } else if (Image && Image.trim() !== '') {
+ 
       imageUrl = Image;
-    } else {
-      throw new Error("Image is required either as a file or a URL.");
     }
 
-    // Proceed with updating the menu item
-    const [result] = await db.promise().query(
-      `UPDATE menus 
-         SET ItemName = ?, 
-             ItemDescription = ?, 
-             Price = ?, 
-             Image = ?, 
-             CategoryID = ?, 
-             MenuStatus = ? 
-         WHERE MenuID = ? AND RestaurantID = ?`,
-      [
-        ItemName,
-        ItemDescription,
-        Price,
-        imageUrl, // Use the generated or provided image URL
-        CategoryID,
-        MenuStatus,
-        MenuID,
-        restaurantId,
-      ]
-    );
 
-    return result.affectedRows > 0; // Returns true if the menu item was updated successfully
+    let query = `UPDATE menus SET ItemName = ?, ItemDescription = ?, Price = ?, CategoryID = ?, MenuStatus = ?`;
+    const queryParams = [ItemName, ItemDescription, Price, CategoryID, MenuStatus];
+
+    if (imageUrl) {
+      query += `, Image = ?`;
+      queryParams.push(imageUrl);
+    }
+
+    query += ` WHERE MenuID = ? AND RestaurantID = ?`;
+    queryParams.push(MenuID, restaurantId);
+
+    const [result] = await db.promise().query(query, queryParams);
+
+    return result.affectedRows > 0; 
   } catch (error) {
-    console.error("Error executing query:", error.message);
+    console.error('Error executing query:', error.message);
     throw new Error(error.message);
   }
 };
+
+
+
+const editMenuStatusService = async (restaurantId, MenuID, MenuStatus) => {
+  try {
+   
+    const [menu] = await db
+      .promise()
+      .query(
+        `SELECT MenuID FROM menus WHERE MenuID = ? AND RestaurantID = ?`,
+        [MenuID, restaurantId]
+      );
+
+
+
+    if (!['active', 'inactive'].includes(MenuStatus)) {
+      throw new Error('MenuStatus must be "active" or "inactive"');
+    }
+
+  
+    const [result] = await db
+      .promise()
+      .query(
+        `UPDATE menus 
+         SET MenuStatus = ? 
+         WHERE MenuID = ? AND RestaurantID = ?`,
+        [MenuStatus, MenuID, restaurantId]
+      );
+
+    if (result.affectedRows === 0) {
+      return false; 
+    }
+
+    return true; 
+  } catch (error) {
+    console.error('Error in editMenuStatusService:', error.message);
+    throw error; 
+  }
+};
+
+
 
 // Delete a menu item
 const deleteMenuService = async (MenuID, RestaurantID) => {
@@ -1230,4 +1281,5 @@ module.exports = {
   deleteCategoryService,
   FetchQRCodeService,
   fetchPopularDishesService,
+  editMenuStatusService
 };

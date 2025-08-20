@@ -24,6 +24,7 @@ const {
   deleteCategoryService,
   FetchQRCodeService,
   fetchPopularDishesService,
+  editMenuStatusService
 } = require("./service.js");
 
 dotenv.config();
@@ -305,7 +306,7 @@ const getMenuItem = async (req, res) => {
   }
 };
 
-// Editing a menu
+
 
 // const editMenu = async (req, res) => {
 //   const { MenuID } = req.params;
@@ -313,23 +314,36 @@ const getMenuItem = async (req, res) => {
 //     const token = req.headers.authorization.split(" ")[1]; // Assuming the token is in the format "Bearer TOKEN"
 
 //     if (!token) {
-//       throw new Error('No token provided');
+//       throw new Error("No token provided");
 //     }
 
 //     const decodedToken = jwt.verify(token, secretKey);
 
 //     if (!decodedToken) {
-//       throw new Error('Failed to authenticate token');
+//       throw new Error("Failed to authenticate token");
 //     }
 
 //     const restaurantId = decodedToken.restaurantId;
+
+//     console.log("Received data in editMenu:", req.body);
+//     console.log("File uploaded:", req.file);
+
+//     // if (req.file == "undefined" || req.file == undefined) {
+//     //   res.status(408).json({ message: "Uplaod Image or Paste Image URL" });
+//     // }
+
 //     const updatedMenu = { ...req.body, RestaurantID: restaurantId };
 
 //     if (!updatedMenu || Object.keys(updatedMenu).length === 0) {
 //       throw new Error("Invalid input data");
 //     }
 
-//     const success = await editMenuService(restaurantId, MenuID, updatedMenu);
+//     const success = await editMenuService(
+//       restaurantId,
+//       MenuID,
+//       updatedMenu,
+//       req.file
+//     );
 
 //     if (success) {
 //       res.status(200).json({ message: "Menu item updated successfully" });
@@ -337,56 +351,91 @@ const getMenuItem = async (req, res) => {
 //       res.status(404).json({ message: "Menu item not found" });
 //     }
 //   } catch (error) {
-//     console.error('Error updating menu item:', error.message);
+//     console.error("Error updating menu item:", error.message);
 //     res.status(400).json({ message: error.message });
 //   }
 // };
 
 const editMenu = async (req, res) => {
   const { MenuID } = req.params;
-  try {
-    const token = req.headers.authorization.split(" ")[1]; // Assuming the token is in the format "Bearer TOKEN"
+  const { ItemName, ItemDescription, Price, CategoryID, MenuStatus, Image } = req.body;
+  const file = req.file;
 
+  // console.log('MenuID:', MenuID);
+  // console.log('Received data in editMenu:', req.body);
+  // console.log('File uploaded:', file);
+
+  try {
+    // Verify token
+    const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
-      throw new Error("No token provided");
+      throw new Error('No token provided');
     }
 
-    const decodedToken = jwt.verify(token, secretKey);
-
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     if (!decodedToken) {
-      throw new Error("Failed to authenticate token");
+      throw new Error('Failed to authenticate token');
     }
 
     const restaurantId = decodedToken.restaurantId;
 
-    console.log("Received data in editMenu:", req.body);
-    console.log("File uploaded:", req.file);
-
-    if (req.file == "undefined" || req.file == undefined) {
-      res.status(408).json({ message: "Uplaod Image or Paste Image URL" });
+    // Validate input data
+    if (!ItemName || !ItemDescription || !Price || !CategoryID || !MenuStatus) {
+      throw new Error('All fields except Image are required');
     }
 
-    const updatedMenu = { ...req.body, RestaurantID: restaurantId };
+    const updatedMenu = { ItemName, ItemDescription, Price, CategoryID, MenuStatus, Image };
 
-    if (!updatedMenu || Object.keys(updatedMenu).length === 0) {
-      throw new Error("Invalid input data");
-    }
-
-    const success = await editMenuService(
-      restaurantId,
-      MenuID,
-      updatedMenu,
-      req.file
-    );
+    const success = await editMenuService(restaurantId, MenuID, updatedMenu, file);
 
     if (success) {
-      res.status(200).json({ message: "Menu item updated successfully" });
+      return res.status(200).json({ message: 'Menu item updated successfully' });
     } else {
-      res.status(404).json({ message: "Menu item not found" });
+      return res.status(404).json({ message: 'Menu item not found' });
     }
   } catch (error) {
-    console.error("Error updating menu item:", error.message);
-    res.status(400).json({ message: error.message });
+    console.error('Error updating menu item:', error.message);
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+
+const editMenuStatus = async (req, res) => {
+  const { MenuID } = req.params;
+  const { MenuStatus } = req.body;
+
+  try {
+    // Verify token
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET); // Use environment variable for secret
+    if (!decodedToken) {
+      throw new Error('Failed to authenticate token');
+    }
+
+    const restaurantId = decodedToken.restaurantId;
+
+    // Validate MenuStatus
+    if (!MenuStatus || !['active', 'inactive'].includes(MenuStatus)) {
+      throw new Error('MenuStatus must be "active" or "inactive"');
+    }
+
+    // Call service function with MenuID and MenuStatus
+    const success = await editMenuStatusService(restaurantId, MenuID, MenuStatus);
+
+    if (success) {
+      return res.status(200).json({ message: 'Menu status updated successfully', MenuStatus });
+    } else {
+      return res.status(404).json({ message: 'Menu item not found' });
+    }
+  } catch (error) {
+    console.error('Error updating menu status:', error.message);
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -680,4 +729,5 @@ module.exports = {
   deleteCategory,
   fetchQRCodeDetailsController,
   fetchPopularDishesController,
+  editMenuStatus,
 };
