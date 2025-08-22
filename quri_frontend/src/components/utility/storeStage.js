@@ -16,3 +16,20 @@ export default function storeStage(stage, userId = null, tableId = null, restaur
   // Save stage to Redux + DB
   store.dispatch(addStage(stage));
 }
+
+
+// function getOrderStatus() {
+//   const state = store.getState().activity;
+
+//   return {
+//     userId: state.userId,
+//     tableId: state.tableId,
+//     restaurantId: state.restaurantId,
+//     stages: state.stages, 
+//     loading: state.loading,
+//     error: state.error
+//   };
+// }
+
+
+// export default { storeStage, getOrderStatus };

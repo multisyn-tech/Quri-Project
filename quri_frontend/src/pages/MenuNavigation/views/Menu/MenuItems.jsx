@@ -14,7 +14,7 @@ import { PiDotsThreeOutline } from "react-icons/pi";
 import FAQ from '../../../../components/BillingFuntionality/Dashboard/SideBarContent/FAQ';
 import SideBarMenu from '../../../../components/BillingFuntionality/Dashboard/SideBarMenu';
 import { useDrawer } from '../../../../state/drawerContext';
-
+import getStatus from '../../../../components/utility/storeStage';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -65,6 +65,23 @@ const MenuItems = () => {
       setSelectedCategory(categories[0]); // Set the first category only once
     }
   }, [categories, selectedCategory]);
+
+
+
+  const checkStatus = () => {
+    const storedUserId = localStorage.getItem("user_id"); 
+  
+    const orderStatus = getStatus.getOrderStatus();
+
+    if (storedUserId === orderStatus.userId) {
+      const lastStage = orderStatus.stages[orderStatus.stages.length - 1];
+      console.log("Last stage for user", storedUserId, ":", lastStage);
+    } else {
+      console.log("User ID in localStorage does not match the stored user ID.");
+    }
+  };
+
+  // checkStatus();
 
 
 
@@ -276,7 +293,7 @@ const MenuItems = () => {
               width: '100vw',
               height: '100vh',
               zIndex: 1100,
-              backgroundColor: 'rgba(0,0,0,0.5)', 
+              backgroundColor: 'rgba(0,0,0,0.5)',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',

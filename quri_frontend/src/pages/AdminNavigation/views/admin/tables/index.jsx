@@ -204,7 +204,7 @@ const Orders = () => {
 
           // audioRef.current.loop = true; // Enable looping
           // audioRef.current.play().catch((err) => console.error("Audio play error:", err));
-          
+
           // }
 
           // if (["Accepted", "Rejected", "Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
@@ -570,12 +570,12 @@ const Orders = () => {
             // <Loader />
             (
               <>
-                <div class="text-right p-2">
-                  <div class="d-flex justify-content-between align-items-center">
+                <div class="text-right p-2 ">
+                  <div class="d-flex justify-content-around align-items-center ">
 
 
                     <TextField
-                      label="Date Wise Filter"
+                      label="start date"
                       type="date"
                       variant="outlined"
                       size="small"
@@ -587,7 +587,7 @@ const Orders = () => {
                     />
 
                     <TextField
-                      label="Date Wise Filter"
+                      label="end date"
                       type="date"
                       variant="outlined"
                       size="small"
@@ -632,9 +632,9 @@ const Orders = () => {
                 )}
 
                 <div class="text-right p-2">
-                  <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex justify-content-around align-items-center">
                     <TextField
-                      label="Date Wise Filter"
+                      label="start date"
                       type="date"
                       variant="outlined"
                       size="small"
@@ -646,7 +646,7 @@ const Orders = () => {
                     />
 
                     <TextField
-                      label="Date Wise Filter"
+                      label="end date"
                       type="date"
                       variant="outlined"
                       size="small"
