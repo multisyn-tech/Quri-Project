@@ -8,7 +8,7 @@ export default function Logs() {
   // Fetch all activity from backend
   const fetchAllActivity = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/customers/get_all_activity`);
+      const response = await fetch(`${BASE_URL}/customers/user_logs`);
       if (!response.ok) throw new Error("Failed to fetch activity");
       const data = await response.json();
       setLogs(data);
@@ -49,100 +49,84 @@ export default function Logs() {
         <p>No activity found.</p>
       ) : (
 
+        <div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "auto repeat(5, 1fr)",
+              gridGap: "15px",
+              backgroundColor: "#007BFF",
+              padding: "10px",
+              borderRadius: "10px",
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
 
-        // Object.entries(groupedLogs).map(([userId, userLogs]) => (
-        //   <div key={userId} style={{ marginBottom: "20px", border:"2px solid black", padding:"10px", borderRadius:"20px" }}>
-        //     <h3>User: {userId}</h3>
-        //     <br></br>
-        //     <div style={{ display: "flex", justifyContent:"space-around", flexDirection:"row-reverse", gap: "10px", flexWrap: "wrap" }}>
-        //       {userLogs.map((log) => (
-        //         <div
-        //           key={log.id}
-        //           style={{
-        //             padding: "10px",
-        //             borderRadius: "8px",
-        //             border: "1px solid #ccc",
-        //             background:
-        //               log.stage.toLowerCase() === "completed"
-        //                 ? "#d4edda"
-        //                 : "#fff3cd",
-        //           }}
-        //         >
-        //           <strong>{log.stage}</strong>
-        //           <br />
-        //           Table: {log.table_id}
-        //           <br />
-        //           {new Date(log.created_at).toLocaleTimeString()}
-        //         </div>
-        //       ))}
-        //     </div>
-        //   </div>
-        // ))
+            <div style={{ textAlign: "center", padding: "10px", marginLeft: "40px", borderRadius: "5px" }}>
+              User ID
+            </div>
 
-
-        Object.entries(groupedLogs).map(([userId, userLogs]) => (
-          <div key={userId} style={{ marginBottom: "30px" }}>
-            <h3 style={{ textAlign: "left", }}>User: {userId}</h3>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: "15px",
-                backgroundColor: "#f9f9f9",
-                border: "1px solid #ddd",
-                borderRadius: "10px",
-              }}
-            >
-              <thead>
-                <tr
-                  style={{
-                    backgroundColor: "#007BFF",
-                    color: "white",
-                    textAlign: "center",
-                  }}
-                >
-                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>Status</th>
-                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>Created</th>
-                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>Confirmed</th>
-                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>Checkout</th>
-                  <th style={{ padding: "10px", border: "1px solid #ddd" }}>Completed</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td
-                    style={{
-                      padding: "10px",
-                      textAlign: "center",
-                      border: "1px solid #ddd",
-                      fontWeight: "bold",
-                      backgroundColor: "#f1f1f1",
-                    }}
-                  >
-                    Stages
-                  </td>
-                  {['created', 'confirmed', 'checkout', 'completed'].map((stage) => {
-                    const log = userLogs.find((log) => log.stage.toLowerCase() === stage);
-                    return (
-                      <td
-                        key={stage}
-                        style={{
-                          textAlign: "center",
-                          padding: "10px",
-                          border: "1px solid #ddd",
-                          backgroundColor: log ? "#d4edda" : "#fff3cd", // Green for completed, Yellow for pending
-                          color: log ? "#155724" : "#856404",
-                        }}
-                      >
-                        {log ? '✔' : ''}
-                      </td>
-                    );
-                  })}
-                </tr>
-              </tbody>
-            </table>
+            {['created', 'confirmed', 'checkout', 'paid', 'completed'].map((stage) => (
+              <div key={stage} style={{ textAlign: "center", marginLeft: "10px", padding: "10px", borderRadius: "5px" }}>
+                {stage.charAt(0).toUpperCase() + stage.slice(1)}
+              </div>
+            ))}
           </div>
-        ))
+
+          {Object.entries(groupedLogs).map(([userId, userLogs]) => (
+            <div key={userId} style={{ marginBottom: "30px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "auto repeat(5, 1fr)",
+                  gridGap: "15px",
+                  backgroundColor: "#f9f9f9",
+                  padding: "15px",
+                  borderRadius: "10px",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "10px",
+                    border: "1px solid #ddd",
+                    backgroundColor: "#f1f1f1",
+                    borderRadius: "5px",
+                    fontSize: "0.85rem",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                  }}
+                  title={userId} 
+                >
+                  {userId.length > 15 ? `${userId.slice(0, 15)}...` : userId} 
+                </div>
+
+              
+                {['created', 'confirmed', 'checkout', 'paid', 'completed'].map((stage) => {
+                  const log = userLogs.find((log) => log.stage.toLowerCase() === stage);
+                  return (
+                    <div
+                      key={stage}
+                      style={{
+                        textAlign: "center",
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                        backgroundColor: log ? "#d4edda" : "#fff3cd",
+                        color: log ? "#155724" : "#856404",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      {log ? '✔' : ''}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
 
 
 

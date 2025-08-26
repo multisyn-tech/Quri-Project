@@ -394,7 +394,7 @@ const InvoiceBody = ({ data1 }) => {
             {data1.items.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{item.description}</TableCell>
-                <TableCell>{item.Quantity} &nbsp; { <small>({item.Quantity} x {(item?.price ?? "0").replace(/[^0-9.]/g, "")} AED)</small>} </TableCell>
+                <TableCell>{item.Quantity} &nbsp; {<small>({item.Quantity} x {(item?.price ?? "0").replace(/[^0-9.]/g, "")} AED)</small>} </TableCell>
                 <TableCell align="right">
                   {(
                     Number((item?.price ?? "0").replace(/[^0-9.]/g, "")) *
@@ -481,7 +481,9 @@ const OrderShippingInfo = ({ dataAvaliable, formData1, selectedStatusOption, han
               checked={switchChecked}
               onChange={handleSwitchChange}
             /> */}
-            {formData1.Status === "Completed" || formData1.Status === "completed" ? (
+            {formData1.Status === "Paid" || formData1.Status === "paid" || 
+              formData1.Status === "completed"
+              || formData1.Status === "Completed" ? (
               <>
                 <span>Paid</span>
                 <Switch

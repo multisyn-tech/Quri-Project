@@ -1,9 +1,10 @@
 import React from 'react'
 import TotalBill from '../../components/BillingFuntionality/TotalBill/TotalBill';
 import { useEffect } from 'react';
-import storeStage from '../../components/utility/storeStage';
+import storeHelpers from '../../components/utility/storeStage';
 const TotalBillings = () => {
 
+  const { storeStage } = storeHelpers;
   useEffect(() => {
     storeStage('checkout')
   }, [])

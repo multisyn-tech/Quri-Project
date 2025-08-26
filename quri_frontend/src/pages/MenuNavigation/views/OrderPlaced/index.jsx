@@ -3,22 +3,26 @@ import List from './OrderPlacingData/List';
 import Loader from './OrderPlacingData/Loader';
 import { useSelector, useDispatch } from 'react-redux';
 import { resetCartItems } from '../../../../features/orders/orderSlice';
-
 import { reset } from '../../../../features/orders/orderSlice';
-
 import { resetActivity } from '../../../../features/activity/activitySlice';
+import { getDetailsOfOrders, getDetailsOfRejectedOrders } from '../../../../features/orders/orderSlice';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const BASE_URl = import.meta.env.VITE_API_BASE_URL;
-import storeStage from '../../../../components/utility/storeStage';
+import storeHelpers from '../../../../components/utility/storeStage';
 
 const OrderPlaced = () => {
 
   const [orderID, setOrderID] = useState(null);
   const [showOrderList, setShowOrderList] = useState(true);
   const [orderDetailIds, setOrderDetailIds] = useState([]);
+  const [lastOrderStatus, setLastOrderStatus] = useState('');
 
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+
 
   const handleResetCart = () => {
     dispatch(resetCartItems()); // Dispatch to reset the cart
@@ -34,11 +38,16 @@ const OrderPlaced = () => {
   // }
 
 
-
+  const { storeStage } = storeHelpers;
   const orderDetailsFromSingleOrder = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
+
+  const order_id = useSelector((state) => state.orders?.order?.order?.OrderID || []);
+
   const allOrders = useSelector((state) => state.orders?.orders || []);
   const logs = useSelector((state) => state.activity);
+  const { getOrderStatus } = storeHelpers;
 
+  // console.log("latest order id ->", order_id)
 
   useEffect(() => {
     if (orderDetailsFromSingleOrder.length > 0) {
@@ -50,69 +59,66 @@ const OrderPlaced = () => {
     } else {
       setShowOrderList(false);
     }
-  }, [orderDetailsFromSingleOrder, allOrders]); // Dependency array
+  }, [orderDetailsFromSingleOrder, allOrders]);
 
 
-  // airpay response handle
   useEffect(() => {
-    const handleAirpayResponse = async () => {
-      if (window.location.search || document.forms.length > 0) {
-        const formData = new FormData(document.forms[0] || {});
-        const responseData = {};
-        formData.forEach((value, key) => {
-          responseData[key] = value;
-        });
+    storeStage('paid')
+  }, [])
 
-        try {
-          const res = await fetch(`${BASE_URL}/bill/airpay-response`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(responseData),
-          });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(getDetailsOfOrders(order_id)).then((res) => {
+        const orderStatus = res.payload;
+        // console.log(orderStatus)
+        setLastOrderStatus(orderStatus.orderDetails.Status);
+      });
+    }, 5000);
 
-          const result = await res.json();
-          console.log('Airpay response processed:', result);
+    return () => clearInterval(interval);
+  }, [order_id, dispatch]);
 
-          if (result.TRANSACTIONSTATUS === 'SUCCESS') {
-            alert('Payment successful!');
-          } else {
-            alert(`Payment failed: ${result.MESSAGE}`);
-          }
-        } catch (error) {
-          console.error('Error processing Airpay response:', error);
-          alert('Error processing payment response');
-        }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("lastOrderStatus:", lastOrderStatus)
+      if (lastOrderStatus == "Delivered" || lastOrderStatus == "delivered"
+        || lastOrderStatus == "Completed" || lastOrderStatus == "completed") {
+        storeStage('completed')
+        dispatch(resetActivity());
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('tableId');
+        handleResetCart();
+        navigate('/quri/menu/home');
       }
-    };
+    }, 5000);
 
-    handleAirpayResponse();
-  }, []);
+    return () => clearInterval(interval);
+  }, [lastOrderStatus, navigate]);
+
 
 
 
   useEffect(() => {
     getOrderID();
-    handleResetCart()
-
+    // handleResetCart()
     removePlatNumberFromScreen()
 
   }, [orderDetailIds]);
 
 
-  useEffect(() => {
-    storeStage('completed')
-  }, [])
 
-  useEffect(() => {
-    if (
-      logs.stages.includes("completed") &&
-      logs.userId &&
-      logs.tableId
-    ) {
-      dispatch(resetActivity());
-      localStorage.removeItem('user_id')
-    }
-  }, [logs.stages, logs.userId, logs.tableId]);
+
+  // useEffect(() => {
+  //   if (
+  //     logs.stages.includes("completed") &&
+  //     logs.userId &&
+  //     logs.tableId
+  //   ) {
+  //     dispatch(resetActivity());
+  //     localStorage.removeItem('user_id')
+  //   }
+  // }, [logs.stages, logs.userId, logs.tableId]);
 
 
   const removePlatNumberFromScreen = () => {
@@ -166,7 +172,7 @@ const OrderPlaced = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ newStatus: 'Completed' })
+        body: JSON.stringify({ newStatus: 'Paid' })
       });
 
       const data = await response.json();

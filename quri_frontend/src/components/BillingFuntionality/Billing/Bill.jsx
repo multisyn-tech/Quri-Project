@@ -18,7 +18,7 @@ import { viewOrder } from '../../../features/orders/orderSlice.jsx';
 import { QURI_SERVICE_FEE } from "../../../config/constants.js";
 import SideBarMenu from '../../BillingFuntionality/Dashboard/SideBarMenu.jsx';
 
-import storeStage from '../../../components/utility/storeStage.js'
+import storeHelpers from '../../../components/utility/storeStage.js'
 
 const Bill = () => {
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ const Bill = () => {
     const [isBillDividerVisible, setIsBillDividerVisible] = useState(false);
 
     const { isDrawerOpen, toggleDrawer, toggleRewardsModal } = useDrawer();
-
+    const { storeStage } = storeHelpers;
 
     const qrCode = useSelector((state) => state.qrcode.qrCodeDetails?.data?.QRCode || null);
     const tableID = useSelector((state) => state.qrcode.qrCodeDetails?.data?.TableID || null);

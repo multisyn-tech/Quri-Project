@@ -6,7 +6,7 @@ import { BiBookmarkAltPlus } from "react-icons/bi";
 import { addOrder, resetCartItems, resetRejectedOrderItems, resetDetailsOfOrder, reset } from '../../../../../features/orders/orderSlice';
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
-import storeStage from "../../../../../components/utility/storeStage";
+import storeHelpers from "../../../../../components/utility/storeStage";
 
 
 //Order Date
@@ -20,7 +20,7 @@ const PlaceOrderButton = ({ restaurantID, tableID, totalPrice, cartItems }) => {
     const orderDetails = useSelector(state => state.orders.detailsOfOrders)
     // console.log("Order Details: ", orderDetails)
 
-
+    const { storeStage } = storeHelpers;
     const finalOrderPlace = () => {
 
         // Map cartItems to OrderDetails

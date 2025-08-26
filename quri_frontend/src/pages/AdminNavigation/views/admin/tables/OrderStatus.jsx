@@ -173,7 +173,6 @@ const OrderStatus = (props) => {
                                                                         orderStatusOptions.find(x => x.value === "select"))
                             }
 
-
                             options={orderStatusOptions}
                             // value="Select Status *"
                             errorStyle={errorMessage === "status"}

@@ -124,6 +124,7 @@ export const addOrder = createAsyncThunk(
   async (orderData, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${BASE_URL}/customers/order`, orderData);
+      // console.log("--->>>", response)
       return response.data;
     } catch (error) {
       console.error("Error while adding order:", error.response?.data || error.message); // Log error details

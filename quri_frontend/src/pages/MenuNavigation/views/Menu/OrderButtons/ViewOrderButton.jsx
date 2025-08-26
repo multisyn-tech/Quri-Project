@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import { Button } from 'antd-mobile';
 import { TbShoppingBag } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
-import storeStage from "../../../../../components/utility/storeStage";
+import storeHelpers  from "../../../../../components/utility/storeStage";
 import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,6 +13,9 @@ const ViewOrderButton = ({ totalPrice }) => {
     const cartPage = () => {
         navigate('/quri/menu/orderSummary');
     };
+
+    const { storeStage } = storeHelpers;
+
 
     useEffect(() => {
         let tableId = qrdetails.data.TableID

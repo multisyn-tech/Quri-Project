@@ -187,9 +187,14 @@ const Orders = () => {
 
           // console.log("order data --> ", data.orders)
           const orders = data.orders || [];
+          const paidOrders = orders.filter(order =>
+            ["paid", "completed"].includes(order.Status.toLowerCase())
+          );
+
 
           // Append plate numbers to orders
-          const updated = filteringPlateNumber(orders, plateData);
+          // const updated = filteringPlateNumber(orders, plateData);
+          const updated = filteringPlateNumber(paidOrders, plateData);
           setTableData(updated);
 
           setAllOrders(updated)
@@ -475,7 +480,7 @@ const Orders = () => {
               : (row.Status === "processing" || row.Status === "Processing") ? 'Processing'
                 : (row.Status === "ready for pickup" || row.Status === "Ready for pickup") ? 'Ready for pickup'
                   : (row.Status === "saved" || row.Status === "Saved") ? 'Saved'
-                    : (row.Status === "completed" || row.Status === "Completed") ? 'Completed'
+                    : (row.Status === "completed" || row.Status === "Completed") ? 'Delivered'
                       : (row.Status === "cancelled" || row.Status === "Cancelled") ? 'Cancelled'
                         : (row.Status === "paid" || row.Status === "Paid") ? 'Paid'
                           : (row.Status === "refunded" || row.Status === "Refunded") ? 'Refunded'
@@ -488,7 +493,7 @@ const Orders = () => {
               : (row.Status === "processing" || row.Status === "Processing") ? 'Processing'
                 : (row.Status === "ready for pickup" || row.Status === "Ready for pickup") ? 'Ready for Pickup'
                   : (row.Status === "saved" || row.Status === "Saved") ? 'Saved'
-                    : (row.Status === "completed" || row.Status === "Completed") ? 'Completed'
+                    : (row.Status === "completed" || row.Status === "Completed") ? 'Delivered'
                       : (row.Status === "cancelled" || row.Status === "Cancelled") ? 'Cancelled'
                         : (row.Status === "paid" || row.Status === "Paid") ? 'Paid'
                           : (row.Status === "refunded" || row.Status === "Refunded") ? 'Refunded'

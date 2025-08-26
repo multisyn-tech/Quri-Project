@@ -102,7 +102,7 @@ const List = () => {
                 </ul>
             </div>
             <div className='flex flex-col items-center justify-center mt-4 space-y-3'>
-                <Button2
+                {/* <Button2
                     gradientFrom="#FFF"
                     gradientMid="#FFF"
                     gradientTo="#FFF"
@@ -111,7 +111,7 @@ const List = () => {
                     <div className='flex'>
                         <span>Order more</span>
                     </div>
-                </Button2>
+                </Button2> */}
 
                 {/* <Button
                     gradientFrom="#FF5AA7"

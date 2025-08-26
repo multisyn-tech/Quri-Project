@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Home from '../../components/BillingFuntionality/Dashboard/Home';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +8,9 @@ import { Col, Row } from 'reactstrap';
 import SpinnerComponent from '../../Manage/Fallback-spinner';
 import { getOrdersByTableID, resetCartItems, reset as resetOrders } from '../../features/orders/orderSlice';
 import { v4 as uuidv4 } from "uuid";
-import storeStage from "../../components/utility/storeStage";
+import storeHelpers from "../../components/utility/storeStage";
+import { resetActivity } from '../../features/activity/activitySlice';
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -18,23 +20,26 @@ const HomeScreen = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const qrdetails = useSelector((state) => state.qrcode.qrCodeDetails);
-    const OrderByTableID = useSelector((state) => state.qrcode.ordersByTableID);
+    const OrderByTableID = useSelector((state) => state.qrcode.qrCodeDetails?.data?.TableID);
     const loading12 = useSelector((state) => state.qrcode.loading);
     const error = useSelector((state) => state.qrcode.error);
-
-
+    const { getOrderStatus } = storeHelpers;
+    const [pollingActive, setPollingActive] = useState(true);
+    const [activities, setActivities] = useState([]);
+    const hasFetchedActivities = useRef(false);
 
     useEffect(() => {
         if (qrCode) {
-            dispatch(reset());
-            dispatch(resetOrders());   // Reset Orders state
-            dispatch(resetCartItems());
+            // dispatch(reset());
+            // dispatch(resetOrders());   // Reset Orders state
+            // dispatch(resetCartItems());
 
             dispatch(getQRDetails(qrCode));
+
         }
     }, [qrCode, dispatch]);
 
-    // New useEffect to dispatch getOrdersByTableID after qrDetails is fetched
+    
     useEffect(() => {
         if (!loading12 && qrdetails?.flag === 1) {
             dispatch(getOrdersByTableID(qrdetails?.data?.TableID));
@@ -42,65 +47,85 @@ const HomeScreen = () => {
     }, [qrdetails, dispatch, loading12]);
 
 
-    // useEffect(() => {
-    //     const fetchOrders = async () => {
-    //         await conditionalRedirection()
-    //     }
-    //     // fetchOrders()
-    // }, [])
-
-    // const conditionalRedirection = async () => {
-    //     // console.log("qrdetails", qrdetails)
-    //     // if (['Received', 'Accepted', 'Rejected'].includes(qrdetails.data.orderStatus)) {
-    //     //     navigate('/quri/home/waiting');
-    //     // }
-
-    //     const tableID = qrdetails.data.TableID
-    //     // send rest id as well
-
-    //     try {
-    //         const res = await fetch(`${BASE_URL}/customers/allOrders/${tableID}`);
-    //         if (!res.ok) {
-    //             throw new Error(`HTTP error! Status: ${res.status}`);
-    //         }
-    //         const records = await res.json();
-
-    //         if (['Received', 'Accepted', 'Rejected'].includes(records.order.order.Status)) {
-    //             navigate('/quri/home/waiting');
-    //         } 
-    //         // else if (['Completed'].includes(records.order.order.Status)) {
-    //         //     navigate('/quri/menu/orderPlaced');
-    //         // }
 
 
-    //         // console.log("order by table", records);
-    //     } catch (err) {
-    //         console.error("Error fetching order by table:", err);
-    //     }
 
-    // }
-
-
-    // useEffect(() => {
-    //     // let tableId = qrdetails.data.TableID
-    //     // let restId = qrdetails.data.RestaurantID
-
-    //     // const userId = getOrCreateUserId();
-    //     // storeStage("initial", userId, tableId, restId); 
-    //     // console.log("User ID:", userId);
-
-    // }, [])
-
-
-    function getOrCreateUserId() {
+    const getOrCreateUserId = () => {
         let id = localStorage.getItem("user_id");
+        let tableId = localStorage.getItem("tableId");
+
+        if (OrderByTableID && (tableId == null || tableId === undefined || Number.isNaN(Number(tableId)))) {
+            localStorage.setItem("tableId", OrderByTableID);
+        }
+
         if (!id) {
             id = uuidv4();
             localStorage.setItem("user_id", id);
         }
-        return id;
-    }
 
+        return id;
+    };
+
+    
+    const checkAndRedirect = (stage) => {
+        // console.log("Redirecting based on stage:", stage);
+        if (stage == "created") navigate("/quri/menu/home");
+        if (stage == "checkout" || stage == "confirmed") navigate("/quri/home/bill");
+        if (stage == "paid") navigate("/quri/menu/orderPlaced");
+    };
+
+  
+    const fetchActivities = async () => {
+        const restId = parseInt(localStorage.getItem('RestaurantID'), 10);
+        const tabId = parseInt(localStorage.getItem('tableId'), 10);
+        try {
+            const response = await fetch(`${BASE_URL}/customers/get_all_activity/${restId}/${tabId}`);
+            const data = await response.json();
+            // console.log(data)
+            setActivities(data);
+        } catch (error) {
+            console.error('Error fetching activities:', error);
+        }
+    };
+
+
+
+
+    useEffect(() => {
+
+        getOrCreateUserId();
+    
+        const fetchAndCheckStage = async () => {
+            await fetchActivities(); 
+
+            if (activities.length > 0) {
+                const lastActivity = activities[activities.length - 1];
+                if (lastActivity && lastActivity.stage) {
+                    // console.log(lastActivity.stage);
+                    checkAndRedirect(lastActivity.stage); 
+                }
+            }
+        };
+
+        fetchAndCheckStage(); 
+
+        const pollingInterval = setInterval(() => {
+            if (activities.length === 0) {
+                // console.log("No activities, fetching...");
+                fetchActivities(); 
+            } else {
+                const lastActivity = activities[activities.length - 1];
+                if (lastActivity && lastActivity.stage) {
+                    // console.log("Polling stage:", lastActivity.stage);
+                    checkAndRedirect(lastActivity.stage); 
+                }
+            }
+        }, 3000);
+
+     
+        return () => clearInterval(pollingInterval);
+
+    }, [navigate, activities]); 
 
 
 

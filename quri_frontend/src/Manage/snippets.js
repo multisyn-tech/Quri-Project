@@ -13,17 +13,18 @@ import toast from "react-hot-toast";
 
 export const orderStatusOptions = [
   { label: "Received", value: "received" },
+  { label: "Paid", value: "paid" },
+  { label: "Completed", value: "completed" },
+  // { label: "Cancelled", value: "cancelled" },
+
   // { label: "Accepted", value: "accepted" },
   // { label: "Rejected", value: "rejected" },
   
-  { label: "", value: "completed" , disable:true},
   // { label: "Completed", value: "completed" },
 
   // { label: "Processing", value: "processing" },
   // { label: "Ready for pickup", value: "ready_for_pickup" },
   // { label: "Saved", value: "saved" },
-  // { label: "Cancelled", value: "cancelled" },
-  // { label: "Paid", value: "paid" },
   // { label: "Refunded", value: "refunded" },
 
 ];
