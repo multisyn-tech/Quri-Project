@@ -7,6 +7,7 @@ const {
   AddCustomers,
   getCustomerByIdController,
   editCustomerController,
+  userLogs,
   deleteCustomerController,
   GetAllOrder,
   GetAllOrderByCustomer,
@@ -19,13 +20,15 @@ const {
   getRecentOrder,
   findRejectedOrder,
   saveUserActivity,
+  refreshOrders,
   getAllActivity
 } = require("./controller.js");
 
 const router = express.Router();
 
 // get all activity of user (stages of orders)
-router.get('/get_all_activity', getAllActivity)
+router.get('/get_all_activity/:restId/:tabId', getAllActivity)
+router.get('/user_logs', userLogs)
 
 // Order related
 router.get("/order", GetAllOrder);
@@ -39,11 +42,10 @@ router.get('/allOrders/:tableId', getAllOrdersByTableId);
 router.post('/recent-order', getRecentOrder);
 // Get QrCode
 router.post("/order", AddOrder);
-
 router.post('/order/getID', findOrderID);
-
 router.put("/order/changeStatus/:OrderID", changeOrderStatus);
 
+router.post("/refresh-order", refreshOrders);
 router.put("/order/edit/:OrderID", editOrder);
 router.delete("/order/delete/:OrderID", deleteOrder);
 
@@ -61,9 +63,6 @@ router.get("/menu/:tableId", getMenuByTableIDController);
 // add "insert rejected order", "find rejected order" from restaurant dashboard to table 
 router.post('/order/rejectedOrder', addRejectedOrder);
 router.post('/order/rejectedOrder/:orderId', findRejectedOrder);
-
-
-
 router.post('/activity', saveUserActivity)
 
 

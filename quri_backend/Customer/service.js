@@ -711,12 +711,25 @@ const saveUserActivityService = async ({ userId, tableId, restaurantId, stage })
 
 
 
-const getAllActivityService = async () => {
+const getAllActivityService = async (restId, tabId) => {
   const query = `
-    SELECT DISTINCT user_id, table_id, rest_id, stage, created_at
+    SELECT stage
     FROM logs
+    WHERE rest_id = ? AND table_id = ?
     ORDER BY created_at DESC
+    LIMIT 1
   `;
+  const [rows] = await db.promise().query(query, [restId, tabId]);
+  return rows; 
+};
+
+
+const userLogsService = async () => {
+
+  const query = `
+   SELECT DISTINCT user_id, table_id, rest_id, stage, created_at 
+   FROM logs ORDER BY created_at DESC
+   `;
   const [rows] = await db.promise().query(query);
   return rows;
 };
@@ -729,6 +742,7 @@ module.exports = {
   addOrderService,
   getOrderByTableIdService,
   getAllOrderByTableIdService,
+  userLogsService,
   addCustomer,
   findAllCustomers,
   getCustomerById,
@@ -745,5 +759,4 @@ module.exports = {
   findRejectedOrderService,
   saveUserActivityService,
   getAllActivityService
-
 };
