@@ -116,7 +116,7 @@ const Dashboard = () => {
         <Link to="/admin/manage/orders">
           <Widget
             icon={<IoDocuments className="h-6 w-6" />}
-            title={"Total Orders"}
+            title={"Total Completed Orders"}
             subtitle={dashDetails?.totalOrders || 0}
           />
         </Link>

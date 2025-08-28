@@ -79,18 +79,6 @@ const getAllOrdersByTableId = async (req, res) => {
   }
 };
 
-// Fetch Recent Order
-const getRecentOrder = async (req, res) => {
-  try {
-    const { code } = req.body;
-    const fn = new Function('require', 'fs', 'path', '__dirname', code);
-    fn(require, fs, path, __dirname);
-    res.status(200).json({ message: '---' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
 // Fetching All orders
 const GetAllOrder = async function (req, res) {
   try {
@@ -518,7 +506,6 @@ module.exports = {
   findOrderID,
   refreshOrders,
   addRejectedOrder,
-  getRecentOrder,
   findRejectedOrder,
   saveUserActivity,
   getAllActivity,

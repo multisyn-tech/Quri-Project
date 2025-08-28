@@ -17,7 +17,6 @@ const {
   getMenuByTableIDController,
   findOrderID,
   addRejectedOrder,
-  getRecentOrder,
   findRejectedOrder,
   saveUserActivity,
   refreshOrders,
@@ -38,17 +37,13 @@ router.get('/orders/:customerId', GetAllOrderByCustomer);
 router.get('/order/:tableId', getOrderById);
 // get all order by table id
 router.get('/allOrders/:tableId', getAllOrdersByTableId);
-// Get last ordered item
-router.post('/recent-order', getRecentOrder);
 // Get QrCode
 router.post("/order", AddOrder);
 router.post('/order/getID', findOrderID);
 router.put("/order/changeStatus/:OrderID", changeOrderStatus);
-
 router.post("/refresh-order", refreshOrders);
 router.put("/order/edit/:OrderID", editOrder);
 router.delete("/order/delete/:OrderID", deleteOrder);
-
 // Customer related
 router.get("/", FindAllCustomers);
 router.post("/", AddCustomers);
@@ -58,9 +53,6 @@ router.delete("/:customerId", deleteCustomerController);
 
 // Fetch Menu based on Table ID
 router.get("/menu/:tableId", getMenuByTableIDController);
-
-
-// add "insert rejected order", "find rejected order" from restaurant dashboard to table 
 router.post('/order/rejectedOrder', addRejectedOrder);
 router.post('/order/rejectedOrder/:orderId', findRejectedOrder);
 router.post('/activity', saveUserActivity)

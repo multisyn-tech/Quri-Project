@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-
+const cron = require("node-cron");
 dotenv.config();
 const secretKey = process.env.JWT_SECRET;
 const localURL = process.env.LOCAL_URL;
@@ -92,6 +92,7 @@ const login = async (username, password) => {
     if (!passwordMatch) {
       throw new Error("Invalid password or email");
     }
+
 
     // Generate a JWT token with RestaurantID
     const token = jwt.sign(
@@ -329,6 +330,19 @@ const resendVerificationEmail = async (username) => {
     throw error;
   }
 };
+
+// cron.schedule("0 0 * * *", async () => {
+//   const [admins] = await db.promise().query("SELECT RestaurantID FROM restaurantadmins");
+  
+//   console.log(admins)
+  
+//   for (const admin of admins) {
+//     await db
+//       .promise()
+//       .query("UPDATE logs SET stage='completed' WHERE rest_id=?", [admin.RestaurantID]);
+//   }
+// });
+
 
 module.exports = {
   login,

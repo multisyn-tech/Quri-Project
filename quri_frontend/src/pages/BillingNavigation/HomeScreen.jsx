@@ -39,7 +39,7 @@ const HomeScreen = () => {
         }
     }, [qrCode, dispatch]);
 
-    
+
     useEffect(() => {
         if (!loading12 && qrdetails?.flag === 1) {
             dispatch(getOrdersByTableID(qrdetails?.data?.TableID));
@@ -54,7 +54,13 @@ const HomeScreen = () => {
         let id = localStorage.getItem("user_id");
         let tableId = localStorage.getItem("tableId");
 
-        if (OrderByTableID && (tableId == null || tableId === undefined || Number.isNaN(Number(tableId)))) {
+        // console.log(OrderByTableID)
+
+        // if (OrderByTableID && (tableId == null || tableId === undefined || Number.isNaN(Number(tableId)))) {
+        //     localStorage.setItem("tableId", OrderByTableID);
+        // }
+
+        if (OrderByTableID) {
             localStorage.setItem("tableId", OrderByTableID);
         }
 
@@ -66,7 +72,7 @@ const HomeScreen = () => {
         return id;
     };
 
-    
+
     const checkAndRedirect = (stage) => {
         // console.log("Redirecting based on stage:", stage);
         if (stage == "created") navigate("/quri/menu/home");
@@ -74,10 +80,11 @@ const HomeScreen = () => {
         if (stage == "paid") navigate("/quri/menu/orderPlaced");
     };
 
-  
+
     const fetchActivities = async () => {
         const restId = parseInt(localStorage.getItem('RestaurantID'), 10);
         const tabId = parseInt(localStorage.getItem('tableId'), 10);
+        // console.log(restId, tabId)
         try {
             const response = await fetch(`${BASE_URL}/customers/get_all_activity/${restId}/${tabId}`);
             const data = await response.json();
@@ -91,41 +98,79 @@ const HomeScreen = () => {
 
 
 
+    // useEffect(() => {
+
+    //     getOrCreateUserId();
+
+    //     const fetchAndCheckStage = async () => {
+    //         await fetchActivities();
+
+    //         if (activities.length > 0) {
+    //             const lastActivity = activities[activities.length - 1];
+    //             if (lastActivity && lastActivity.stage) {
+    //                 // console.log(lastActivity.stage);
+    //                 checkAndRedirect(lastActivity.stage);
+    //             }
+    //         }
+    //     };
+
+    //     fetchAndCheckStage();
+
+    //     const pollingInterval = setInterval(() => {
+    //         if (activities.length === 0) {
+    //             // console.log("No activities, fetching...");
+    //             fetchActivities();
+    //         } else {
+    //             const lastActivity = activities[activities.length - 1];
+    //             if (lastActivity && lastActivity.stage) {
+    //                 // console.log("Polling stage:", lastActivity.stage);
+    //                 checkAndRedirect(lastActivity.stage);
+    //             }
+    //         }
+    //     }, 3000);
+
+
+    //     return () => clearInterval(pollingInterval);
+
+    // }, [navigate, activities]);
+
+
+
+
+
     useEffect(() => {
+        getOrCreateUserId(); // always updates tableId immediately
 
-        getOrCreateUserId();
-    
         const fetchAndCheckStage = async () => {
-            await fetchActivities(); 
+            await fetchActivities();
 
-            if (activities.length > 0) {
-                const lastActivity = activities[activities.length - 1];
-                if (lastActivity && lastActivity.stage) {
-                    // console.log(lastActivity.stage);
-                    checkAndRedirect(lastActivity.stage); 
+            // Wait 1 second before checking stage (prevents instant redirect)
+            setTimeout(() => {
+                if (activities.length > 0) {
+                    const lastActivity = activities[activities.length - 1];
+                    if (lastActivity && lastActivity.stage) {
+                        checkAndRedirect(lastActivity.stage);
+                    }
                 }
-            }
+            }, 1000);
         };
 
-        fetchAndCheckStage(); 
+        fetchAndCheckStage();
 
         const pollingInterval = setInterval(() => {
             if (activities.length === 0) {
-                // console.log("No activities, fetching...");
-                fetchActivities(); 
+                fetchActivities();
             } else {
                 const lastActivity = activities[activities.length - 1];
                 if (lastActivity && lastActivity.stage) {
-                    // console.log("Polling stage:", lastActivity.stage);
-                    checkAndRedirect(lastActivity.stage); 
+                    checkAndRedirect(lastActivity.stage);
                 }
             }
         }, 3000);
 
-     
         return () => clearInterval(pollingInterval);
+    }, [navigate, activities]);
 
-    }, [navigate, activities]); 
 
 
 

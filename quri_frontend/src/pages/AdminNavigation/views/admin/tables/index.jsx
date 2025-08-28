@@ -27,7 +27,7 @@ const Orders = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   // const [showModal, setShowModal] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(true);
 
   const [rejectedModal, setRejectedModal] = useState({});
   const [rejectedItems, setRejectedItems] = useState({});
@@ -207,8 +207,8 @@ const Orders = () => {
           //   isAudioUnlocked.current
           // ) {
 
-          // audioRef.current.loop = true; // Enable looping
-          // audioRef.current.play().catch((err) => console.error("Audio play error:", err));
+          //   audioRef.current.loop = true; // Enable looping
+          //   audioRef.current.play().catch((err) => console.error("Audio play error:", err));
 
           // }
 
@@ -217,7 +217,23 @@ const Orders = () => {
           //   audioRef.current.currentTime = 0;
           // }
 
-          prevOrderCountRef.current = data.orders.length;
+          // prevOrderCountRef.current = data.orders.length;
+
+
+          // ---
+          if (
+            ["Paid"].includes(newOrderStatus) &&
+            isAudioUnlocked.current
+          ) {
+            audioRef.current.loop = true; // Enable looping
+            audioRef.current.play().catch((err) => console.error("Audio play error:", err));
+          }
+
+          if (["Completed"].includes(newOrderStatus) && !audioRef.current.paused) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
+
           setLoading(false);
         })
         .catch((error) => {
@@ -347,45 +363,6 @@ const Orders = () => {
 
     setLoader(false); // hide spinner
   };
-
-
-
-
-  // const getData = () => {
-  //   setLoading(true);
-  //   let obj = {
-  //     page: '1',
-  //     limit: '1000',
-  //     search: ''
-  //   };
-  //   //console.log('called')
-  //   //  dispatch(getOrders(obj));
-  //   return dispatch(getOrders(obj))
-  //     .unwrap()
-  //     .then((data) => {
-
-
-  //       if (
-  //         prevOrderCountRef.current !== null &&
-  //         data.orders.length > prevOrderCountRef.current &&
-  //         isAudioUnlocked.current
-  //       ) {
-  //         audioRef.current.play();
-  //       }
-
-  //       prevOrderCountRef.current = data.orders.length;
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching orders:", error);
-  //       setErrorMessage(error.message);
-  //       setLoading(false);
-  //     })
-  //     .finally(() => {
-  //       setLoading(false); // Always stop loading regardless of success/fail
-  //     });;
-  // };
-
 
 
 

