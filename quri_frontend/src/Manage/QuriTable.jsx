@@ -135,7 +135,8 @@ const QuriTable = ({ propsData, columns, tableData = [], name, setTableData }) =
           }))}
           data={searchValue.length ? filteredData : [...tableData].reverse()}
           pagination
-          paginationRowsPerPageOptions={[10, 15, 25, 50, 100]}
+          paginationPerPage={25} // item per page
+          paginationRowsPerPageOptions={[20, 15, 25, 50, 100]}
           sortIcon={<ChevronDown size={10} />}
           onChangeRowsPerPage={(currentRowsPerPage, currentPage) => handlePagination(currentPage, currentRowsPerPage)}
           onChangePage={(currentPage) => handlePagination(currentPage, 10)}

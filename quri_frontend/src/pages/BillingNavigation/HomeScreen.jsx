@@ -47,23 +47,15 @@ const HomeScreen = () => {
     }, [qrdetails, dispatch, loading12]);
 
 
-
+    useEffect(() => {
+        if (OrderByTableID) {
+            localStorage.setItem("tableId", OrderByTableID);
+        }
+    }, [OrderByTableID]);
 
 
     const getOrCreateUserId = () => {
         let id = localStorage.getItem("user_id");
-        let tableId = localStorage.getItem("tableId");
-
-        // console.log(OrderByTableID)
-
-        // if (OrderByTableID && (tableId == null || tableId === undefined || Number.isNaN(Number(tableId)))) {
-        //     localStorage.setItem("tableId", OrderByTableID);
-        // }
-
-        if (OrderByTableID) {
-            localStorage.setItem("tableId", OrderByTableID);
-        }
-
         if (!id) {
             id = uuidv4();
             localStorage.setItem("user_id", id);
@@ -136,40 +128,56 @@ const HomeScreen = () => {
 
 
 
+    // 👇 This effect ONLY runs when a new QR code resolves to a TableID
+
+
+
 
 
     useEffect(() => {
-        getOrCreateUserId(); // always updates tableId immediately
+        if (OrderByTableID) {
+            localStorage.setItem("tableId", OrderByTableID);
+          
+            fetchActivities().then(() => {
+                setTimeout(() => {
+                    setActivities((prev) => {
+                        if (prev.length > 0) {
+                            const lastActivity = prev[prev.length - 1];
+                            if (lastActivity?.stage) {
+                                checkAndRedirect(lastActivity.stage);
+                            }
+                        }
+                        return prev;
+                    });
+                }, 1000);
+            });
+        }
+    }, [OrderByTableID]);
 
-        const fetchAndCheckStage = async () => {
-            await fetchActivities();
 
-            // Wait 1 second before checking stage (prevents instant redirect)
-            setTimeout(() => {
-                if (activities.length > 0) {
-                    const lastActivity = activities[activities.length - 1];
-                    if (lastActivity && lastActivity.stage) {
+    useEffect(() => {
+        getOrCreateUserId();
+
+        const pollingInterval = setInterval(() => {
+            setActivities((prev) => {
+                if (prev.length === 0) {
+                    fetchActivities();
+                } else {
+                    const lastActivity = prev[prev.length - 1];
+                    if (lastActivity?.stage) {
                         checkAndRedirect(lastActivity.stage);
                     }
                 }
-            }, 1000);
-        };
-
-        fetchAndCheckStage();
-
-        const pollingInterval = setInterval(() => {
-            if (activities.length === 0) {
-                fetchActivities();
-            } else {
-                const lastActivity = activities[activities.length - 1];
-                if (lastActivity && lastActivity.stage) {
-                    checkAndRedirect(lastActivity.stage);
-                }
-            }
+                return prev;
+            });
         }, 3000);
 
         return () => clearInterval(pollingInterval);
-    }, [navigate, activities]);
+    }, [navigate]);
+
+
+
+
 
 
 
