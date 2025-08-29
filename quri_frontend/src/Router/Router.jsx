@@ -113,6 +113,7 @@ const ThemeRoutes = [
  
   {
     path: "/quri",
+    
     // element: <MenuPrivateRoutes ><Outlet /></MenuPrivateRoutes>,
     children: [
       { path: "home/:qrCode", exact: true, element: <HomeScreen /> },

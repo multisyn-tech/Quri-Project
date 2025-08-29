@@ -3,7 +3,6 @@ const {
   Login,
   Register,
   restaurantRegisteration,
-
   fetchAllRestaurantsMenus,
   getAllRestaurantOrdersController,
   fetchMenuByRestaurantIDController,
