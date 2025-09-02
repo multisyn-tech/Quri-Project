@@ -18,7 +18,6 @@ const AddingTip = ({ total, onShowBill }) => {
   const [customTipAmount, setCustomTipAmount] = useState(0);
   const [plateNumber, setPlateNumber] = useState('');
   const [debouncedPlate, setDebouncedPlate] = useState('');
-
   const [tipsAvailable, setTipsAvailable] = useState(true);
 
   const [isClicked, setIsClicked] = useState(false);
@@ -26,6 +25,8 @@ const AddingTip = ({ total, onShowBill }) => {
   const [selectedRating, setSelectedRating] = useState(0);
 
   const orderInfo = useSelector((state) => state.orders?.order?.order?.order || []);
+
+  const type = useSelector((state) => state.qrcode.qrCodeDetails.data.Type);
 
 
   const handleStarClick = (index) => {
@@ -249,20 +250,25 @@ const AddingTip = ({ total, onShowBill }) => {
             </div>
           </div> */}
 
-
-          {/* plate number */}
-          <div className='my-5'>
-            <h1 className='font-medium text-xl '>Enter your plate number</h1>
-            <input
-              className='my-1 py-3 px-2 w-full border-2'
-              type="text"
-              value={plateNumber || ''}
-              // onChange={(e) => setPlateNumber(e.target.value)}
-              onChange={handlePlateChange}
-              required
-              placeholder='Enter your car plate number i.e. AXD-144'
-            />
-          </div>
+          {type == 'take-away' ?
+            <>
+              {/* plate number */}
+              <div className='my-5'>
+                <h1 className='font-medium text-xl '>Enter your plate number</h1>
+                <input
+                  className='my-1 py-3 px-2 w-full border-2'
+                  type="text"
+                  value={plateNumber || ''}
+                  // onChange={(e) => setPlateNumber(e.target.value)}
+                  onChange={handlePlateChange}
+                  required
+                  placeholder='Enter your car plate number i.e. AXD-144'
+                />
+              </div>
+            </>
+            :
+            <></>
+          }
 
         </div>
       </div>

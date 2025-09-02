@@ -36,6 +36,8 @@ const Dashboard = () => {
   const dispatch = useDispatch()
   const dashDetails = useSelector(state=>state.dashboard.dashboardDetails)
 
+  console.log("dashboard details:", dashDetails)
+
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
 

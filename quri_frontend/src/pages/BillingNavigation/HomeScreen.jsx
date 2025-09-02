@@ -24,7 +24,6 @@ const HomeScreen = () => {
     const loading12 = useSelector((state) => state.qrcode.loading);
     const error = useSelector((state) => state.qrcode.error);
     const { getOrderStatus } = storeHelpers;
-    const [pollingActive, setPollingActive] = useState(true);
     const [activities, setActivities] = useState([]);
     const hasFetchedActivities = useRef(false);
 
@@ -38,6 +37,20 @@ const HomeScreen = () => {
 
         }
     }, [qrCode, dispatch]);
+
+
+    useEffect(() => {
+        let previousCode = qrdetails.data.QRCode;
+        let presentCode = qrCode;
+
+        // console.log("previous code: ",qrdetails.data.QRCode);
+        // console.log("present code : ",qrCode);
+
+        if (previousCode != presentCode) {
+            dispatch(resetCartItems());
+        }
+
+    }, [])
 
 
     useEffect(() => {
@@ -131,13 +144,10 @@ const HomeScreen = () => {
     // 👇 This effect ONLY runs when a new QR code resolves to a TableID
 
 
-
-
-
     useEffect(() => {
         if (OrderByTableID) {
             localStorage.setItem("tableId", OrderByTableID);
-          
+
             fetchActivities().then(() => {
                 setTimeout(() => {
                     setActivities((prev) => {
@@ -174,12 +184,6 @@ const HomeScreen = () => {
 
         return () => clearInterval(pollingInterval);
     }, [navigate]);
-
-
-
-
-
-
 
 
 

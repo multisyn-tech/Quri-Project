@@ -16,8 +16,6 @@ import QuriFee from '../Billing/QuriFee';
 const TotalBill = () => {
 
     const orderDetails = useSelector((state) => state.orders?.order?.order?.orderDetails || []);
-
-
     // console.log("order details: ",orderDetails)
 
     const [isQuriFeeVisible, setIsQuriFeeVisible] = useState(false);
