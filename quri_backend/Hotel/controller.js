@@ -50,9 +50,6 @@ const AddTable = async (req, res) => {
     }
 
     const RestaurantID = decodedToken.restaurantId;
-
-    console.log("RestaurantID ", RestaurantID);
-
     const table = await addTableService({ ...req.body, RestaurantID });
 
     return res.status(200).json({ message: "Table added successfully" });

@@ -43,7 +43,8 @@ const generateRandomRestaurantName = () => {
 const validStatus = ["Active", "Inactive"];
 
 const addTableService = async (data) => {
-  const { RestaurantID, QRCode } = data;
+  const { RestaurantID, QRCode, Type } = data;
+
   try {
     // Check if RestaurantID exists
     const [restaurant] = await db
@@ -58,9 +59,10 @@ const addTableService = async (data) => {
     // Proceed with inserting the table
     await db
       .promise()
-      .query(`INSERT INTO tables (RestaurantID, QRCode) VALUES(?, ?)`, [
+      .query(`INSERT INTO tables (RestaurantID, QRCode, Type) VALUES(?, ?, ?)`, [
         RestaurantID,
         QRCode,
+        Type
       ]);
     return true;
   } catch (error) {
@@ -682,7 +684,7 @@ const editMenuService = async (restaurantId, MenuID, data, file) => {
   }
 
   try {
-    
+
     const [categories] = await db
       .promise()
       .query(
@@ -702,15 +704,15 @@ const editMenuService = async (restaurantId, MenuID, data, file) => {
       );
 
     if (menu.length === 0) {
-      return false; 
+      return false;
     }
 
     let imageUrl = null;
     if (file) {
-    
+
       imageUrl = `food-uploads/${path.basename(file.path)}`;
     } else if (Image && Image.trim() !== '') {
- 
+
       imageUrl = Image;
     }
 
@@ -728,7 +730,7 @@ const editMenuService = async (restaurantId, MenuID, data, file) => {
 
     const [result] = await db.promise().query(query, queryParams);
 
-    return result.affectedRows > 0; 
+    return result.affectedRows > 0;
   } catch (error) {
     console.error('Error executing query:', error.message);
     throw new Error(error.message);
@@ -739,7 +741,7 @@ const editMenuService = async (restaurantId, MenuID, data, file) => {
 
 const editMenuStatusService = async (restaurantId, MenuID, MenuStatus) => {
   try {
-   
+
     const [menu] = await db
       .promise()
       .query(
@@ -753,7 +755,7 @@ const editMenuStatusService = async (restaurantId, MenuID, MenuStatus) => {
       throw new Error('MenuStatus must be "active" or "inactive"');
     }
 
-  
+
     const [result] = await db
       .promise()
       .query(
@@ -764,13 +766,13 @@ const editMenuStatusService = async (restaurantId, MenuID, MenuStatus) => {
       );
 
     if (result.affectedRows === 0) {
-      return false; 
+      return false;
     }
 
-    return true; 
+    return true;
   } catch (error) {
     console.error('Error in editMenuStatusService:', error.message);
-    throw error; 
+    throw error;
   }
 };
 
@@ -1092,26 +1094,24 @@ const deleteCategoryService = async (CategoryID) => {
 
 const FetchQRCodeService = async (QRCode) => {
   try {
-    // Query to check if QRCode exists and fetch TableID and RestaurantID
+
     const [rows] = await db
       .promise()
-      .query(`SELECT TableID, RestaurantID FROM tables WHERE QRCode = ?`, [
+      .query(`SELECT TableID, RestaurantID,Type FROM tables WHERE QRCode = ?`, [
         QRCode,
       ]);
 
-    // Check if any row is returned, meaning the QR code is valid
+
     if (rows.length > 0) {
-      const { TableID, RestaurantID } = rows[0];
+      const { TableID, RestaurantID, Type } = rows[0];
 
       // Now that the QR code is valid, fetch the settings based on RestaurantID
       const [settingsRows] = await db
         .promise()
         .query(`SELECT * FROM settings WHERE RestaurantID = ?`, [RestaurantID]);
 
-      // Store the settings data
       const settingsData = settingsRows.length > 0 ? settingsRows : [];
 
-      // Query to check if TableID exists in orders and fetch its status
       const [orderRows] = await db
         .promise()
         .query(
@@ -1122,7 +1122,7 @@ const FetchQRCodeService = async (QRCode) => {
       if (orderRows.length > 0) {
         const { OrderID, status: orderStatus } = orderRows[0];
 
-        // Determine if the order is new or existing
+        
         if (orderStatus === "completed" || orderStatus === "cancelled") {
           // The order is new
           return {
@@ -1132,6 +1132,7 @@ const FetchQRCodeService = async (QRCode) => {
             data: {
               QRCode,
               TableID,
+              Type,
               RestaurantID,
               settings: settingsData, // Include settings data
             },
@@ -1145,6 +1146,7 @@ const FetchQRCodeService = async (QRCode) => {
             data: {
               QRCode,
               TableID,
+              Type,
               RestaurantID,
               OrderID,
               orderStatus,
@@ -1161,6 +1163,7 @@ const FetchQRCodeService = async (QRCode) => {
           data: {
             QRCode,
             TableID,
+            Type,
             RestaurantID,
             settings: settingsData, // Include settings data
           },

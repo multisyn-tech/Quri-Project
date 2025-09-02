@@ -79,7 +79,7 @@
       query: `
         SELECT COUNT(*) as total_orders
         FROM orders
-        WHERE RestaurantID = ?;
+        WHERE RestaurantID = ? AND Status="Completed";
       `,
       params: (RestaurantID) => [RestaurantID],
     },
