@@ -25,6 +25,12 @@ const {
   fetchQRCodeDetailsController,
   fetchPopularDishesController,
   editMenuStatus,
+  getAllUnits,
+  getAllAddons,
+  addUnit,
+  addAddon,
+  deleteAddon,
+  updateAddon
 } = require("./controller.js");
 
 const uploadFoodImage = require('../middleWare/foodUpload.js');
@@ -52,6 +58,12 @@ router.get("/menu/:MenuId", getMenuItem);
 router.put("/menu/edit/:MenuID", uploadFoodImage.single('image'), editMenu);
 router.delete("/menu/delete/:MenuID", deleteMenu);
 router.put("/menu/status/:MenuID",  editMenuStatus);
+router.post('/menu/add-unit', addUnit);
+router.post('/menu/add-addon', addAddon);
+router.post('/menu/getunits', getAllUnits);
+router.post('/menu/getaddons', getAllAddons);
+router.delete('/menu/deleteAddon', deleteAddon);
+router.put('/menu/update-addon', updateAddon);
 // Order Details
 router.post("/orderdetails", addOrderDetail);
 router.get("/orderdetails/:OrderID", getAllOrderDetails);

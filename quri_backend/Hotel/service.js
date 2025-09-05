@@ -956,6 +956,84 @@ const removeOrderDetailService = async (OrderDetailID) => {
   }
 };
 
+
+
+const addUnitService = async (name, restId) => {
+  try {
+    await db.query(`INSERT INTO units (name, restId) VALUES (?,?)`, [name, restId]);
+    const [rows] = await db.promise().query("SELECT * FROM units");
+    return rows;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+
+const addAddonService = async (restId, name, unit, price, description) => {
+  try {
+    await db.query(`INSERT INTO addons (name, unit, price, description, restId) VALUES (?,?,?,?,?)`,
+      [name, unit, price, description, restId]
+    );
+    const [rows] = await db.promise().query("SELECT * FROM addons WHERE restId = ?", [restId]);
+    return rows;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+
+
+const getUnitsService = async (restId) => {
+  try {
+    const [rows] = await db.promise().query(`SELECT * from units WHERE restId = ?`, [restId]);
+    return rows
+  }
+  catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+
+const getAddonsService = async (restId) => {
+  try {
+    const [rows] = await db.promise().query(`SELECT * from addons WHERE restId = ?`, [restId]);
+    return rows
+  }
+  catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+
+const deleteAddonService = async (id) => {
+  try {
+    const [rows] = await db.promise().query(`DELETE from addons WHERE id = ?`, [id]);
+    return true
+  }
+  catch (err) {
+    throw new Error(err.message)
+  }
+}
+
+const updateAddonService = async (id, name, unit, price, description, restId) => {
+  try {
+    const [result] = await db.promise().query(
+      `UPDATE addons 
+       SET name = ?, unit = ?, price = ?, description = ? 
+       WHERE id = ? AND restId = ?`,
+      [name, unit, price, description, id, restId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: "Addon not found" });
+    }
+    return true
+  } catch (err) {
+    console.error("Error updating addon:", err);
+    return false;
+  }
+}
+
 /**
  * Category Logic
  */
@@ -1122,7 +1200,7 @@ const FetchQRCodeService = async (QRCode) => {
       if (orderRows.length > 0) {
         const { OrderID, status: orderStatus } = orderRows[0];
 
-        
+
         if (orderStatus === "completed" || orderStatus === "cancelled") {
           // The order is new
           return {
@@ -1280,6 +1358,12 @@ module.exports = {
   removeOrderDetailService,
   addCategoryService,
   fetchAllCategoriesService,
+  addUnitService,
+  addAddonService,
+  getUnitsService,
+  getAddonsService,
+  deleteAddonService,
+  updateAddonService,
   editCategoryService,
   deleteCategoryService,
   FetchQRCodeService,

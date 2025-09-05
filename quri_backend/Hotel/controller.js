@@ -19,6 +19,12 @@ const {
   editOrderDetailService,
   removeOrderDetailService,
   addCategoryService,
+  addAddonService,
+  addUnitService,
+  getUnitsService,
+  getAddonsService,
+  deleteAddonService,
+  updateAddonService,
   fetchAllCategoriesService,
   editCategoryService,
   deleteCategoryService,
@@ -505,7 +511,7 @@ const getAllOrderDetails = async (req, res) => {
 
 
 const refreshOrders = async (req, res) => {
-  const { id } = req.body;  
+  const { id } = req.body;
 
   if (!id) {
     return res.status(400).json({ error: 'id is required' });
@@ -615,6 +621,87 @@ const fetchAllCategories = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch categories" });
   }
 };
+
+
+
+const addUnit = async (req, res) => {
+  try {
+    const { name, restId } = req.body || {};
+    if (!name) return res.status(400).json({ message: "name is required" });
+    const rows = await addUnitService(name, restId);
+    return res.status(200).json({ success: true, data: rows });
+  } catch (error) {
+    console.error("add unit error:", error);
+    return res.status(500).json({ message: error.message || "Error" });
+  }
+};
+
+const addAddon = async (req, res) => {
+  try {
+    const { restId, name, unit, price, description } = req.body;
+    const rows = await addAddonService(restId, name, unit, price, description);
+    return res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error("add addon error:", err);
+    return res.status(500).json({ message: err.message || "Error" });
+  }
+}
+
+const getAllUnits = async (req, res) => {
+  try {
+    const { restId } = req.body;
+
+    if (!restId) {
+      return res.status(400).json({ success: false, message: "restId is required" });
+    }
+    const rows = await getUnitsService(restId);
+    // console.log(rows)
+    return res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error("getUnits error:", err.message);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const deleteAddon = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const rows = await deleteAddonService(id);
+    return res.status(200).json({ success: true });
+
+  } catch (err) {
+    return res.status(500).json({ success: false });
+  }
+}
+
+
+
+const getAllAddons = async (req, res) => {
+  try {
+    const { restId } = req.body;
+    const rows = await getAddonsService(restId);
+    // console.log(rows)
+    return res.status(200).json({ success: true, data: rows });
+  } catch (err) {
+    console.error("get addons error:", err.message);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+const updateAddon = async (req, res) => {
+
+  try {
+    const { id, name, unit, price, description, restId } = req.body;
+    const rows = await updateAddonService(id, name, unit, price, description, restId);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("edit addons error:", error.message);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+
+
+}
+
 
 // Edit a category
 const editCategory = async (req, res) => {
@@ -746,4 +833,10 @@ module.exports = {
   fetchQRCodeDetailsController,
   fetchPopularDishesController,
   editMenuStatus,
+  addUnit,
+  addAddon,
+  getAllAddons,
+  getAllUnits,
+  deleteAddon,
+  updateAddon,
 };
